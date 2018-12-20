@@ -1,11 +1,47 @@
 {
   "pages": [
     "pages/index/main",
-    "pages/logs/main"  ],
+    "pages/duobao/main",
+    "pages/invite/main",
+    "pages/mine/main"
+  ],
   "window": {
     "backgroundTextStyle": "light",
     "navigationBarBackgroundColor": "#fff",
-    "navigationBarTitleText": "WeChat",
-    "navigationBarTextStyle": "black"
+    "navigationBarTitleText": "步数换",
+    "enablePullDownRefresh": false,
+    "onReachBottomDistance": 150,
+    "navigationStyle": "custom"
+  },
+  "tabBar": {
+    "color": "#2E3135",
+    "selectedColor": "#7C54FF",
+    "backgroundColor": "#fff",
+    "list": [
+      {
+        "pagePath": "pages/index/main",
+        "text": "首页",
+        "iconPath": "/static/images/tab/home.png",
+        "selectedIconPath": "/static/images/tab/home_selected.png"
+      },
+      {
+        "pagePath": "pages/duobao/main",
+        "text": "夺宝",
+        "iconPath": "/static/images/tab/giveMall.png",
+        "selectedIconPath": "/static/images/tab/giveMall_selected.png"
+      },
+      {
+        "pagePath": "pages/invite/main",
+        "text": "好友加成",
+        "iconPath": "/static/images/tab/invite.png",
+        "selectedIconPath": "/static/images/tab/invite_selected.png"
+      },
+      {
+        "pagePath": "pages/mine/main",
+        "text": "我的",
+        "iconPath": "/static/images/tab/mine.png",
+        "selectedIconPath": "/static/images/tab/mine_selected.png"
+      }
+    ]
   }
 }
