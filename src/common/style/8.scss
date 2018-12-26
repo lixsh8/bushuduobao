@@ -1,0 +1,33 @@
+form._b562ac6 {
+    overflow: visible;
+}
+
+button._b562ac6 {
+    position: static;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: content-box;
+    font-size: 18px;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1;
+    border-radius: 0;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    color: #000000;
+    background-color: transparent;
+    text-align: left;
+    overflow: visible;
+}
+
+button._b562ac6::before,button._b562ac6::after {
+    content: '';
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 0;
+    height: 0;
+    display: none;
+}

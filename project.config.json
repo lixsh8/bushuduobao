@@ -10,8 +10,8 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx4d822debd05bd127",
-	"projectname": "%E7%AB%8B%E5%87%8F%E8%B4%AD",
+	"appid": "wxde7177077fe19036",
+	"projectname": "%E6%AD%A5%E6%95%B0%E5%AE%9D",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 6,
 			"list": [
 				{
 					"id": 0,
@@ -39,21 +39,21 @@
 					"query": ""
 				},
 				{
-					"id": -1,
-					"name": "商品详情",
-					"pathName": "pages/goodsDetail/main",
+					"id": 1,
+					"name": "好友加成",
+					"pathName": "pages/invite/main",
 					"query": ""
 				},
 				{
-					"id": -1,
-					"name": "专题页",
-					"pathName": "pages/zhuanti/main",
+					"id": 2,
+					"name": "我的",
+					"pathName": "pages/mine/main",
 					"query": ""
 				},
 				{
-					"id": -1,
-					"name": "红包页",
-					"pathName": "pages/pack/main",
+					"id": 3,
+					"name": "广告福利",
+					"pathName": "pages/welfare_ad/main",
 					"query": ""
 				},
 				{
@@ -61,6 +61,18 @@
 					"name": "首页",
 					"pathName": "pages/index/main",
 					"query": "id=1"
+				},
+				{
+					"id": 5,
+					"name": "我的订单",
+					"pathName": "pages/order/main",
+					"query": ""
+				},
+				{
+					"id": 6,
+					"name": "商品詳情",
+					"pathName": "pages/goods_detail/main",
+					"query": ""
 				}
 			]
 		}

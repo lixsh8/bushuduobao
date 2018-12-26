@@ -5,6 +5,10 @@
       :headerBackground="headerBackground"
       :titleColor="titleColor"
     />
+    <!-- <button
+      open-type="getUserInfo"
+      @getuserinfo="bindGetUserInfo"
+    >授权登录</button> -->
 
     <div class="page">
       <!-- top -->
@@ -17,7 +21,7 @@
         </div>
         <!-- 总共多少金币 -->
         <div
-          bindtap="goStepDetail"
+          @click="goStepDetail"
           class="powerCoin"
         >
           <text class="agentCoinInteger">10</text>
@@ -25,7 +29,7 @@
         </div>
         <!-- 挂着的金币 -->
         <div
-          bindtap="handlePrize"
+          @click="handlePrize"
           class="prize-common"
           :class="item.className"
           :data-wpyhandleprize-a="item"
@@ -41,7 +45,7 @@
         </div>
         <!-- 分享金币 -->
         <button
-          bindtap="$RunningTopArea$shareGroup"
+          @click="$RunningTopArea$shareGroup"
           class="share-group"
           data-type="1"
           hoverClass="none"
@@ -52,7 +56,7 @@
         </button>
         <!-- 赚步数币 -->
         <div
-          bindtap="$RunningTopArea$navToAdv"
+          @click="$RunningTopArea$navToAdv"
           class="adv-prize prize-common"
         >
           <div class="prize-common-num">10<text>币</text>
@@ -62,7 +66,7 @@
         <!-- 领取 -->
         <div
           animation="centerAnim"
-          bindtap="$RunningTopArea$exchangeCoinTwo"
+          @click="$RunningTopArea$exchangeCoinTwo"
           class="centerData"
         >
           <div class="centerData-nickName">未兑换步数</div>
@@ -70,19 +74,19 @@
           </div>
           <div class="centerData-stepTips">每日24点步数清零</div>
           <div
-            bindtap="$RunningTopArea$logClick"
+            @click="getWeRunData"
             class="centerData-stepBottom"
             v-if="totalStep==0"
-          >{{$RunningTopArea$loadingWeRunData?'正在获取...':'获取最新微信步数'}}</div>
+          >{{loadingWeRunData?'正在获取...':'获取最新微信步数'}}</div>
           <div
-            bindtap="$RunningTopArea$exchangeClick"
+            @click="$RunningTopArea$exchangeClick"
             class="centerData-stepBottom breathe-btn"
             wx:else
           >点击兑换成步数币</div>
         </div>
         <!-- 邀请按钮 -->
         <button
-          bindtap="$RunningTopArea$inviteNew"
+          @click="$RunningTopArea$inviteNew"
           class="inviteNew"
           data-type="0"
           openType="share"
@@ -91,7 +95,7 @@
         </button>
         <div class="middleArea">
           <div
-            bindtap="$RunningTopArea$handleCardBtn"
+            @click="$RunningTopArea$handleCardBtn"
             class="card"
             data-wpyhandlecardbtn-a="item"
             v-for="(item, index) in cardsList"
@@ -106,7 +110,7 @@
           </div>
         </div>
         <div
-          bindtap="$RunningTopArea$beginChallenge"
+          @click="beginChallenge"
           class="activity-challenge"
           v-if="newUserChallengeBanner"
         >
@@ -125,7 +129,7 @@
         <div class="head _b790fd0">
           <div class="title _b790fd0">{{newUserZoneInfo.name}}</div>
           <div
-            bindtap="$NewUserZone$goActivity"
+            @click="$NewUserZone$goActivity"
             class="more _b790fd0"
             data-wpygoactivity-a="newUserZoneInfo.url"
             data-wpygoactivity-b="newUserZoneInfo.id"
@@ -133,7 +137,7 @@
         </div>
         <div class="list _b790fd0">
           <div
-            bindtap="$NewUserZone$goDetail"
+            @click="$NewUserZone$goDetail"
             class="GoodCardA _b790fd0"
             data-wpygodetail-a="$NewUserZone$item"
             v-for="item in newUserZoneInfo.infoList"
@@ -151,7 +155,7 @@
           </div>
         </div>
         <div
-          bindtap="$NewUserZone$goActivity"
+          @click="$NewUserZone$goActivity"
           class="div-more _b790fd0"
           data-wpygoactivity-a="newUserZoneInfo.url"
           data-wpygoactivity-b="newUserZoneInfo.id"
@@ -168,7 +172,7 @@
         <div class="head _2edb85c">
           <div class="title _2edb85c">{{oneCoinZoneInfo.name}}</div>
           <div
-            bindtap="$OneCoinZone$goActivity"
+            @click="$OneCoinZone$goActivity"
             class="more _2edb85c"
             data-wpygoactivity-a="oneCoinZoneInfo.url"
             data-wpygoactivity-b="oneCoinZoneInfo.id"
@@ -192,7 +196,7 @@
               :key="item.cid"
             >
               <div
-                bindtap="$OneCoinZone$goDetail"
+                @click="$OneCoinZone$goDetail"
                 class="goods _2edb85c"
                 data-wpygodetail-a="goods"
                 :data-index="goodsindex"
@@ -286,7 +290,7 @@
           v-if="tabs.length"
         >
           <view
-            bindtap="changeTab"
+            @click="changeTab"
             class="tab"
             data-wpychangetab-a="index"
             id="tab-index"
@@ -397,17 +401,24 @@
           </view>
 
           <!-- 返回頂部 -->
-          <back-top :showBackTop="showBackTop"/>
+          <back-top :showBackTop="showBackTop" />
         </view>
       </view>
 
     </div>
+
+    <auth-modal
+      @getUserInfo="getUserInfo"
+      :authModalShow="authModalShow"
+    />
   </div>
 </template>
 
 <script>
 import headBar from "@/components/headBar";
 import backTop from "@/components/backTop";
+import authModal from "@/components/authModal";
+import request from "@/utils/request";
 
 export default {
   data() {
@@ -416,12 +427,17 @@ export default {
       headerBackground: "#8054ff",
       titleColor: "#fff",
       showBackTop: true,
+      // 是否需要弹窗授权获取用户信息
+      authModalShow: !1,
       // 金币列表
       prizeList: [
-        { coin: 10, name: "新手", className: "left-bottom" },
-        { coin: 110, name: "新手", className: "adv-prize" },
-        { coin: 10, name: "新手", className: "left-bottom" }
+        { coin: 10, name: "签到", className: "signin-prize" },
+        { coin: 110, name: "新手", className: "new-user-prize" },
+        { coin: 110, name: "广告", className: "adv-prize" },
+        { coin: 10, name: "collect", className: "collect-prize" }
       ],
+      // 步数
+      totalStep: 0,
       // 导航
       cardsList: [
         {
@@ -981,16 +997,91 @@ export default {
 
   components: {
     headBar,
-    backTop
+    backTop,
+    authModal
   },
-
-  methods: {},
+  methods: {
+    beginChallenge() {
+      wx.navigateTo({
+        url: "/pages/welfare_ad/main"
+      });
+    },
+    getUserInfo(e) {
+      request.get(
+        "http://api.xiaotaotao123.cn/application/mobile/index.php?act=little&op=updateUserInfo",
+        {
+          iv: encodeURIComponent(e.iv),
+          encrypted_data: encodeURIComponent(e.encryptedData)
+        }
+      );
+    },
+    // 获取微信步数
+    getWeRunData() {
+      wx.getWeRunData({
+        success(res) {
+          // 发送数据到后台解码
+          const encryptedData = res.encryptedData;
+          const iv = res.iv;
+          console.log(res);
+          request
+            .get(
+              "http://api.xiaotaotao123.cn/application/mobile/index.php?act=home&op=exchangeSteps",
+              {
+                iv: encodeURIComponent(iv),
+                encrypted_data: encodeURIComponent(encryptedData)
+              }
+            )
+            .then(res => {
+              console.log(res);
+            })
+            .catch(res => {
+              console.log(res);
+            });
+        },
+        fail() {
+          wx.showModal({
+            title: "提示",
+            content: "请到设置里面打开",
+            success(res) {
+              if (res.confirm) {
+                wx.openSetting({
+                  success(res) {
+                    console.log(res.authSetting);
+                  }
+                });
+              } else if (res.cancel) {
+                console.log("用户点击取消");
+              }
+            }
+          });
+        }
+      });
+    }
+  },
 
   created() {},
 
   onLoad(options) {
-    const {id} = options;
+    const { id } = options;
     this.globalData.id = id;
+    var _this = this;
+
+    // 查看是否授权
+    wx.getSetting({
+      success(res) {
+        if (res.authSetting["scope.userInfo"]) {
+          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+          _this.authModalShow = !1;
+          wx.getUserInfo({
+            success(res) {
+              console.log(res.userInfo);
+            }
+          });
+        } else {
+          _this.authModalShow = !0;
+        }
+      }
+    });
   }
 };
 </script>
@@ -2505,27 +2596,27 @@ ad {
   border-radius: 10rpx;
 }
 .loading-tip._be7d132 {
-    width: 100%;
-    height: 76rpx;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 80rpx;
+  width: 100%;
+  height: 76rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 80rpx;
 }
 
 .loading-tip image._be7d132 {
-    width: 76rpx;
-    height: 76rpx;
+  width: 76rpx;
+  height: 76rpx;
 }
 
 .loading-tip text._be7d132 {
-    font-size: 30rpx;
-    color: #5B5A5A;
+  font-size: 30rpx;
+  color: #5b5a5a;
 }
 
 .text._be7d132 {
-    text-align: center;
-    color: #9B9B9B;
-    font-size: 28rpx;
+  text-align: center;
+  color: #9b9b9b;
+  font-size: 28rpx;
 }
 </style>

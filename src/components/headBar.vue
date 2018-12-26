@@ -7,9 +7,51 @@
       <div
         class="header-title"
         :style="{color: titleColor}"
-      >{{title}}</div>
+      >
+        {{title}}
+
+        <block v-if="showCustomBar">
+          <view
+            class="_c71564c"
+            v-if="customBarStyle==='white'"
+          >
+            <image
+              @click="navBack"
+              class="back _c71564c"
+              mode="aspectFit"
+              src="/static/images/whiteBack.png"
+            />
+            <image
+              @click="navIndex"
+              class="index _c71564c"
+              mode="aspectFit"
+              src="/static/images/whiteHome.png"
+            />
+          </view>
+          <view
+            class="_c71564c"
+            v-else
+          >
+            <image
+              @click="navBack"
+              class="back _c71564c"
+              mode="aspectFit"
+              src="/static/images/blackBack.png"
+            />
+            <image
+              @click="navIndex"
+              class="index _c71564c"
+              mode="aspectFit"
+              src="/static/images/blackHome.png"
+            />
+          </view>
+        </block>
+      </div>
     </div>
-    <div class="cover" :style="{height: headerHeightTotal + 'px'}"></div>
+    <div
+      class="cover"
+      :style="{height: headerHeightTotal + 'px'}"
+    ></div>
   </div>
 </template>
 
@@ -31,23 +73,34 @@ export default {
     titleColor: {
       type: String,
       default: "#000"
+    },
+    showCustomBar: {
+      type: Boolean,
+      default: !1
+    },
+    customBarStyle: {
+      type: String,
+      default: "black"
     }
   },
   computed: {
     headerHeightTotal() {
-      return this.headerHeight + this.statusBarHeight;
+      return this.headerHeight + this.globalData.statusBarHeight;
+    }
+  },
+  methods: {
+    navBack() {
+      wx.navigateBack({
+        delta: 1
+      });
+    },
+    navIndex() {
+      wx.switchTab({
+        url: "/pages/index/main"
+      });
     }
   },
   created() {
-    wx.getSystemInfo({
-      success: res => {
-        // 导航高度
-        this.statusBarHeight = res.statusBarHeight;
-      },
-      fail(err) {
-        console.log(err);
-      }
-    });
   }
 };
 </script>
@@ -75,8 +128,26 @@ export default {
     font-size: 36rpx;
     color: black;
   }
+
+  .back {
+    width: 24.5rpx;
+    height: 42rpx;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 20rpx 20rpx;
+  }
+
+  .index {
+    width: 44rpx;
+    height: 44rpx;
+    position: absolute;
+    bottom: 0;
+    left: 60rpx;
+    padding: 20rpx 10rpx;
+  }
 }
-.cover{
+.cover {
   width: 100%;
 }
 </style>

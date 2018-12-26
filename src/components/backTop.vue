@@ -53,6 +53,7 @@ export default {
   height: 50px;
   bottom: 50px;
   right: 0;
+  z-index: 5;
 
   img {
     display: block;

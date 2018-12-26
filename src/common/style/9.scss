@@ -1,0 +1,203 @@
+button._26eca26 {
+    position: static;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: content-box;
+    font-size: 18px;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1;
+    border-radius: 0;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    color: #000000;
+    background-color: transparent;
+}
+
+button._26eca26::before,button._26eca26::after {
+    content: '';
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+.dialog._26eca26 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1800;
+}
+
+.dialog-mask._26eca26 {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: #000000;
+    opacity: .6;
+}
+
+.dialog-container._26eca26 {
+    position: absolute;
+    top: 350rpx;
+    left: 57rpx;
+    width: 640rpx;
+    border-radius: 10rpx;
+    background-color: #ffffff;
+    text-align: center;
+    font-family: "Helvetica Neue",Helvetica,Arial,"PingFang SC","Hiragino Sans GB","Heiti SC","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif;
+}
+
+.dialog-container-close._26eca26 {
+    display: block;
+    position: absolute;
+    padding: 15rpx 30rpx;
+    right: 0;
+    top: 0;
+}
+
+.dialog-container-close-x._26eca26 {
+    display: inline-block;
+    width: 30rpx;
+    height: 2rpx;
+    background: #999;
+    font-size: 0;
+    line-height: 0;
+    vertical-align: middle;
+    -webkit-transform: rotate(45deg);
+}
+
+.dialog-container-close-x._26eca26::after {
+    content: '.';
+    display: block;
+    width: 30rpx;
+    height: 2rpx;
+    background: #999;
+    -webkit-transform: rotate(-90deg);
+}
+
+.dialog-container-title._26eca26 {
+    font-size: 36rpx;
+    font-weight: 400;
+    line-height: 1;
+    color: #43474c;
+    padding: 64rpx 0 28rpx;
+    font-family: "PingFangSC-Medium";
+    font-weight: 500;
+}
+
+.dialog-container .large-header._26eca26 {
+    padding-top: 159rpx;
+}
+
+.dialog-container-content._26eca26 {
+    font-size: 30rpx;
+    color: #aaaeb9;
+    font-weight: 400;
+    line-height: 46rpx;
+    box-sizing: border-box;
+    padding: 0 46rpx 52rpx 48rpx;
+    white-space: pre-wrap;
+}
+
+.dialog-container-content.scrollable._26eca26 {
+    height: 354rpx;
+    text-align: left;
+}
+
+.dialog-container-buttons._26eca26 {
+    position: relative;
+    border: none!important;
+    overflow: hidden;
+}
+
+.dialog-container-buttons._26eca26:before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: 0;
+    left: 0;
+    transform: scale(.5);
+    transform-origin: 0 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    border-radius: 0;
+    border-top: 1px solid #f1f1f1;
+}
+
+.dialog-container-buttons-button._26eca26 {
+    height: 110rpx;
+    font-size: 36rpx;
+    color: #43474c;
+    font-weight: 400;
+    line-height: 110rpx;
+    box-sizing: border-box;
+    text-align: center;
+    position: relative;
+}
+
+.dialog-container-buttons-button button._26eca26 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.dialog-container-buttons.horizontal.count2 .dialog-container-buttons-button._26eca26 {
+    width: 50%;
+    float: left;
+}
+
+.dialog-container-buttons.horizontal.count2 .dialog-container-buttons-button._26eca26:nth-child(1) {
+    position: relative;
+    border: none!important;
+}
+
+.dialog-container-buttons.horizontal.count2 .dialog-container-buttons-button._26eca26:nth-child(1):before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: 0;
+    left: 0;
+    transform: scale(.5);
+    transform-origin: 0 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    border-radius: 0;
+    border-right: 1px solid #f1f1f1;
+}
+
+.dialog-container-buttons.vertical .dialog-container-buttons-button._26eca26:not(:last-child) {
+    position: relative;
+    border: none!important;
+}
+
+.dialog-container-buttons.vertical .dialog-container-buttons-button._26eca26:not(:last-child):before {
+    content: '';
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    top: 0;
+    left: 0;
+    transform: scale(.5);
+    transform-origin: 0 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    border-radius: 0;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.dialog-container-buttons.highlight .dialog-container-buttons-button.main._26eca26 {
+    color: #6DA5FF;
+}

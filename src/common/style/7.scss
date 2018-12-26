@@ -1,0 +1,166 @@
+button._b684810 {
+    position: static;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    box-sizing: content-box;
+    font-size: 18px;
+    text-align: center;
+    text-decoration: none;
+    line-height: 1;
+    border-radius: 0;
+    -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+    color: #000000;
+    background-color: transparent;
+}
+
+button._b684810::before,button._b684810::after {
+    content: '';
+    margin: 0;
+    padding: 0;
+    border: 0;
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+@keyframes breathe {
+    0% {
+        transform: scale(.95);
+    }
+
+    17% {
+        transform: scale(1);
+    }
+
+    33% {
+        transform: scale(1.05);
+    }
+
+    66% {
+        transform: scale(1);
+    }
+
+    100% {
+        transform: scale(.95);
+    }
+}
+
+.launchScreen._b684810 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
+    z-index: 100;
+    background: rgba(0,0,0,0.7);
+    overflow: hidden;
+}
+
+.launchScreen .launcher._b684810 {
+    position: relative;
+    margin: 400rpx auto 0;
+    width: 548rpx;
+    background: #fff;
+    height: 344rpx;
+    background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/oneCoinFree/dialogBg.png") no-repeat;
+    background-size: 100% 100%;
+}
+
+.launchScreen .launcher .dialog._b684810 {
+    width: 100%;
+    height: 100%;
+}
+
+.launchScreen .launcher .dialog .title._b684810 {
+    width: 100%;
+    padding-top: 40rpx;
+    font-family: PingFangSC-Semibold;
+    font-size: 48rpx;
+    font-weight: 600;
+    color: #FFFFFF;
+    text-align: center;
+    text-shadow: 0 2rpx 8rpx #A666EA;
+}
+
+.launchScreen .launcher .dialog .dialogContent._b684810 {
+    width: 468rpx;
+    margin: 30rpx auto 0;
+    text-align: center;
+    font-size: 28rpx;
+    line-height: 40rpx;
+    color: #FFFFFF;
+}
+
+.launchScreen .launcher .dialog .dialogBtn._b684810 {
+    width: 484rpx;
+    height: 72rpx;
+    position: absolute;
+    left: 32rpx;
+    bottom: 32rpx;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.launchScreen .launcher .dialog .dialogBtn button._b684810 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.launchScreen .launcher .dialog .dialogBtn .leftBtn._b684810 {
+    width: 149rpx;
+    height: 69rpx;
+    line-height: 69rpx;
+    text-align: center;
+    border: 3rpx solid #FFF97C;
+    border-radius: 52rpx;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    font-size: 32rpx;
+    color: #FFF97C;
+}
+
+.launchScreen .launcher .dialog .dialogBtn .rightBtn._b684810 {
+    width: 316rpx;
+    height: 72rpx;
+    line-height: 72rpx;
+    text-align: center;
+    background-image: linear-gradient(-180deg,#FFFC6B 0,#FFD729 100%);
+    box-shadow: inset 0 7rpx 11rpx 0 rgba(255,255,255,0.28);
+    border-radius: 52rpx;
+    font-family: PingFangSC-Medium;
+    font-weight: 500;
+    font-size: 32rpx;
+    color: #A3434F;
+    position: relative;
+}
+
+.launchScreen .launcher .dialog .dialogBtn .rightBtn .rightBtnStyle._b684810 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 316rpx;
+    height: 100%;
+}
+
+.launchScreen .launcher .dialog .dialogBtn .mainBtn._b684810 {
+    width: 468rpx;
+    height: 72rpx;
+    line-height: 72rpx;
+    text-align: center;
+    margin: 16rpx auto 0;
+    background-image: linear-gradient(-180deg,#FFFC6B 0,#FFD729 100%);
+    box-shadow: inset 0 7rpx 11rpx 0 rgba(255,255,255,0.28);
+    border-radius: 52rpx;
+    font-family: PingFangSC-Medium;
+    font-size: 32rpx;
+    color: #A3434F;
+    animation: breathe 1.2s infinite linear;
+}

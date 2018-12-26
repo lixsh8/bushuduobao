@@ -3,6 +3,11 @@
     "pages/index/main",
     "pages/duobao/main",
     "pages/invite/main",
+    "pages/welfare_ad/main",
+    "pages/order/main",
+    "pages/order_detail/main",
+    "pages/goods_detail/main",
+    "pages/logistics/main",
     "pages/mine/main"
   ],
   "window": {

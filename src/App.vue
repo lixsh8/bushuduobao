@@ -1,6 +1,31 @@
 <script>
+// import api from "@/utils/api";
+import util from "@/utils/util";
+import request from "@/utils/request";
+
 export default {
-  created() {
+  created() {},
+
+  onLaunch(opts) {
+    // console.log(opts);
+  },
+  async onShow(opts) {
+    console.log("onShow" + JSON.stringify(opts));
+    const checkSession = await util.checkSession();
+    
+    if (!checkSession || !wx.getStorageSync("token")) {
+      let loginResult = await util.login();
+      if (loginResult && loginResult.code) {
+        wx.setStorageSync("code", loginResult.code);
+        let tokenResult = await request.get(
+          "http://api.xiaotaotao123.cn/application/mobile/index.php?act=little&op=getToken",
+          { code: loginResult.code }
+        );
+        if (tokenResult && tokenResult.data && tokenResult.data.token) {
+          wx.setStorageSync("token", tokenResult.data.token);
+        }
+      }
+    }
   }
 };
 </script>
@@ -12,7 +37,6 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  padding: 200rpx 0;
   box-sizing: border-box;
 }
 </style>

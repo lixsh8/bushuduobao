@@ -1,0 +1,164 @@
+/*! Import by _C[13], whose real path we cannot found. */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1800;
+  background: rgba(0,0,0,0.5);
+}
+
+.modal .window {
+  box-sizing: border-box;
+  width: 560rpx;
+  margin: 450rpx auto 0;
+  background: #fff;
+  border-radius: 8rpx;
+}
+
+.modal .window .title {
+  font-size: 36rpx;
+  color: #000;
+  text-align: center;
+  line-height: 50rpx;
+  padding: 50rpx 36rpx 0;
+}
+
+.modal .window .content {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 24rpx 36rpx 0;
+  font-size: 30rpx;
+  color: #888;
+  text-align: center;
+  line-height: 42rpx;
+  white-space: pre-wrap;
+}
+
+.modal .window .content.scrollable {
+  height: 354rpx;
+  text-align: left;
+}
+
+.modal .window .buttons {
+  margin: 30rpx 0 0;
+  position: relative;
+  border: none!important;
+}
+
+.modal .window .buttons:before {
+  content: '';
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: 0;
+  left: 0;
+  transform: scale(.5);
+  transform-origin: 0 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  border-radius: 0;
+  border-top: 1px solid #e5e5e5;
+}
+
+.modal .window .buttons .button {
+  display: block;
+  text-align: center;
+  font-size: 36rpx;
+  color: #02bb00;
+  height: 100rpx;
+  line-height: 100rpx;
+}
+/*! Import end */
+
+/*! Import by _C[15], whose real path we cannot found. */
+.tip._3205fde {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100000000;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: PingFangSC-Regular;
+  font-size: 24rpx;
+  color: #909090;
+}
+
+.tip .error-icon._3205fde {
+  width: 260rpx;
+  height: 259rpx;
+}
+/*! Import end */
+
+/*! Import by _C[14], whose real path we cannot found. */
+.backHome._70b7751 {
+  width: 126rpx;
+  height: 126rpx;
+  background: no-repeat;
+  background-size: 100% 100%;
+  position: fixed;
+  right: 24rpx;
+  bottom: 200rpx;
+  z-index: 200;
+}
+
+.backHome.unready._70b7751 {
+  visibility: hidden;
+}
+/*! Import end */
+.nav._7bb4318 {
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+}
+
+.nav .back._7bb4318 {
+  width: 24.5rpx;
+  height: 42rpx;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 20rpx 20rpx;
+}
+
+.nav .index._7bb4318 {
+  width: 44rpx;
+  height: 44rpx;
+  position: absolute;
+  bottom: 0;
+  left: 60rpx;
+  padding: 20rpx 10rpx;
+}
+
+.nav-title._7bb4318 {
+  width: 100%;
+  height: 45px;
+  line-height: 45px;
+  text-align: center;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  font-family: PingFang-SC-Medium;
+  font-weight: 600;
+  font-size: 36rpx;
+  color: black;
+}
+
+.bg-gray._7bb4318 {
+  position: relative;
+  background-color: #ffffff;
+}
+
+.hidden._7bb4318 {
+  overflow: hidden;
+}

@@ -1,0 +1,90 @@
+.navigation._051ee37 {
+    z-index: 10;
+    position: fixed;
+    right: 40rpx;
+    bottom: 154rpx;
+    width: 390rpx;
+    height: 88rpx;
+    box-shadow: 0 4rpx 8rpx 0 rgba(0,0,0,0.16);
+    border-radius: 44rpx;
+    border: 1rpx solid #E5E5E5;
+    background: #ffffff;
+    overflow: hidden;
+}
+
+.navigation-bar._051ee37 {
+    margin: 0 12rpx 0 24rpx;
+    display: flex;
+    justify-content: space-around;
+}
+
+.navigation-item._051ee37 {
+    height: 88rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20rpx;
+}
+
+.navigation-item-wrap._051ee37 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.navigation-item-wrap-icon._051ee37 {
+    display: inline-block;
+    width: 30rpx;
+    height: 30rpx;
+    background: no-repeat;
+    background-size: cover;
+}
+
+.navigation-item-wrap-text._051ee37 {
+    margin: 8rpx 0 0 0;
+    font-size: 20rpx;
+    color: #333333;
+}
+
+.navigation-arrow._051ee37 {
+    width: 88rpx;
+    height: 76rpx;
+    background: rgba(0,144,255,0.24);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navigation-arrow-icon._051ee37 {
+    width: 28rpx;
+    height: 18rpx;
+    background: url("https://pic5.zhuanstatic.com/zhuanzh/n_v25b4b2001858c48759edc4faadb93bf49.png") no-repeat;
+    background-size: cover;
+}
+
+.circlenavigation._051ee37 {
+    z-index: 19;
+    position: fixed;
+    right: 40rpx;
+    bottom: 154rpx;
+    width: 88rpx;
+    height: 88rpx;
+    border: 1rpx solid #E5E5E5;
+    box-shadow: 0 4rpx 8rpx 0 rgba(0,0,0,0.16);
+    border-radius: 44rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.circlenavigation-text._051ee37 {
+    width: 42rpx;
+    height: 56rpx;
+    font-size: 20rpx;
+    color: #333333;
+    display: flex;
+    align-items: center;
+    line-height: 28rpx;
+}
