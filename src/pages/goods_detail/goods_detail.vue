@@ -14,7 +14,7 @@
     <div class="banner">
       <div
         class="box indexBanner"
-        wx:if="banners.length>0"
+        v-if="banners.length>0"
       >
         <swiper
           :autoplay="config.autoplay"
@@ -24,7 +24,7 @@
           :indicatorColor="config.indicatorColor"
           :indicatorDots="config.indicatorDots"
           :interval="config.interval"
-          wx:if="banners.length>1"
+          v-if="banners.length>1"
         >
           <swiper-item
             catchtap="onBanner"
@@ -46,7 +46,7 @@
     <div class="info">
       <div class="price">
         <img
-          src="/static/images/icon_pack_sm.png"
+          :src="icon_pack_sm"
           alt=""
         />
         <div class="sale-price">￥1</div>
@@ -151,6 +151,13 @@
       </div>
     </div>
 
+    <!-- 返回頂部 -->
+    <back-top :showBackTop="showBackTop" />
+    <!-- 底部没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore"
+      noMoreTips="没有更多数据了"
+    />
     <!-- 底部按钮 -->
     <div class="fixed-btn">立即参与</div>
     <!-- 快速导航 -->
@@ -161,6 +168,11 @@
 <script type="text/ecmascript-6">
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
+import util from "@/utils/util";
+import api from "@/utils/api";
+// import request from "@/utils/request";
+import backTop from "@/components/backTop";
+import pagingFooter from "@/components/pagingFooter";
 
 export default {
   data() {
@@ -181,33 +193,23 @@ export default {
         duration: 500,
         circular: !0
       },
-      // banner
-      banners: [
-        {
-          pic:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v28a2603bb43864971a5935082b31a9b04_98414919452bae9c.jpg?w=1500&h=1500",
-          url: "pages/index/index?ChannelID=TG001&IndirectChannel=LK"
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v27434fcdc57294b4a8a3c7b1499f7eed8.gif",
-          url: "?from=2051"
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v22ab511d8b13749318d1ab002032dc85d.gif",
-          url: "?chid=1966&subchid=cq_zhuan01"
-        }
-      ]
+      banners: [],
+      duobaoData: null
     };
   },
 
   components: {
     headBar,
+    backTop,
+    pagingFooter,
     quickNavigate
   },
 
-  computed: {},
+  computed: {
+    icon_pack_sm() {
+      return this.globalData.img_url + 'icon_pack_sm.png'
+    }
+  },
 
   mounted(ev) {
     console.log(this.globalData.resourceUrl)
@@ -216,6 +218,19 @@ export default {
   methods: {
     changeTab(idx) {
 
+    }
+  },
+  // 页面加载
+  async onLoad(e) {
+    var id = e.id;
+
+    const res = await util.request(api.DuobaoDetail, {id: id}, "GET", this);
+    if (res.data && res.code === 0) {
+      // this.totalData = res.data;
+      console.log(res.data);
+
+      this.duobaoData = res.data;
+    } else {
     }
   }
 };

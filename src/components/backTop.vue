@@ -6,7 +6,7 @@
     @click="backTop"
   >
     <img
-      src="/static/images/back_top.png"
+      :src="backTopIcon"
       mode="widthFix"
       alt=""
     >
@@ -19,6 +19,11 @@ export default {
     return {
       showBackTop: false
     };
+  },
+  computed: {
+    backTopIcon() {
+      return this.globalData.img_url + 'back_top.png';
+    }
   },
 
   onPageScroll(ev) {

@@ -1,8 +1,9 @@
 import request from "./request";
 
-const ApiRootUrl = "http://api.xiaotaotao123.cn/application/mobile/index.php";
+const ApiRootUrl = "https://devapi.xiaotaotao123.cn/application/mobile/index.php";
 
 const api = {
+
   // 首页 
   Index: ApiRootUrl + "?act=index&op=index",
   IndexExchangeStep: ApiRootUrl + "?act=index&op=exchangeSteps",
@@ -18,6 +19,11 @@ const api = {
     request.get("?act=friend&op=index", null, {
       baseURL: ApiRootUrl
     }),
+
+  // 夺宝详情页
+  DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
+
+
   // 首页数据接口
   getIndexData: r =>
     request.get("?act=index&op=index", null, {
@@ -35,7 +41,7 @@ const api = {
     }),
   // 使用util的request方法，字符串变量即可
   // 微信登录静默登录
-  Login: ApiRootUrl + "login/login",
+  Login: ApiRootUrl + "?act=little&op=getToken",
   // 微信登录 授权获取用户信息登录
   AuthLoginByWeixin: ApiRootUrl + "auth/loginByWeixin",
   // 获取微信统一下单prepay_id

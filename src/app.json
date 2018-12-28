@@ -8,6 +8,10 @@
     "pages/order_detail/main",
     "pages/goods_detail/main",
     "pages/logistics/main",
+    "pages/index/index",
+    "pages/xmadPage/copyInfo",
+    "pages/xmadPage/sell",
+    "pages/xmadPage/collect",
     "pages/mine/main"
   ],
   "window": {
@@ -32,8 +36,8 @@
       {
         "pagePath": "pages/duobao/main",
         "text": "夺宝",
-        "iconPath": "/static/images/tab/giveMall.png",
-        "selectedIconPath": "/static/images/tab/giveMall_selected.png"
+        "iconPath": "/static/images/tab/duobao.png",
+        "selectedIconPath": "/static/images/tab/duobao_selected.png"
       },
       {
         "pagePath": "pages/invite/main",

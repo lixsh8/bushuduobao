@@ -76,7 +76,7 @@
           </div>
           <div class="centerData-stepTips">每日24点步数清零</div>
           <div
-            @click="getWeRunData"
+            @tap="getWeRunData"
             class="centerData-stepBottom"
             v-if="totalStep<=0"
           >{{loadingWeRunData?'正在获取...':'获取最新微信步数'}}</div>
@@ -110,7 +110,10 @@
               :style="{'background': 'url('+item.img+') no-repeat center top','background-size': '120rpx 120rpx'}"
             ></div>
             <div class="card-name">{{item.title}}</div>
-            <div class="card-icon">{{item.bubble}}</div>
+            <div
+              class="card-icon"
+              v-if="item.bubble"
+            >{{item.bubble}}</div>
           </div>
         </div>
 
@@ -378,7 +381,7 @@
             </block>
 
             <!-- loading -->
-            <div
+            <!-- <div
               class="loading-tip _be7d132"
               v-if="showTip"
             >
@@ -394,10 +397,7 @@
                 />
                 <text class="loading-text _be7d132">{{tips.noMore.text}}</text>
               </block>
-            </div>
-
-            <!-- 返回頂部 -->
-            <back-top :showBackTop="showBackTop" />
+            </div> -->
           </div>
         </div>
 
@@ -405,6 +405,14 @@
 
     </div>
 
+    <!-- 返回頂部 -->
+    <back-top :showBackTop="showBackTop" />
+    <!-- 底部没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore"
+      noMoreTips="没有更多数据了"
+    />
+    <!-- 授权弹窗 -->
     <auth-modal
       @getUserInfo="getUserInfo"
       :authModalShow="authModalShow"
@@ -416,6 +424,7 @@
 import headBar from "@/components/headBar";
 import backTop from "@/components/backTop";
 import authModal from "@/components/authModal";
+import pagingFooter from "@/components/pagingFooter";
 import util from "@/utils/util";
 import api from "@/utils/api";
 import request from "@/utils/request";
@@ -502,6 +511,9 @@ export default {
         { cateId: 200, cateName: "其他", havePrice: null }
       ],
       // 推荐商品 列表
+      page: 1,
+      hasMore: !0,
+      showNoMore: !1,
       duobao: null,
       // 提示
       showTip: true,
@@ -533,7 +545,8 @@ export default {
   components: {
     headBar,
     backTop,
-    authModal
+    authModal,
+    pagingFooter
   },
   methods: {
     // 跳转
@@ -558,7 +571,7 @@ export default {
     },
     getUserInfo(e) {
       request.get(
-        "http://api.xiaotaotao123.cn/application/mobile/index.php?act=little&op=updateUserInfo",
+        "https://devapi.xiaotaotao123.cn/application/mobile/index.php?act=little&op=updateUserInfo",
         {
           iv: encodeURIComponent(e.iv),
           encrypted_data: encodeURIComponent(e.encryptedData)
@@ -567,6 +580,8 @@ export default {
     },
     // 获取微信步数
     getWeRunData() {
+      console.log('正在获取步数...');
+      
       var _this = this;
       _this.loadingWeRunData = !0;
       wx.getWeRunData({
@@ -577,7 +592,7 @@ export default {
           console.log(res);
           request
             .get(
-              "http://api.xiaotaotao123.cn/application/mobile/index.php?act=index&op=getStep",
+              "https://devapi.xiaotaotao123.cn/application/mobile/index.php?act=index&op=getStep",
               {
                 iv: encodeURIComponent(iv),
                 encrypted_data: encodeURIComponent(encryptedData)
@@ -644,28 +659,67 @@ export default {
     }
   },
 
+  // 滚动加载
+  async onReachBottom() {
+    if (this.hasMore) {
+      let list = this.duobao.list;
+      let page = this.page;
+      page++;
+
+      wx.showToast({
+        title: '数据加载中...', // 提示的内容,
+        icon: 'loading', // 图标,
+        duration: 1000 // 延迟时间,
+      });
+      
+      const Duobao = await util.request(
+        api.IndexDuobao,
+        { page: page },
+        "GET",
+        this
+      );
+      console.log(Duobao.data);
+      if (Duobao.data && Duobao.code === 0 && Duobao.data.list && Duobao.data.list.length > 0) {
+        // this.totalData = res.data;
+        var data = Duobao.data;
+        data.list = list.concat(data.list);
+        this.duobao = data;
+        this.hasMore = Duobao.data.hasMore;
+        this.page = Duobao.data.page;
+        if (Duobao.data.hasMore) {
+          this.showNoMore = !1;
+        } else {
+          this.showNoMore = !0;
+        }
+      }
+    } else {
+      this.showNoMore = !0;
+    }
+  },
+
+  // 页面加载
   async onLoad(options) {
     const { id } = options;
     this.globalData.id = id;
 
     this.checkAuth();
     // 获取首页数据
-    request.get(api.Index, null).then(res => {
-      this.hb_amount = res.data.hb_amount;
-      this.bubble = res.data.bubble;
-      this.menuList = res.data.menuList;
-      this.banner = res.data.banner;
-    });
-    // const res = await util.request(api.Index, null, "GET", this);
-    // if (res.data && res.code === 0) {
-    //   // this.totalData = res.data;
-    //   console.log(res.data);
-
+    // request.get(api.Index, null).then(res => {
     //   this.hb_amount = res.data.hb_amount;
     //   this.bubble = res.data.bubble;
     //   this.menuList = res.data.menuList;
     //   this.banner = res.data.banner;
-    // }
+    // });
+    const res = await util.request(api.Index, null, "GET", this);
+    if (res.data && res.code === 0) {
+      // this.totalData = res.data;
+      console.log(res.data);
+
+      this.hb_amount = res.data.hb_amount;
+      this.bubble = res.data.bubble;
+      this.menuList = res.data.menuList;
+      this.banner = res.data.banner;
+    }
     // 获取步数
     this.getWeRunData();
     // 获取新手专区数据 act=duobao&op=newbornZone
@@ -690,12 +744,18 @@ export default {
     }
 
     // 夺宝列表 IndexDuobao
-    const Duobao = await util.request(api.IndexDuobao, null, "GET", this);
+    const Duobao = await util.request(
+      api.IndexDuobao,
+      { page: 1 },
+      "GET",
+      this
+    );
     console.log(Duobao.data);
     if (Duobao.data && Duobao.code === 0) {
       // this.totalData = res.data;
 
       this.duobao = Duobao.data;
+      this.hasMore = Duobao.data.hasMore;
     }
   }
 };
@@ -2187,7 +2247,7 @@ ad {
   width: 686rpx;
   margin-top: 32rpx;
   margin-left: 32rpx;
-  padding-bottom: 180rpx;
+  padding-bottom: 10rpx;
 }
 
 .RecommendGoods-list .GoodCardA {

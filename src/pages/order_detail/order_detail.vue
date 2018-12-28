@@ -154,7 +154,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import util from "@/utils/util";
+// import util from "@/utils/util";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 
@@ -198,32 +198,24 @@ export default {
 
   methods: {
     makePhoneCall() {
-      console.log(this.reloadFn);
-      this.reloadFn();
-      // wx.makePhoneCall({
-      //   phoneNumber: "15888888888"
-      // });
+      wx.makePhoneCall({
+        phoneNumber: "15888888888"
+      });
     },
     copyOrderNo(No) {
-      util.request(
-        "http://api.xiaotaotao123.cn/application/mobile/index.php?act=little&op=getToken",
-        null,
-        "GET",
-        this
-      );
 
-      // wx.setClipboardData({
-      //   data: No,
-      //   success(res) {
-      //     wx.getClipboardData({
-      //       success(res) {
-      //         wx.showToast({
-      //           title: "复制成功"
-      //         });
-      //       }
-      //     });
-      //   }
-      // });
+      wx.setClipboardData({
+        data: No,
+        success(res) {
+          wx.getClipboardData({
+            success(res) {
+              wx.showToast({
+                title: "复制成功"
+              });
+            }
+          });
+        }
+      });
     }
   }
 };

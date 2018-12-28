@@ -1,5 +1,5 @@
 <script>
-// import api from "@/utils/api";
+import api from "@/utils/api";
 import util from "@/utils/util";
 import request from "@/utils/request";
 
@@ -18,7 +18,7 @@ export default {
       if (loginResult && loginResult.code) {
         wx.setStorageSync("code", loginResult.code);
         let tokenResult = await request.get(
-          "http://api.xiaotaotao123.cn/application/mobile/index.php?act=little&op=getToken",
+          api.Login,
           { code: loginResult.code }
         );
         if (tokenResult && tokenResult.data && tokenResult.data.token) {
