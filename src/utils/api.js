@@ -1,6 +1,6 @@
 import request from "./request";
 
-const ApiRootUrl = "https://devapi.xiaotaotao123.cn/application/mobile/index.php";
+const ApiRootUrl = "https://devapi.xiaotaotao123.cn/";
 
 const api = {
 
@@ -22,6 +22,7 @@ const api = {
 
   // 夺宝详情页
   DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
+  DuobaoHistory: ApiRootUrl + "?act=duobao&op=getDbPrize",
 
 
   // 首页数据接口

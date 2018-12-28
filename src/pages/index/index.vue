@@ -571,7 +571,7 @@ export default {
     },
     getUserInfo(e) {
       request.get(
-        "https://devapi.xiaotaotao123.cn/application/mobile/index.php?act=little&op=updateUserInfo",
+        "https://devapi.xiaotaotao123.cn/?act=little&op=updateUserInfo",
         {
           iv: encodeURIComponent(e.iv),
           encrypted_data: encodeURIComponent(e.encryptedData)
@@ -592,7 +592,7 @@ export default {
           console.log(res);
           request
             .get(
-              "https://devapi.xiaotaotao123.cn/application/mobile/index.php?act=index&op=getStep",
+              "https://devapi.xiaotaotao123.cn/?act=index&op=getStep",
               {
                 iv: encodeURIComponent(iv),
                 encrypted_data: encodeURIComponent(encryptedData)
@@ -2178,7 +2178,6 @@ ad {
   position: relative;
   width: 100%;
   background-color: #ffffff;
-  min-height: 1200rpx;
 }
 
 .RecommendGoods-title {
