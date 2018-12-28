@@ -24,27 +24,27 @@
           @click="goStepDetail"
           class="powerCoin"
         >
-          <text class="agentCoinInteger">10</text>
-          <text class="agentCoinDecimal">000</text>
+          <text class="agentCoinInteger">{{hb_amount}}</text>
+          <text class="agentCoinDecimal"></text>
         </div>
         <!-- 挂着的金币 -->
         <div
           @click="handlePrize"
           class="prize-common"
-          :class="item.className"
-          :data-wpyhandleprize-a="item"
-          v-for="(item, index) in prizeList"
+          :class="item.type"
+          v-for="(item, index) in bubble"
           :key="index"
         >
           <div
             class="prize-common-num"
-            v-if="item.coin>0"
-          >{{item.coin}}<text>币</text>
+            v-if="item.hb>0"
+          >￥{{item.hb}}<text></text>
           </div>
-          <div class="prize-common-name">{{item.name}}</div>
+          <div class="prize-common-name">{{item.title}}</div>
         </div>
+
         <!-- 分享金币 -->
-        <button
+        <!-- <button
           @click="$RunningTopArea$shareGroup"
           class="share-group"
           data-type="1"
@@ -53,16 +53,18 @@
         >
           <div class="share-group-image"></div>
           <div class="share-group-name">分享领币</div>
-        </button>
+        </button> -->
+
         <!-- 赚步数币 -->
-        <div
+        <!-- <div
           @click="$RunningTopArea$navToAdv"
           class="adv-prize prize-common"
         >
           <div class="prize-common-num">10<text>币</text>
           </div>
           <div class="prize-common-name">赚步数币</div>
-        </div>
+        </div> -->
+
         <!-- 领取 -->
         <div
           animation="centerAnim"
@@ -70,53 +72,58 @@
           class="centerData"
         >
           <div class="centerData-nickName">未兑换步数</div>
-          <div class="centerData-totalStep">12123<text class="step-class">步</text>
+          <div class="centerData-totalStep">{{totalStep}}<text class="step-class">步</text>
           </div>
           <div class="centerData-stepTips">每日24点步数清零</div>
           <div
             @click="getWeRunData"
             class="centerData-stepBottom"
-            v-if="totalStep==0"
+            v-if="totalStep<=0"
           >{{loadingWeRunData?'正在获取...':'获取最新微信步数'}}</div>
           <div
-            @click="$RunningTopArea$exchangeClick"
+            @click="exchangeStep"
             class="centerData-stepBottom breathe-btn"
-            wx:else
+            v-else
           >点击兑换成步数币</div>
         </div>
         <!-- 邀请按钮 -->
         <button
-          @click="$RunningTopArea$inviteNew"
+          @click="inviteNew"
           class="inviteNew"
           data-type="0"
           openType="share"
         >
           邀请新人赚5-20币
         </button>
+
         <div class="middleArea">
+          <!-- 导航 -->
           <div
-            @click="$RunningTopArea$handleCardBtn"
+            @click="jump"
             class="card"
-            data-wpyhandlecardbtn-a="item"
-            v-for="(item, index) in cardsList"
+            :data-url="item.link"
+            v-for="(item, index) in menuList"
             :key="index"
           >
             <div
               class="card-pic"
-              :style="{'background': 'url('+item.pic+') no-repeat center top','background-size': '120rpx 120rpx'}"
+              :style="{'background': 'url('+item.img+') no-repeat center top','background-size': '120rpx 120rpx'}"
             ></div>
-            <div class="card-name">{{item.name}}</div>
-            <div class="card-icon">领12币</div>
+            <div class="card-name">{{item.title}}</div>
+            <div class="card-icon">{{item.bubble}}</div>
           </div>
         </div>
+
+        <!-- banner -->
         <div
-          @click="beginChallenge"
+          @click="jump"
+          :data-url='banner.link'
           class="activity-challenge"
-          v-if="newUserChallengeBanner"
+          v-if="banner"
         >
           <image
             mode="aspectFit"
-            :src="newUserChallengeBanner"
+            :src="banner.img"
           />
         </div>
       </div>
@@ -124,59 +131,56 @@
       <!-- 新人专区 -->
       <div
         class="new _b790fd0"
-        v-if="newUserZoneInfo.name"
+        v-if="newUserZoneInfo&&newUserZoneInfo.list"
       >
         <div class="head _b790fd0">
-          <div class="title _b790fd0">{{newUserZoneInfo.name}}</div>
+          <div class="title _b790fd0">{{newUserZoneInfo.title}}</div>
           <div
             @click="$NewUserZone$goActivity"
             class="more _b790fd0"
-            data-wpygoactivity-a="newUserZoneInfo.url"
-            data-wpygoactivity-b="newUserZoneInfo.id"
-          >{{newUserZoneInfo.subTitle}}</div>
+            :data-url="newUserZoneInfo.url"
+          >{{newUserZoneInfo.subtitle}}</div>
         </div>
         <div class="list _b790fd0">
           <div
-            @click="$NewUserZone$goDetail"
+            @click="goDetail"
             class="GoodCardA _b790fd0"
-            data-wpygodetail-a="$NewUserZone$item"
-            v-for="item in newUserZoneInfo.infoList"
-            :key="item.id"
+            data-dgoods_id="item.dgoods_id"
+            v-for="item in newUserZoneInfo.list"
+            :key="item.dgoods_id"
           >
             <image
               class="_b790fd0"
               mode="aspectFill"
-              :src="item.pic"
+              :src="item.dgoods_image"
             />
             <div class="GoodCardA-title _b790fd0">
-              {{item.title}}
+              {{item.dgoods_name}}
             </div>
-            <div class="GoodCardA-price _b790fd0">{{item.coin}}</div>
+            <div class="GoodCardA-price _b790fd0">{{item.dgoods_market_price}}</div>
           </div>
         </div>
         <div
-          @click="$NewUserZone$goActivity"
+          @click="goActivity"
           class="div-more _b790fd0"
           data-wpygoactivity-a="newUserZoneInfo.url"
-          data-wpygoactivity-b="newUserZoneInfo.id"
         >
           <text class="_b790fd0">点击查看更多</text>
         </div>
       </div>
 
-      <!-- 1元兑换 -->
+      <!-- 最新开奖 -->
       <div
         class="one-coin _2edb85c"
-        wx:if="oneCoinZoneInfo.name"
+        v-if="latestAward&&latestAward.list"
       >
         <div class="head _2edb85c">
-          <div class="title _2edb85c">{{oneCoinZoneInfo.name}}</div>
+          <div class="title _2edb85c">{{latestAward&&latestAward.title}}</div>
           <div
             @click="$OneCoinZone$goActivity"
             class="more _2edb85c"
-            data-wpygoactivity-a="oneCoinZoneInfo.url"
-            data-wpygoactivity-b="oneCoinZoneInfo.id"
-          >{{oneCoinZoneInfo.subTitle}}</div>
+            :data-url="latestAward&&latestAward.subtitle"
+          >{{latestAward&&latestAward.subtitle}}</div>
         </div>
         <div class="box _2edb85c">
           <swiper
@@ -191,26 +195,27 @@
           >
             <swiper-item
               class="swiper-item _2edb85c"
-              v-for="(item, index) in oneCoinZoneInfoList"
+              v-if="latestAward"
+              v-for="(item, index) in latestAward.list"
               :data-index="index"
-              :key="item.cid"
+              :key="index"
             >
               <div
-                @click="$OneCoinZone$goDetail"
+                @click="goDetail"
                 class="goods _2edb85c"
-                data-wpygodetail-a="goods"
+                v-for="(goods, goodsindex) in item"
                 :data-index="goodsindex"
-                v-for="(goods, goodsindex)  in item.goods"
                 :key="goods.id"
+                :data-id="goods.id"
               >
                 <image
                   class="_2edb85c"
-                  :src="goods.pic"
+                  :src="goods.img"
                 />
                 <div class="goods-title _2edb85c">{{goods.title}}</div>
-                <div class="goods-price _2edb85c">
+                <!-- <div class="goods-price _2edb85c">
                   {{goods.coin}}
-                </div>
+                </div> -->
               </div>
             </swiper-item>
           </swiper>
@@ -221,7 +226,7 @@
       <div class="banner">
         <div
           class="box _3142106 indexBanner"
-          wx:if="banners.length>0"
+          v-if="banners.length>0"
         >
           <swiper
             :autoplay="config.autoplay"
@@ -231,7 +236,7 @@
             :indicatorColor="config.indicatorColor"
             :indicatorDots="config.indicatorDots"
             :interval="config.interval"
-            wx:if="banners.length>1"
+            v-if="banners.length>1"
           >
             <swiper-item
               catchtap="onBanner"
@@ -240,7 +245,7 @@
               v-for="banner in banners"
               :key="banner.id"
             >
-              <image
+              <img
                 class="pic _3142106"
                 :src="banner.pic"
               />
@@ -251,14 +256,14 @@
           </swiper>
           <div
             class="banners single _3142106"
-            wx:if="banners.length==1"
+            v-if="banners.length==1"
           >
             <div
               catchtap="onBanner"
               class="banner-wrap _3142106"
               data-wpyonbanner-a="0"
             >
-              <image
+              <img
                 class="pic _3142106"
                 :src="banners[0].pic"
               />
@@ -270,140 +275,133 @@
         </div>
       </div>
 
-      <!-- 大家都在免费换  -->
-      <view class="Recommend">
-        <view class="Recommend-title">
-          <text class="left">大家都在免费换</text>
-          <text class="right">每周二上新</text>
-        </view>
-      </view>
-      <!-- 商品列表 滚动类别-->
-      <view
-        class="goodslist"
-        id="goodslist"
-        style="top: navHeghtpx;"
+      <!-- 夺宝  -->
+      <div
+        class="duobao"
+        v-if="duobao&&duobao.list"
       >
-        <scroll-view
-          class="tabsArea"
-          scrollIntoView="tab-position"
-          scrollX="true"
-          v-if="tabs.length"
-        >
-          <view
-            @click="changeTab"
-            class="tab"
-            data-wpychangetab-a="index"
-            id="tab-index"
-            v-for="(item, index) in tabs"
-            :key="index"
+        <div class="Recommend">
+          <div class="Recommend-title">
+            <text class="left">{{duobao.title}}</text>
+            <text class="right">{{duobao.subtitle}}</text>
+          </div>
+        </div>
+        <!-- 滚动类别-->
+        <!-- <div
+          class="goodslist"
+          id="goodslist"
+          style="top: navHeghtpx;"
+         >
+          <scroll-div
+            class="tabsArea"
+            scrollIntodiv="tab-position"
+            scrollX="true"
+            v-if="tabs.length"
           >
-            {{item.cateName}}
-          </view>
-        </scroll-view>
-      </view>
-
-      <!-- 商品列表 -->
-      <view
-        bindtouchend="$RunningGoods$moveEndTab"
-        bindtouchstart="$RunningGoods$startTouch"
-        class="RecommendGoods"
-      >
-        <view class="RecommendGoods-list">
-          <block
-            v-for="item in recList"
-            :key="item.id"
-          >
-            <form
-              bindsubmit="$RunningGoods$goodCard$onTap"
-              class="GoodCardA"
-              data-com-index="$RunningGoods$index"
-              data-index="$RunningGoods$index"
-              reportSubmit="true"
-              v-if="!item.showAd"
+            <div
+              @click="changeTab"
+              class="tab"
+              data-wpychangetab-a="index"
+              id="tab-index"
+              v-for="(item, index) in tabs"
+              :key="index"
             >
-              <image
-                class="ad"
-                mode="aspectFill"
-                :src="item.pic"
-                v-if="item.appId"
-              />
-              <block v-else>
-                <image
+              {{item.cateName}}
+            </div>
+          </scroll-div>
+        </div> -->
+
+        <!-- 商品列表 -->
+        <div class="RecommendGoods">
+          <div class="RecommendGoods-list">
+            <block
+              v-for="item in duobao.list"
+              :key="item.dgoods_id"
+            >
+              <form
+                bindsubmit=""
+                class="GoodCardA"
+                data-index=""
+                v-if="!item.showAd"
+              >
+                <!-- 广告 -->
+                <img
+                  class="ad"
                   mode="aspectFill"
                   :src="item.pic"
+                  v-if="item.appId"
                 />
-                <view
-                  class="statusLogo"
-                  v-if="!item.ownStock&&item.id"
-                >已售罄</view>
-                <view class="GoodCardA-title">
-                  {{item.name||item.title}}
-                </view>
-                <view class="GoodCardA-labels">
-                  <image
-                    class="free"
-                    mode="aspectFit"
-                    src="https://pic1.zhuanstatic.com/zhuanzh/n_v2af580778b9364c6bb73e0d0e00784548.png"
-                    wx:if="!item.freeLable&&item.id"
+                <!-- 商品 -->
+                <block v-else>
+                  <img
+                    mode="aspectFill"
+                    :src="item.dgoods_image"
                   />
-                  <image
-                    class="youfei"
-                    mode="aspectFit"
-                    src="https://pic1.zhuanstatic.com/zhuanzh/n_v2ff2e38f4a8384445ae202dd8246d67ca.png"
-                    wx:if="item.freeLable&&item.id"
-                  />
-                </view>
-                <view
-                  class="GoodCardA-price"
-                  wx:if="item.step"
-                >
-                  <view class="coinStep">
-                    <text class="step">{{item.step}}</text>
-                  </view>
-                </view>
-              </block>
-              <button
-                class="makeSubmit"
-                formType="submit"
-              ></button>
-            </form>
+                  <!-- <div
+                    class="statusLogo"
+                    v-if="!item.ownStock&&item.dgoods_id"
+                   >已售罄</div> -->
+                  <div class="GoodCardA-title">
+                    {{item.dgoods_name}}
+                  </div>
+                  <!-- <div class="GoodCardA-labels">
+                    <img
+                      class="free"
+                      mode="aspectFit"
+                      :src="item.dgoods_image"
+                      />
+                  </div> -->
+                  <div class="GoodCardA-price">
+                    <div class="coinStep">
+                      <text class="step">{{item.dgoods_market_price}}</text>
+                    </div>
+                  </div>
+                </block>
+                <button
+                  class="makeSubmit"
+                  formType="submit"
+                ></button>
+              </form>
 
-            <ad
-              class="ad-banner"
-              unitId="adunit-35c5d7764460c855"
-              v-if="item.showAd==1"
-            ></ad>
+              <ad
+                class="ad-banner"
+                unitId="adunit-35c5d7764460c855"
+                v-if="item.showAd==1"
+              ></ad>
 
-            <ad
-              class="ad-banner"
-              unitId="adunit-33e3062f3743e51e"
-              v-if="item.showAd==2"
-            ></ad>
+              <ad
+                class="ad-banner"
+                unitId="adunit-33e3062f3743e51e"
+                v-if="item.showAd==2"
+              ></ad>
 
-          </block>
-          <!-- loading -->
-          <view
-            class="loading-tip _be7d132"
-            v-if="showTip"
-          >
-            <view
-              class="text _be7d132"
-              v-if="loadText&&loading"
-            >{{tip.text}}</view>
-            <block v-else>
-              <image
-                class="loading-icon _be7d132"
-                mode="aspectFit"
-                :src="tips.noMore.icon"
-              />
-              <text class="loading-text _be7d132">{{tips.noMore.text}}</text>
             </block>
-          </view>
 
-          <!-- 返回頂部 -->
-          <back-top :showBackTop="showBackTop" />
-        </view>
-      </view>
+            <!-- loading -->
+            <div
+              class="loading-tip _be7d132"
+              v-if="showTip"
+            >
+              <div
+                class="text _be7d132"
+                v-if="loadText&&loading"
+              >{{tip.text}}</div>
+              <block v-else>
+                <img
+                  class="loading-icon _be7d132"
+                  mode="aspectFit"
+                  :src="tips.noMore.icon"
+                />
+                <text class="loading-text _be7d132">{{tips.noMore.text}}</text>
+              </block>
+            </div>
+
+            <!-- 返回頂部 -->
+            <back-top :showBackTop="showBackTop" />
+          </div>
+        </div>
+
+      </div>
 
     </div>
 
@@ -418,6 +416,8 @@
 import headBar from "@/components/headBar";
 import backTop from "@/components/backTop";
 import authModal from "@/components/authModal";
+import util from "@/utils/util";
+import api from "@/utils/api";
 import request from "@/utils/request";
 
 export default {
@@ -427,90 +427,25 @@ export default {
       headerBackground: "#8054ff",
       titleColor: "#fff",
       showBackTop: true,
+      isNet: true,
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
+      hb_amount: 0,
       // 金币列表
-      prizeList: [
-        { coin: 10, name: "签到", className: "signin-prize" },
-        { coin: 110, name: "新手", className: "new-user-prize" },
-        { coin: 110, name: "广告", className: "adv-prize" },
-        { coin: 10, name: "collect", className: "collect-prize" }
+      bubble: [
+        // { coin: 10, name: "签到", className: "signin-prize" },
+        // { coin: 110, name: "新手", className: "new-user-prize" },
+        // { coin: 110, name: "广告", className: "adv-prize" },
+        // { coin: 10, name: "collect", className: "collect-prize" }
       ],
       // 步数
       totalStep: 0,
+      loadingWeRunData: !1,
       // 导航
-      cardsList: [
-        {
-          id: 10,
-          name: "夺宝",
-          path: "/pages/duobao/main",
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2ceb4574225ce4b8fa8b93eb7f4a661fa.png"
-        },
-        {
-          id: 10,
-          name: "好友加成",
-          path: "/pages/invite/main",
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2ceb4574225ce4b8fa8b93eb7f4a661fa.png"
-        },
-        {
-          id: 10,
-          name: "我的",
-          path: "/pages/mine/main",
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2ceb4574225ce4b8fa8b93eb7f4a661fa.png"
-        }
-      ],
-      // 新用户banner
-      newUserChallengeBanner:
-        "http://pic1.zhuanstatic.com/zhuanzh/n_v2e08361d71bce45978543ebfafe157222.png",
+      menuList: [],
+      banner: null,
       // 新用户专享
-      newUserZoneInfo: {
-        id: "1050347089071964161",
-        name: "新人专区",
-        subTitle: "注册10天内未兑用户专享",
-        infoList: [
-          {
-            id: "1075299398411354112",
-            pic:
-              "https://pic3.zhuanstatic.com/zhuanzh/n_v21f2a79d9bf894913b4366fa523e31183_bafefbd9e39002df.png?w=600&h=600",
-            coin: "5",
-            infoUrl: null,
-            metric: "4407d08dbd7a61c1403fe4e21c8984fc",
-            title: "【新人专属】0.4元福袋"
-          },
-          {
-            id: "1074606862390788096",
-            pic:
-              "https://pic3.zhuanstatic.com/zhuanzh/n_v270f2518369a74c90b02c0943036db72e_b31e1422093902cb.png?w=600&h=600",
-            coin: "10",
-            infoUrl: null,
-            metric: "7659a20963cd17c21eada1907e560a49",
-            title: "【新人限量秒杀】1元话费"
-          },
-          {
-            id: "1074920443065925632",
-            pic:
-              "https://pic2.zhuanstatic.com/zhuanzh/n_v2561a43f9dcde472bb61b80d8815e3606_0764e0d7b2833055.jpg?w=600&h=600",
-            coin: "30",
-            infoUrl: null,
-            metric: "fea2dc1adcafd167314bd443381dd9b0",
-            title: "【免费送】30g护手霜"
-          },
-          {
-            id: "1075234855744176128",
-            pic:
-              "https://pic1.zhuanstatic.com/zhuanzh/n_v2b714599e9d6c402c9b1129066616bc8a_07c7a34c444a1c6d.jpg?w=600&h=600",
-            coin: "50",
-            infoUrl: null,
-            metric: "7003733fa5e8d25da92fc718ced27584",
-            title: "手机懒人折叠支架"
-          }
-        ],
-        url: "/pages/activity/newuser",
-        infoUrl: null
-      },
+      newUserZoneInfo: null,
       // 轮播图配置
       config: {
         current: 0,
@@ -522,113 +457,8 @@ export default {
         duration: 500,
         circular: !0
       },
-      // 一元购
-      oneCoinZoneInfo: {
-        id: "1052566806314614785",
-        name: "1币免费换",
-        subTitle: "全场1币起",
-        url: "/pages/activity/oneCoinFree",
-        infoUrl: null
-      },
-      // 一元购
-      oneCoinZoneInfoList: [
-        {
-          cid: 11111,
-          goods: [
-            {
-              id: "1074925028769792000",
-              pic:
-                "https://pic2.zhuanstatic.com/zhuanzh/n_v22984f444bcfa425892eeb863cd4ed67f_d0aac94bd4ddb5c9.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "1c7c1322d65861b2a994bab5b85a1ba9",
-              title: "黑胶防紫外线雨伞"
-            },
-            {
-              id: "1071976977017077760",
-              pic:
-                "https://pic1.zhuanstatic.com/zhuanzh/n_v21ef9e011240a47caabac166320ca52bc_ca5183bbc416225f.png?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "4546f87b063e94e7f34108b4ca0e023c",
-              title: "助力福袋"
-            },
-            {
-              id: "1075287983923396608",
-              pic:
-                "https://pic2.zhuanstatic.com/zhuanzh/n_v246d2477beb284fb0bf08aafe0618e06b_e401d1274b4dbcde.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "01435762fe2b9eea8d03ef6ebb7ae343",
-              title: "女士水钻手表"
-            }
-          ]
-        },
-        {
-          cid: 2222,
-          goods: [
-            {
-              id: "1074906707009732608",
-              pic:
-                "https://pic2.zhuanstatic.com/zhuanzh/n_v2b0521fc5220f4b778291bd091af1a95a_bab7b1dc23930de9.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "f83e3e378e7186378396ff3717db6e11",
-              title: "充电毛绒暖手袋"
-            },
-            {
-              id: "1068434312640069632",
-              pic:
-                "https://pic2.zhuanstatic.com/zhuanzh/n_v2994ff3d392144fda8a2981435669f743_29f2f93d4c4d05ff.png?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "4f5e7ee352059f89eceeb12b54faacb0",
-              title: "6元话费"
-            },
-            {
-              id: "1075288349108862976",
-              pic:
-                "https://pic2.zhuanstatic.com/zhuanzh/n_v29fe95facfcf04d5b88ad4c7fa76a5c3b_7bc59b631c0256ca.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "1e047c4573dad613833ddf0144ea7905",
-              title: "ＣＯＣＯZEUSEE香氛洗发露"
-            }
-          ]
-        },
-        {
-          cid: 3333,
-          goods: [
-            {
-              id: "1065791633645109248",
-              pic:
-                "https://pic1.zhuanstatic.com/zhuanzh/n_v28a2603bb43864971a5935082b31a9b04_98414919452bae9c.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "3029159985c50472f978e35fd6aa467b",
-              title: "彩色垃圾袋5卷100只"
-            },
-            {
-              id: "1075349807440068608",
-              pic:
-                "https://pic1.zhuanstatic.com/zhuanzh/n_v2012a424b126d4a3a933b3dc4c9f80e4c_ae14cbf51e5ab202.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "986decf392e85d5ec513536114fb63e6",
-              title: "男女情侣电子手环"
-            },
-            {
-              id: "1075288731818131456",
-              pic:
-                "https://pic1.zhuanstatic.com/zhuanzh/n_v2f36c0e5a91b1425e88b7b21c6672eab1_25425f2e618804a5.jpg?w=600&h=600",
-              coin: "1",
-              infoUrl: "/pages/detail/runningOneCoinDetail",
-              metric: "ad19634a044f47dad619772e66fb19a2",
-              title: "猫耳朵束发带"
-            }
-          ]
-        }
-      ],
+      // 最新开奖
+      latestAward: null,
       // banner
       banners: [
         {
@@ -672,307 +502,7 @@ export default {
         { cateId: 200, cateName: "其他", havePrice: null }
       ],
       // 推荐商品 列表
-      recList: [
-        {
-          step: 5,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v26b65bf1091944226b6e1824c4cd38597_853add83ebd39462.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】折叠漏斗",
-          oriPrice: "15.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1074997590363209728",
-          metric: "2207346b84692b976be09d31384d385f",
-          freeLable: 1,
-          desc:
-            "商品规格：一个，直径7.5cm\n商品材质:食品级硅胶\n商品介绍:用于厨房内酱油 ,料酒,食用油等装罐不会泄露,也可用于洗发水,沐浴露等替换装的装罐,食品级硅胶,可折叠经久耐用                                                                                特别说明：\n1:请确保收货信息正确\n2:若有多款色，颜色，随机发货\n3:暂不支持港澳台，新疆，西藏，内蒙古，甘肃，宁夏，青海等偏远地区兑换。",
-          payPrice: 2
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2880e4f40edfa4e3792991d8c05278c56_4ac87c621c61e6e9.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】削皮刨丝器",
-          oriPrice: "12.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1074998392897142784",
-          metric: "555f7a358f7055bd2141910596a23a56",
-          freeLable: 1,
-          desc:
-            "商品规格；一个                                                                                 商品描述；家居用水果蔬菜刨皮器【特点】二合一组合设计，叠加方便，轻松削皮，刨丝省时省力。【功能】可用于日常果蔬削皮，刨丝，方便实用                                                                                                                                                                                        说明：1:请确保收货信息无误                                     \n           2:暂不支持港澳台等片，新疆，，甘肃。宁夏，内蒙，海南，北京等偏远地区兑换",
-          payPrice: 5
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2737a44c6be8c48988405fc56b318d0e0_1aaca6ad2cce6403.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】大白小夜灯",
-          oriPrice: "10.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1074599143738966016",
-          metric: "988e00b2b8574fc9d31ad87dc4b52193",
-          freeLable: 1,
-          desc:
-            "商品材质：\t搪胶 电子元件 LED灯\n商品尺寸：\t6*6.5cm\n特别说明\n1、请确保收货信息无误；\n2、若有多种款式、颜色，随机发货；\n3、暂不支持港澳台、新疆、西藏、内蒙、青海、宁夏等偏远地区兑换",
-          payPrice: 5
-        },
-        {
-          step: 1,
-          pic:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2da2f38e2989540a2b50a5ad651197ef6_09b7a561db601f1d.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】圣诞树小夜灯",
-          oriPrice: "0.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075258515003539456",
-          metric: "5eac5ecfda4e73a16201a6a5f6dccd1c",
-          freeLable: 1,
-          desc:
-            "品材质：\t亚克力+电子元件\t商品款式：\t透明白色\n商品重量：   \t50g\t包装尺寸：\t12.5*6*6cm\n商品尺寸：\t12*5.5cm\n特别说明（拍前请看）\n1、请确保收货信息无误；\n2、商品为全新\n3、若有多种款式、颜色，随机发货；\n4、暂不支持港澳台、新疆、西藏、青海、等偏远地区不兑换\n5、48小时内发货",
-          payPrice: 6
-        },
-        {
-          step: 1,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2130bba7c8404432b87d8ff417e0ba06d_6a6e7abe7498a490.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】圣诞发箍",
-          oriPrice: "0.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075259055166980096",
-          metric: "f65a21048b5815a684b9251cde973eaf",
-          freeLable: 1,
-          desc:
-            "特别说明（拍前请看）\n随机一个发\n1、请确保收货信息无误；\n2、商品为全新\n3、若有多种款式、颜色，随机发货；\n4、暂不支持港澳台、新疆、西藏、青海、等偏远地区不兑换\n5、48小时内发货",
-          payPrice: 7
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2d076cad9b9ed4f1f8e70105f1d9292f4_17c29fdefd8f71e5.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】儿童益智口琴",
-          oriPrice: "18.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1074999970920136704",
-          metric: "e0c4510ad8fde93b380a15b985c840a2",
-          freeLable: 1,
-          desc:
-            "图案很多随机发,在宝宝大脑发育的过程中,聆听音乐将会增加大脑联系通道。在幼L时期，如果父母忽略音乐的作用，有可能会错过开发宝宝的大脑潜能的机会。口琴是培训宝宝的音乐素养和对音乐感知能力的工具;同时还能锻炼宝宝的肺活量,调节呼吸气量和节奏的技巧。\n【产品尺寸】13*2.8*2cm\n【关于发货】48小时内发出偏远地区除外，新疆，西藏，内蒙古，青海，甘肃，北京不发货勿拍！谢谢",
-          payPrice: 5
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2b10ab4f4808f4507a761ec0fe780781e_0b8fc31ac002976c.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】时尚女表",
-          oriPrice: "39.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1064807414370402304",
-          metric: "e1bd53cfd50d785fe078a73d128f87f1",
-          freeLable: 1,
-          desc:
-            "菱形切割表壳，时尚款式设计，带上美美滴！表盘直径36mm，表盘厚度8mm，总长20mm（可缩短）。颜色有红色、黑色、棕色、灰色、绿色，白色，粉色等，每单送出一个，颜色随机哦",
-          payPrice: 9
-        },
-        {
-          step: 1,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v22e129f0960d045f2a36081e881c07191_e7a07bc14655b816.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】圣诞袜大号1只",
-          oriPrice: "0.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075259967109332992",
-          metric: "c82fd99b837f302f8123ecb5f1bc2b47",
-          freeLable: 1,
-          desc:
-            "尺寸\t23*36cm\n一个装随机\n特别说明（拍前请看）\n1、请确保收货信息无误；\n2、商品为全新\n3、若有多种款式、颜色，随机发货；\n4、暂不支持港澳台、新疆、西藏、青海、等偏远地区不兑换\n5、48小时内发货",
-          payPrice: 7
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v21d110a0ef56147a5aa81e977c5644863_2747df1a211bb384.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】时尚男表",
-          oriPrice: "28.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1074620054844211200",
-          metric: "a9f93903696e7d4a5ba97f7a5ae37ca1",
-          freeLable: 1,
-          desc: "表盘直径约4cm，总长22cm，表带可以缩短。颜色有2种，随机送出哦~",
-          payPrice: 9
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v23beca57576fc41bab4f0caaa5ef8e462_dab4f761325f46fc.png?w=1000&h=1000",
-          name: "【秒杀即将结束】亚克力小夜灯",
-          oriPrice: "0.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075001301131067392",
-          metric: "6e174377686f0f912073b2d12f9d9a51",
-          freeLable: 1,
-          desc:
-            "商品材质：\t亚克力+PP+电子元件\t商品款式：\t雪人、圣诞老人、圣诞树、苹果、埃菲尔铁塔*（款式随机一个装）\n商品净重：\t40g\t商品包装：\t盒装\n商品尺寸：\t9*14cm，底座直径3.6cm（造型不同，尺寸存在差异）\n特别说明（拍前请看）\n1、请确保收货信息无误；\n2、商品为全新\n3、若有多种款式、颜色，随机发货；\n4、暂不支持港澳台、新疆、西藏、青海、等偏远地区不兑换\n5、48小时内发货",
-          payPrice: 5
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2d2589bd3f0e240dc95b0a376a7729e0c_3f3c5bdf3376b7b6.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】封口机",
-          oriPrice: "19.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075000376479973376",
-          metric: "7deb83da8475d916dbb1dbf320200573",
-          freeLable: 1,
-          desc:
-            "家用彩色迷你密封机，手压式热封口机。\n在您要封口的袋子上左右轻轻一过，具有防潮、防霉的密封袋就形成了。适用于各种零食、蔬果的塑料袋，保鲜袋轻松一次性密封保鲜很放心，下次使用新鲜如初。没吃完的零食、干果花茶等轻轻- -压即可密封储存哦，【产品尺寸】9.5*4*3.7\n[ 必须使用2节5号正品南孚电池，]才能使其发热达到封口作用，重要的事说三E遍[不要使用普通电池] [ 不要使用普通电池] ( 不要使用普通电池]，不配带电池。\n【关于发货】拍下必发48小时内发货，偏远地区除外，新疆，西藏，不发货哦！其余地方正常发货！最后图片是教程。",
-          payPrice: 5
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2ac583805b0344700b1e2b739c828c15b_eacc981122a1f847.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】大理石口红",
-          oriPrice: "38.88",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075000886121463808",
-          metric: "9af337069403e8d54ca532eb4aeffc09",
-          freeLable: 1,
-          desc:
-            "新品大理石口红，不沾杯不掉色，持久显色思柔滑丰盈的色泽和柔顺感，修饰唇色的效果，轻柔肌肤，不易脱色，缔造丰盈丝柔般的性感双唇，展现出你性感的唇.上风采，款式多样。\n【规格】3g\n101 #水润豆沙色\n102#水润斩男色\n103#水润海棠色\n104#水润砖红色\n105#水润人鱼姬\n109#哑光豆沙色\n107 #哑光珊瑚色\n110#哑光CHINI色\n108#哑光复古红\n【款式选择】拍下后在收货地址后面备注颜色型号，\n收货地址后面备注颜色型号。\n收货地址后面备注颜色型号，没有备注的随机发货。没有备注的 不接受任何指责，辱骂，退货，退款。\n《关于发货》拍下后48小时内发货，《偏 远地区除外》新疆，西藏，青海，甘肃，内蒙，海南，宁夏，北京不发货请勿拍",
-          payPrice: 5
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v270ac188f423b45ebb44e66c1f0c373e7_dbe5d41048f4aafa.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】二次元眼镜",
-          oriPrice: "29.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075000668260925440",
-          metric: "a2a5050bd44dcc457a073eacb9af5ce2",
-          freeLable: 1,
-          desc:
-            "抖音秦奋同款马赛克装逼像素眼镜抖音眼镜太阳镜二次元搞笑我的世界，拍照片拍视频必备。和正常眼镜一样。【规格】长度约14.5cm颜色黑【度数】平光镜，材质ABS材料。\n【支持使用免邮卷】\n【关于发货】拍下必发48小时内发出偏远地区除外，新疆，西藏，内蒙古，青海。甘肃不发货勿拍，谢谢！",
-          payPrice: 5
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v28322dcb725c84a26951a8fa33c5dff98_af4fed39a20d5843.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】水龙头滤水器防溅水",
-          oriPrice: "25.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075002367209897984",
-          metric: "02c879927b73c5e6ca1d0f3e62537600",
-          freeLable: 1,
-          desc:
-            "商品规格：一个装；适用于16～23mm水龙头安装\n商品描述：[防溅水] [可伸缩] 创意家居生活新帮手,采用PP材质制作,PVC材质套口，安全无毒可伸缩并能360度旋转分支水流,喷洒均匀,方便洗碗洗菜,节约用水。安装方便。健康生活,从水龙头开始!\n特别说明：\n1:请确保收货信息无误\n2:有【蓝色，绿色，红色】三款，拍下收货地址后面备注款式，没备注随机发货\n3:暂不支持港澳台，新疆，西藏，内蒙古，青海，甘肃，宁夏，海南等偏远地区兑换。",
-          payPrice: 6
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v26dc0b21df0544386beb6fcccde9ee76b_72508b7ae8d436f0.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】淘米器",
-          oriPrice: "12.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075002768692871168",
-          metric: "114b264ee14b01e348dab68a451b5b2a",
-          freeLable: 1,
-          desc:
-            "淘米器，优质PP材质，环保健康，加厚设计，手感舒适，适用于厨房淘米洗米，清洗水果蔬菜等！\n1、每天上午9点补充库存\n2、已兑换商品将在48小时内发货，颜色随机发！请确保收货信息无误！\n3 北京，海南，黑龙江，宁夏，青海，新疆，内蒙，西藏偏远省不发，其他非偏远省拍下会按下单时间发货！",
-          payPrice: 6
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v21988173a283c44bfb1f538a891c36945_00fb87454d0ce5f1.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】衣架10支",
-          oriPrice: "15.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075002925769555968",
-          metric: "79d8fb9aebb4d77ddeb24420597b340e",
-          freeLable: 1,
-          desc:
-            "产品材质\t 铁丝+浸塑\n产品重量\t 318克/把\n产品尺寸\t 肩宽38.8cm 高度21.8cm\n产品说明\t 加高设计（更实用），浸塑不生锈  \n说明：\n1、请确保收货信息无误；\n2、若有多种款式、颜色，随机发货；\n3、暂不支持港澳台、新疆、西藏、内蒙、青海、宁夏等偏远地区兑换\n4、每天上午9点补充库存\n5、已兑换商品将在48小时内发货",
-          payPrice: 7
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v245ae03e8041c41f783d6b29b667a1c53_4780869f604cf171.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】垃圾袋点段式五卷",
-          oriPrice: "19.89",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075003152253583360",
-          metric: "0912ac9a22d1e3360aad52f1587aeb09",
-          freeLable: 1,
-          desc:
-            "材质；聚乙烯+pp \n颜色；五卷随机发\n规格；约42*49cm/个\n偏远地区不发货 特价清仓",
-          payPrice: 7
-        },
-        {
-          step: 10,
-          pic:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2a09bd4bdc83e48af98de1987058f6c75_49025994ea1336ad.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】双动圈耳机",
-          oriPrice: "88.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1073522034035654656",
-          metric: "b40d530ad902b4b604b475cb4006bc8e",
-          freeLable: 1,
-          desc:
-            "商品规格：一条\n商品描述：免费送一条双动圈入耳式耳机，喜欢的点个关注，原价88的耳机免费送了，质量超级好~~~拍下都会发货，全国发货~~~\n说明：\n1、请确保收货信息无误；\n3、暂不支持港澳台偏远地区兑换",
-          payPrice: 7
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v211f40f9693994dfdbdb2b40ae8012d8b_1572d24757a314fb.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】化妆品收纳盒",
-          oriPrice: "0.00",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075003320940101632",
-          metric: "6c5b747f5446267b2b61183577993412",
-          freeLable: 1,
-          desc:
-            "商品规格：抽屉化妆品收纳盒化妆品整理桌面首选护肤品梳分盒。\n说明\n1、请确保收货信息无误；\n2、每天上午9点补充库存\n3、已兑换商品将在48小时内发货\n4、若有多种款式、颜色，随机发货；\n5、暂不支持港澳台、新疆、西藏等偏远地区兑换",
-          payPrice: 7
-        },
-        {
-          step: 5,
-          pic:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2edf587cb775b4660b724c676f7ae5414_5f348d913e483fc1.jpg?w=1000&h=1000",
-          name: "【秒杀即将结束】隐形双头修容笔",
-          oriPrice: "19.89",
-          ownStock: 1,
-          exchangeType: 2,
-          id: "1075003542500016128",
-          metric: "2b2d5fdfb4f81d32f74fc6eaf622e784",
-          freeLable: 1,
-          desc: "限时促销 高光两用初学者修脸粉V脸阴影鼻影膏笔女 颜色随机",
-          payPrice: 8
-        },
-        { showAd: 1 }
-      ],
+      duobao: null,
       // 提示
       showTip: true,
       tips: {
@@ -994,6 +524,11 @@ export default {
       }
     };
   },
+  computed: {
+    // showExchangeBtb() {
+    //   return this.totalStep > 0 ? !0 : !1
+    // }
+  },
 
   components: {
     headBar,
@@ -1001,6 +536,21 @@ export default {
     authModal
   },
   methods: {
+    // 跳转
+    jump(e) {
+      var url = e.currentTarget.dataset.url;
+      if (url.indexOf("/index") || url.indexOf("/invite")) {
+        wx.switchTab({ url: url });
+      } else {
+        wx.navigateTo({ url: url });
+      }
+    },
+    // 跳转详情
+    goDetail(e) {
+      wx.navigateTo({
+        url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.dgoods_id
+      });
+    },
     beginChallenge() {
       wx.navigateTo({
         url: "/pages/welfare_ad/main"
@@ -1017,6 +567,8 @@ export default {
     },
     // 获取微信步数
     getWeRunData() {
+      var _this = this;
+      _this.loadingWeRunData = !0;
       wx.getWeRunData({
         success(res) {
           // 发送数据到后台解码
@@ -1025,7 +577,7 @@ export default {
           console.log(res);
           request
             .get(
-              "http://api.xiaotaotao123.cn/application/mobile/index.php?act=home&op=exchangeSteps",
+              "http://api.xiaotaotao123.cn/application/mobile/index.php?act=index&op=getStep",
               {
                 iv: encodeURIComponent(iv),
                 encrypted_data: encodeURIComponent(encryptedData)
@@ -1033,6 +585,8 @@ export default {
             )
             .then(res => {
               console.log(res);
+              _this.totalStep = res.data;
+              _this.loadingWeRunData = !1;
             })
             .catch(res => {
               console.log(res);
@@ -1056,32 +610,93 @@ export default {
           });
         }
       });
+    },
+    // 兑换步数
+    async exchangeStep() {
+      const res = await util.request(api.IndexExchangeStep, null, "GET", this);
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+
+        this.totalStep = 0;
+        this.hb_amount = res.data.hb_amount;
+      } else {
+      }
+    },
+    checkAuth() {
+      // 查看是否授权
+      var _this = this;
+      wx.getSetting({
+        success(res) {
+          if (res.authSetting["scope.userInfo"]) {
+            // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+            _this.authModalShow = !1;
+            wx.getUserInfo({
+              success(res) {
+                console.log(res.userInfo);
+              }
+            });
+          } else {
+            _this.authModalShow = !0;
+          }
+        }
+      });
     }
   },
 
-  created() {},
-
-  onLoad(options) {
+  async onLoad(options) {
     const { id } = options;
     this.globalData.id = id;
-    var _this = this;
 
-    // 查看是否授权
-    wx.getSetting({
-      success(res) {
-        if (res.authSetting["scope.userInfo"]) {
-          // 已经授权，可以直接调用 getUserInfo 获取头像昵称
-          _this.authModalShow = !1;
-          wx.getUserInfo({
-            success(res) {
-              console.log(res.userInfo);
-            }
-          });
-        } else {
-          _this.authModalShow = !0;
-        }
-      }
+    this.checkAuth();
+    // 获取首页数据
+    request.get(api.Index, null).then(res => {
+      this.hb_amount = res.data.hb_amount;
+      this.bubble = res.data.bubble;
+      this.menuList = res.data.menuList;
+      this.banner = res.data.banner;
     });
+    // const res = await util.request(api.Index, null, "GET", this);
+    // if (res.data && res.code === 0) {
+    //   // this.totalData = res.data;
+    //   console.log(res.data);
+
+    //   this.hb_amount = res.data.hb_amount;
+    //   this.bubble = res.data.bubble;
+    //   this.menuList = res.data.menuList;
+    //   this.banner = res.data.banner;
+    // }
+    // 获取步数
+    this.getWeRunData();
+    // 获取新手专区数据 act=duobao&op=newbornZone
+    const resNewZone = await util.request(api.IndexNewZone, null, "GET", this);
+    if (resNewZone.data && resNewZone.code === 0) {
+      console.log(resNewZone.data);
+
+      this.newUserZoneInfo = resNewZone.data;
+    }
+    // 最新开奖 IndexLatestAward
+    const resLatestAward = await util.request(
+      api.IndexLatestAward,
+      null,
+      "GET",
+      this
+    );
+    console.log(resLatestAward.data);
+    if (resLatestAward.data && resLatestAward.code === 0) {
+      // this.totalData = res.data;
+
+      this.latestAward = resLatestAward.data;
+    }
+
+    // 夺宝列表 IndexDuobao
+    const Duobao = await util.request(api.IndexDuobao, null, "GET", this);
+    console.log(Duobao.data);
+    if (Duobao.data && Duobao.code === 0) {
+      // this.totalData = res.data;
+
+      this.duobao = Duobao.data;
+    }
   }
 };
 </script>
@@ -1734,8 +1349,9 @@ button::after {
   line-height: 32rpx;
   padding: 0 12rpx;
 }
-
-.signin-prize {
+/* 签到气泡红包 */
+.signin-prize,
+.attendanceReward {
   position: absolute;
   right: 40rpx;
   top: 220rpx;
@@ -1756,15 +1372,17 @@ button::after {
 .breathe-btn {
   animation: breathe 1.2s infinite linear;
 }
-
-.new-user-prize {
+/* 新用户红包 */
+.new-user-prize,
+.newReward {
   position: absolute;
   top: 120rpx;
   left: 70rpx;
   z-index: 100;
 }
-
-.invite-new-prize {
+/* 邀请拉新红包 */
+.invite-new-prize,
+.invitationReward {
   position: absolute;
   top: 120rpx;
   right: 120rpx;
@@ -1967,11 +1585,15 @@ ad {
 .indexBanner {
   margin: 24rpx auto;
   width: 702rpx;
-  height: 300rpx;
+  height: 240rpx;
   background: #fff;
   overflow: hidden;
   border-radius: 8rpx;
   box-shadow: 0 2rpx 7rpx rgba(0, 0, 0, 0.16);
+}
+.indexBanner img {
+  width: 100%;
+  height: 100%;
 }
 
 .loading {

@@ -6,13 +6,11 @@
       :titleColor="titleColor"
     />
 
-    <div
-      class="wrapper-box _b562ac6"
-     >
+    <div class="wrapper-box _b562ac6">
       <div
         class="wrapper1 _b562ac6"
         formType="submit"
-       >
+      >
         <!-- 頁面加載 -->
         <div
           class="loading"
@@ -22,7 +20,7 @@
         <div
           class="outPage"
           v-else
-         >
+        >
           <div
             @click="showRule"
             class="activityRule"
@@ -30,22 +28,24 @@
 
           <div class="topBg">
             <div class="gotReward">
-              {{totalData.haveGotRewardToday}}
-              <text>币</text>
+              {{totalData.plusNum}}
+              <!-- <text>币</text> -->
             </div>
             <div class="tips">
-              累计奖励{{totalData.accumulateReward}}步数币
+              <!-- 累计奖励{{totalData.accumulateReward}}步数币 -->
+              加成倍数越高，到手红包越大
               <text bindtap="goDetailPage">查看明细</text>
             </div>
             <button
               class="inviteBtn"
               data-type="0"
               openType="share"
-            >邀请新用户得{{totalData.inviteTotalReward}}币</button>
-            <div class="bottomTips">邀请成功立得{{totalData.inviteReward}}币，连续5天唤醒好友领剩余{{totalData.inviteRemainReward}}币</div>
+            >邀请新用户得{{totalData.inviteTotalReward}}加成</button>
+            <!-- <div class="bottomTips">邀请成功立得</div> -->
           </div>
 
           <div class="centerBg voidHeight">
+            <!-- 无邀请列表 -->
             <block v-if="friendList.length==0">
               <div class="totalCoin">每邀请1位好友，可获得{{totalData.inviteTotalReward}}币</div>
               <div class="inviteCoin">邀请成功立得{{totalData.inviteReward}}币，连续5天唤醒好友领剩余{{totalData.inviteTotalReward-totalData.inviteReward}}币</div>
@@ -60,24 +60,22 @@
               </div>
               <div class="award2"></div>
             </block>
+            <!-- 有邀请列表 -->
             <block v-else>
               <div class="importantInfo">
-                <div class="inviteTotalUserNum">累计邀请{{totalData.inviteTotalUserNum}}好友</div>
+                <div class="inviteTotalUserNum">{{f_title}}</div>
                 <div
                   class="remainGetRewardToday"
                   v-if="ifLimited"
                 >今日已到
-                  <text>{{coinRewardLimit}}</text>币奖励上限
+                  <text>{{coinRewardLimit}}</text>奖励上限
                 </div>
                 <block v-else>
-                  <div
-                    class="remainGetRewardToday"
-                    v-if="totalData.remainGetRewardToday!=null||totalData.remainGetRewardToday!='null'"
-                  >今日唤醒好友还可领
-                    <text>{{totalData.remainGetRewardToday}}</text>币
+                  <div class="remainGetRewardToday">{{f_subtitle}}
                   </div>
                 </block>
               </div>
+              <!-- 用户列表 -->
               <div class="list-page">
                 <div
                   class="userItem"
@@ -86,23 +84,30 @@
                 >
                   <image
                     class="portrait"
-                    src="item.userPic"
+                    :src="item.avatarUrl"
                   />
                   <div class="nameInfo">
-                    <div class="nickName">{{item.userNickName}}</div>
-                    <div class="tips">{{item.backupDesc}}</div>
+                    <div class="nickName">{{item.nickName}}</div>
+                    <div
+                      class="tips"
+                      v-if="item.hb_amount>0"
+                    >好友今日已兑换{{item.StepNumber}}步</div>
+                    <div
+                      class="tips"
+                      v-else
+                    >好友今日未兑换步数</div>
+                  </div>
+                  <div
+                    class="coinInfo2 gray2"
+                    v-if="item.hb_amount>0"
+                  >
+                    已获得红包<text class="info-m">￥{{item.hb_amount}}</text>
                   </div>
                   <button
-                    bindtap="reCallUser"
-                    class="coinInfo"
-                    data-index="index"
-                  >
-                    {{item.btnTxt}}
-                    <text
-                      style=""
-                      v-if="item.rewardCoin!=''"
-                    >{{item.style?'领'+item.rewardCoin+'币':item.rewardCoin+'币'}}</text>
-                  </button>
+                    class="coinInfo2"
+                    openType="share"
+                    v-else
+                  >召唤好友兑换</button>
                 </div>
               </div>
             </block>
@@ -112,33 +117,63 @@
     </div>
 
     <!-- 规则 -->
-    <div bindtap="$RuleDialog$onModal" catchtouchmove="$RuleDialog$touchmoveHandler" class="launchScreen _6a61420" data-ele="modal" style="top:px;" v-if="ruleDialogShow">
+    <div
+      bindtap="$RuleDialog$onModal"
+      catchtouchmove="$RuleDialog$touchmoveHandler"
+      class="launchScreen _6a61420"
+      data-ele="modal"
+      style="top:px;"
+      v-if="ruleDialogShow"
+    >
       <div class="launcher _6a61420">
         <div class="bg _6a61420"></div>
         <div class="totalCoin _6a61420">每邀请1位好友，可获得{{$RuleDialog$totalCoin}}币</div>
-        <div class="inviteCoin _6a61420">邀请成功立得{{$RuleDialog$inviteReward}}币，连续5天唤醒好友领剩余{{$RuleDialog$totalCoin-$RuleDialog$inviteReward}}币</div>
+        <div class="inviteCoin _6a61420">邀请成功立得{{$RuleDialog$inviteReward}}币</div>
         <div class="award1 _6a61420">
           <div class="eachCoin _6a61420">
-            <div class="eachItem _6a61420" v-for="(item,index) in eachCoin" :key="index">{{item}}</div>
+            <div
+              class="eachItem _6a61420"
+              v-for="(item,index) in eachCoin"
+              :key="index"
+            >{{item}}</div>
           </div>
         </div>
         <div class="title _6a61420">活动细则</div>
-        <scroll-div class="content _6a61420" scrollY="true">
+        <scroll-div
+          class="content _6a61420"
+          scrollY="true"
+        >
           <div class="_6a61420">1、邀请好友奖励：每邀请1位好友，好友注册后的5天里，每天将自己运动的步数兑换成转币，您即可拿到当天对应的奖励，第一天奖励5币，第二天奖励2币，第三天奖励5币，第四天奖励2币，第五天奖励6币；</div>
           <div class="_6a61420">2、好友加成：邀请的好友每日步数币加成，好友每日兑换步数，你就可以获得1个步数币奖励，好友数越多，每日奖励币数越多；</div>
           <div class="_6a61420">3、加成时间：好友注册30天内，每天兑换步数币，你都可以获得1步数币奖励，好友注册超过30天则无法收到奖励；</div>
           <div class="_6a61420">4、账号异常：如果你与邀请好友的账号是同一个人，则无法获得邀请奖励和好友加成。同一个手机号、设备号、银行卡、收货地址均视为同一个账号；</div>
           <div class="_6a61420">5、奖励领取：每日获得邀请好友和好友加成的奖励，需要你点击步数换首页奖励气泡进行领取；</div>
         </scroll-div>
-        <div @click="ruleDialogClose" class="close _6a61420"></div>
+        <div
+          @click="ruleDialogClose"
+          class="close _6a61420"
+        ></div>
       </div>
     </div>
 
+    <!-- 网络错误 -->
+    <!-- <page-error
+      @refresh="refresh"
+      :showPageError="!isNet"
+    /> -->
+    <!-- 没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore"
+      noMoreTips="没有更多数据了"
+    />
   </div>
 </template>
 
 <script>
 import headBar from "@/components/headBar";
+import pagingFooter from "@/components/pagingFooter";
+import util from "@/utils/util";
+import api from "@/utils/api";
 
 export default {
   data() {
@@ -146,31 +181,24 @@ export default {
       title: "好友加成",
       headerBackground: "#d03430",
       titleColor: "#fff",
+      isNet: !0,
       isLoading: 0,
-      totalData: {
-        haveGotRewardToday: "0",
-        accumulateReward: "0",
-        inviteTotalUserNum: "0",
-        remainGetRewardToday: "0",
-        inviteReward: "5",
-        inviteRemainReward: "0",
-        inviteRewardMap: {},
-        inviteTotalReward: "20"
-      },
-      eachCoin: ["5", "2", "5", "2", "6"],
-      listSharePic: "",
-      listShareTitle: "",
-      pageSharePic: "",
-      pageShareTitle: "",
+      totalData: {},
       friendList: [],
-      coinRewardLimit: "",
+      reloadFn: [],
+      f_title: "",
+      f_subtitle: "",
+      hasMore: !0,
+      showNoMore: !1,
+      eachCoin: ["5", "2", "5", "2", "6"],
       ifLimited: !1,
       ruleDialogShow: 0
     };
   },
 
   components: {
-    headBar
+    headBar,
+    pagingFooter
   },
 
   methods: {
@@ -179,13 +207,95 @@ export default {
     },
     ruleDialogClose() {
       this.ruleDialogShow = !1;
+    },
+    reload() {
+      console.log(1);
+      api.getFriendData();
+    },
+    refresh() {
+      console.log(this.reloadFn);
+      // this.reloadFn && this.reloadFn();
+      for (var i = 0, len = this.reloadFn.length; i < len; i++) {
+        this.reloadFn[i] && this.reloadFn[i]();
+      }
     }
   },
 
   created() {},
+  // 分享
+  onShareAppMessage(res) {
+    if (res.from === "button") {
+      // 来自页面内转发按钮
+      console.log(res);
+      return {
+        title: this.totalData.share.title,
+        imageUrl: this.totalData.share.img,
+        path: this.totalData.share.link
+      };
+    }
+    return {
+      title: this.totalData.share.title,
+      imageUrl: this.totalData.share.img,
+      path: this.totalData.share.link
+    };
+  },
+  // 滚动加载
+  async onReachBottom(e) {
+    let list = this.friendList;
+    let page = this.page;
+    page++;
 
-  onLoad() {
-    console.log(this.globalData.id);
+    if (this.hasMore) {
+      const resFriendUserlist = await util.request(
+        api.FriendUserlist,
+        { page: page },
+        "GET",
+        this
+      );
+
+      if (
+        resFriendUserlist.data &&
+        resFriendUserlist.code === 0 &&
+        resFriendUserlist.data.list &&
+        resFriendUserlist.data.list.length > 0
+      ) {
+        var hasMore = resFriendUserlist.data.hasMore;
+        this.friendList = list.concat(resFriendUserlist.data.list || []);
+        this.hasMore = hasMore;
+        this.page = resFriendUserlist.data.page;
+        if (hasMore) {
+          this.showNoMore = !1;
+        } else {
+          this.showNoMore = !0;
+        }
+      }
+    } else {
+      this.showNoMore = !0;
+    }
+  },
+
+  // 页面加载
+  async onLoad() {
+    // wx.hideShareMenu()
+    const res = await util.request(api.Friend, null, "GET", this);
+    if (res.data && res.code === 0) {
+      this.totalData = res.data;
+    }
+
+    // 请求列表
+    const resFriendUserlist = await util.request(
+      api.FriendUserlist,
+      { page: 1 },
+      "GET",
+      this
+    );
+    if (resFriendUserlist.data && resFriendUserlist.code === 0) {
+      this.friendList = resFriendUserlist.data.list || [];
+      this.f_title = resFriendUserlist.data.title;
+      this.f_subtitle = resFriendUserlist.data.subtitle;
+      this.hasMore = resFriendUserlist.data.hasMore;
+      this.page = resFriendUserlist.data.page;
+    }
   }
 };
 </script>
@@ -199,7 +309,7 @@ page {
   background: #d03430;
   height: 100%;
 }
-.wrapper-box{
+.wrapper-box {
   height: 100%;
   line-height: 1;
 }
@@ -456,7 +566,7 @@ button._e59e4f5::after {
   line-height: 28rpx;
 }
 
-.launchScreen .launcher .list-page .userItem .coinInfo._e59e4f5 {
+.userItem .coinInfo {
   font-size: 24rpx;
   color: #c55a00;
   position: absolute;
@@ -470,17 +580,46 @@ button._e59e4f5::after {
   text-align: center;
 }
 
-.launchScreen .launcher .list-page .userItem .coinInfo text._e59e4f5 {
+.userItem .coinInfo text {
   font-family: PingFangSC-Semibold;
   font-weight: 600;
   margin-left: 10rpx;
-  font-size: 24rpx;
+  font-size: 20rpx;
 }
 
-.launchScreen .launcher .list-page .userItem .gray._e59e4f5 {
+.userItem .gray {
   background: #f3f3f3;
-  font-size: 24rpx;
+  font-size: 20rpx;
   color: #666666;
+}
+.userItem .coinInfo2 {
+  font-size: 24rpx;
+  color: #c55a00;
+  position: absolute;
+  top: 32rpx;
+  right: 24rpx;
+  width: 215rpx;
+  height: 56rpx;
+  border-radius: 28rpx;
+  background: #ffd66b;
+  line-height: 56rpx;
+  text-align: center;
+}
+
+.userItem .coinInfo2 text {
+  font-family: PingFangSC-Semibold;
+  font-weight: 600;
+  margin-left: 10rpx;
+  font-size: 20rpx;
+}
+
+.userItem .gray2 {
+  background: #f3f3f3;
+  font-size: 20rpx;
+  color: #666666;
+}
+.userItem .gray2 .info-m {
+  color: #d03430;
 }
 
 .launchScreen .launcher .changeList._e59e4f5 {
@@ -751,7 +890,6 @@ page {
   font-size: 24rpx;
   color: #ac4700;
   margin-right: 32rpx;
-  margin-top: -12rpx;
 }
 
 .centerBg .importantInfo .remainGetRewardToday text {

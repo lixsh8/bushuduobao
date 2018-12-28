@@ -1,11 +1,26 @@
 import request from "./request";
 
-const ApiRootUrl = "http://127.0.0.1:8360/api/";
+const ApiRootUrl = "http://api.xiaotaotao123.cn/application/mobile/index.php";
 
 const api = {
+  // 首页 
+  Index: ApiRootUrl + "?act=index&op=index",
+  IndexExchangeStep: ApiRootUrl + "?act=index&op=exchangeSteps",
+  IndexNewZone: ApiRootUrl + "?act=duobao&op=newbornZone",
+  IndexLatestAward: ApiRootUrl + "?act=duobao&op=latestAward",
+  IndexDuobao: ApiRootUrl + "?act=duobao&op=index",
+
+  // 好友加成页面 
+  Friend: ApiRootUrl + "?act=friend&op=index",
+  FriendUserlist: ApiRootUrl + "?act=friend&op=userlist",
+
+  getFriendData: r =>
+    request.get("?act=friend&op=index", null, {
+      baseURL: ApiRootUrl
+    }),
   // 首页数据接口
   getIndexData: r =>
-    request.get("index/index", null, {
+    request.get("?act=index&op=index", null, {
       baseURL: ApiRootUrl
     }),
   // 分类目录全部分类数据接口
