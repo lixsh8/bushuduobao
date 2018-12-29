@@ -23,6 +23,8 @@ const api = {
   // 夺宝详情页
   DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
   DuobaoHistory: ApiRootUrl + "?act=duobao&op=getDbPrize",
+  // 参与明细
+  JoinList: ApiRootUrl + "?act=duobao&op=getBuyTimesDetail",
 
 
   // 首页数据接口

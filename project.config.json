@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 6,
+			"current": 9,
 			"list": [
 				{
 					"id": 0,
@@ -72,13 +72,25 @@
 					"id": 6,
 					"name": "商品詳情",
 					"pathName": "pages/goods_detail/main",
-					"query": "id=18"
+					"query": "id=48"
 				},
 				{
 					"id": -1,
 					"name": "订单详情",
 					"pathName": "pages/order_detail/main",
 					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "收益规则",
+					"pathName": "pages/income_rules/main",
+					"query": "id=48&income=12.3"
+				},
+				{
+					"id": -1,
+					"name": "参与明细",
+					"pathName": "pages/join_list/main",
+					"query": "id=48"
 				}
 			]
 		}

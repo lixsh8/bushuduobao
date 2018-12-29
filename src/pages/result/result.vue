@@ -100,17 +100,11 @@
         </div>
         <div class="my-money">
           <div class="my-money-hd">当前收益</div>
-          <div
-            class="my-money-bd"
-            @click="goIncome()"
-          >¥{{duobaoData.hb_amount}}</div>
+          <div class="my-money-bd">¥{{duobaoData.hb_amount}}</div>
         </div>
       </div>
 
-      <div
-        class="join-count"
-        @click="goJoinList()"
-      >
+      <div class="join-count">
         <div class="join-count-t">已有{{duobaoData.joinNumber}}人参与</div>
         <img
           src="/static/images/icon_arr_gray.png"
@@ -229,7 +223,7 @@ import buyModal from "@/components/buyModal";
 export default {
   data() {
     return {
-      title: "商品详情",
+      title: "参与结果",
       headerBackground: "#fff",
       titleColor: "black",
       showCustomBar: !0,
@@ -295,27 +289,11 @@ export default {
     },
     changeNum(e) {
       this.buyNum = e || 0;
-      console.log(this.buyNum);
+      console.log(this.buyNum)
     },
     // 关闭
     closeBuyModal() {
       this.showBuyModal = !1;
-    },
-    // 跳转到收益规则
-    goIncome() {
-      wx.navigateTo({
-        url:
-          "/pages/income_rules/main?id=" +
-          this.is_id +
-          "&income=" +
-          this.duobaoData.hb_amount
-      });
-    },
-    // 跳转到参与明细
-    goJoinList() {
-      wx.navigateTo({
-        url: "/pages/join_list/main?id=" + this.is_id
-      });
     }
   },
 
@@ -373,20 +351,17 @@ export default {
     if (res.data && res.code === 0) {
       // this.totalData = res.data;
       console.log(res.data);
-      let info = res.data.goodsInfo;
 
       this.duobaoData = res.data;
       this.title = res.data.title;
-      this.is_id = info.is_id;
-      this.dgoods_id = info.dgoods_id;
-      this.article = info.dgoods_body;
+      this.article = res.data.goodsInfo.dgoods_body;
     } else {
     }
 
     // 往期回顾
     const resDuobaoHistory = await util.request(
       api.DuobaoHistory,
-      { page: 1, is_id: this.is_id },
+      { page: 1 },
       "GET",
       this
     );

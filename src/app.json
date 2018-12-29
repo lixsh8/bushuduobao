@@ -7,11 +7,11 @@
     "pages/order/main",
     "pages/order_detail/main",
     "pages/goods_detail/main",
+    "pages/join_list/main",
+    "pages/income_rules/main",
+    "pages/result/main",
     "pages/logistics/main",
     "pages/index/index",
-    "pages/xmadPage/copyInfo",
-    "pages/xmadPage/sell",
-    "pages/xmadPage/collect",
     "pages/mine/main"
   ],
   "window": {

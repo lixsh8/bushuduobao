@@ -90,8 +90,14 @@ export default {
   },
   methods: {
     navBack() {
+      console.log('back');
       wx.navigateBack({
-        delta: 1
+        delta: 1,
+        fail: function() {
+          console.log('backFailed');
+          
+          wx.switchTab({ url: '/pages/index/main' });
+        }
       });
     },
     navIndex() {

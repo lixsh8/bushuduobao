@@ -148,7 +148,7 @@
           <div
             @click="goDetail"
             class="GoodCardA _b790fd0"
-            data-dgoods_id="item.dgoods_id"
+            :data-is_id="item.dgoods_id"
             v-for="item in newUserZoneInfo.list"
             :key="item.dgoods_id"
           >
@@ -321,8 +321,7 @@
               v-for="item in duobao.list"
               :key="item.dgoods_id"
             >
-              <form
-                bindsubmit=""
+              <div
                 class="GoodCardA"
                 data-index=""
                 v-if="!item.showAd"
@@ -335,7 +334,10 @@
                   v-if="item.appId"
                 />
                 <!-- 商品 -->
-                <block v-else>
+                <div v-else
+                  @click="goDetail"
+                  :data-is_id="item.is_id"
+                >
                   <img
                     mode="aspectFill"
                     :src="item.dgoods_image"
@@ -359,12 +361,12 @@
                       <text class="step">{{item.dgoods_market_price}}</text>
                     </div>
                   </div>
-                </block>
+                </div>
                 <button
                   class="makeSubmit"
                   formType="submit"
                 ></button>
-              </form>
+              </div>
 
               <ad
                 class="ad-banner"
@@ -561,7 +563,7 @@ export default {
     // 跳转详情
     goDetail(e) {
       wx.navigateTo({
-        url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.dgoods_id
+        url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
       });
     },
     beginChallenge() {
