@@ -22,157 +22,157 @@ function formatNumber(n) {
 /**
  * 封封微信的的request
  */
-// function request(url, data = {}, method = "GET") {
-//   return new Promise(function(resolve, reject) {
-//     wx.request({
-//       url: url,
-//       data: data,
-//       method: method,
-//       header: {
-//         "Content-Type": "application/json",
-//         "X-Xbyjshop-Token": wx.getStorageSync("token")
-//       },
-//       success: function(res) {
-//         // console.log('请求成功，url:', url);
-//         // console.log('请求参数，data:', data);
-//         if (res.statusCode === 200) {
-//           if (res.data.errno === 401) {
-//             // 需要登录后才可以操作
-//             let code = null;
-//             return login()
-//               .then(res => {
-//                 code = res.code;
-//                 return getUserInfo();
-//               })
-//               .then(userInfo => {
-//                 // 登录远程服务器
-//                 request(
-//                   api.AuthLoginByWeixin,
-//                   {
-//                     code: code,
-//                     userInfo: userInfo
-//                   },
-//                   "POST"
-//                 )
-//                   .then(res => {
-//                     if (res.errno === 0) {
-//                       // 存储用户信息
-//                       wx.setStorageSync("userInfo", res.data.userInfo);
-//                       wx.setStorageSync("token", res.data.token);
-//                       resolve(res);
-//                     } else {
-//                       reject(res);
-//                     }
-//                   })
-//                   .catch(err => {
-//                     reject(err);
-//                   });
-//               })
-//               .catch(err => {
-//                 reject(err);
-//               });
-//           } else {
-//             resolve(res.data);
-//           }
-//         } else {
-//           reject(res.errMsg);
-//         }
-//       },
-//       fail: function(err) {
-//         reject(err);
-//         // console.log('请求失败，url', url);
-//         // console.log('请求参数，data:', data);
-//       }
-//     });
-//   });
-// }
-function request(url, data = {}, method = "GET", page, type) {
-  var isOne = true;
-  var cachFn = function() {
-    return new Promise(function(resolve, reject) {
-      wx.request({
-        url: url,
-        data: data,
-        method: method,
-        header: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Authorization: "cjt " + wx.getStorageSync("token")
-        },
-        success: function(res) {
-          // console.log('请求成功，url:', url);
-          // console.log('请求参数，data:', data);
-          if (res.statusCode === 200) {
-            if (res.data.errno === 401) {
-              // 需要登录后才可以操作
-              let code = null;
-              return login()
-                .then(res => {
-                  code = res.code;
-                  return getUserInfo();
-                })
-                .then(userInfo => {
-                  // 登录远程服务器
-                  request(
-                    api.AuthLoginByWeixin,
-                    {
-                      code: code,
-                      userInfo: userInfo
-                    },
-                    "POST"
-                  )
-                    .then(res => {
-                      if (res.errno === 0) {
-                        // 存储用户信息
-                        wx.setStorageSync("userInfo", res.data.userInfo);
-                        wx.setStorageSync("token", res.data.token);
-                        resolve(res);
-                      } else {
-                        reject(res);
-                      }
-                    })
-                    .catch(err => {
-                      reject(err);
-                    });
-                })
-                .catch(err => {
-                  reject(err);
-                });
-            } else {
-              resolve(res.data);
-            }
+function request(url, data = {}, method = "GET") {
+  return new Promise(function(resolve, reject) {
+    wx.request({
+      url: url,
+      data: data,
+      method: method,
+      header: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        Authorization: "cjt " + wx.getStorageSync("token")
+      },
+      success: function(res) {
+        // console.log('请求成功，url:', url);
+        // console.log('请求参数，data:', data);
+        if (res.statusCode === 200) {
+          if (res.data.errno === 401) {
+            // 需要登录后才可以操作
+            let code = null;
+            return login()
+              .then(res => {
+                code = res.code;
+                return getUserInfo();
+              })
+              .then(userInfo => {
+                // 登录远程服务器
+                request(
+                  api.AuthLoginByWeixin,
+                  {
+                    code: code,
+                    userInfo: userInfo
+                  },
+                  "POST"
+                )
+                  .then(res => {
+                    if (res.errno === 0) {
+                      // 存储用户信息
+                      wx.setStorageSync("userInfo", res.data.userInfo);
+                      wx.setStorageSync("token", res.data.token);
+                      resolve(res);
+                    } else {
+                      reject(res);
+                    }
+                  })
+                  .catch(err => {
+                    reject(err);
+                  });
+              })
+              .catch(err => {
+                reject(err);
+              });
           } else {
-            reject(res.errMsg);
+            resolve(res.data);
           }
-          if (!page.isNet) {
-            page.isNet = true;
-          }
-        },
-        fail: function(err) {
-          console.log("11");
-          reject(err);
-          if (!isOne) {
-            return;
-          }
-          page.isNet = false;
-          page.isRequested = false;
-          // 记录本次请求，加载时，执行page实例的reloadFn即可
-          // page.reloadFn = request(url, data, method, page, 1);
-          var requests = page.reloadFn;
-          console.log(page.reloadFn)
-          requests.push(request(url, data, method, page, 1));
-          page.reloadFn = requests
-          isOne = false;
+        } else {
+          reject(res.errMsg);
         }
-      });
+      },
+      fail: function(err) {
+        reject(err);
+        // console.log('请求失败，url', url);
+        // console.log('请求参数，data:', data);
+      }
     });
-  };
-
-  if (type) {
-    page.isRequested = true;
-  }
-
-  return type ? cachFn : cachFn();
+  });
 }
+// function request(url, data = {}, method = "GET", page, type) {
+//   var isOne = true;
+//   var cachFn = function() {
+//     return new Promise(function(resolve, reject) {
+//       wx.request({
+//         url: url,
+//         data: data,
+//         method: method,
+//         header: {
+//           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+//           Authorization: "cjt " + wx.getStorageSync("token")
+//         },
+//         success: function(res) {
+//           // console.log('请求成功，url:', url);
+//           // console.log('请求参数，data:', data);
+//           if (res.statusCode === 200) {
+//             if (res.data.errno === 401) {
+//               // 需要登录后才可以操作
+//               let code = null;
+//               return login()
+//                 .then(res => {
+//                   code = res.code;
+//                   return getUserInfo();
+//                 })
+//                 .then(userInfo => {
+//                   // 登录远程服务器
+//                   request(
+//                     api.AuthLoginByWeixin,
+//                     {
+//                       code: code,
+//                       userInfo: userInfo
+//                     },
+//                     "POST"
+//                   )
+//                     .then(res => {
+//                       if (res.errno === 0) {
+//                         // 存储用户信息
+//                         wx.setStorageSync("userInfo", res.data.userInfo);
+//                         wx.setStorageSync("token", res.data.token);
+//                         resolve(res);
+//                       } else {
+//                         reject(res);
+//                       }
+//                     })
+//                     .catch(err => {
+//                       reject(err);
+//                     });
+//                 })
+//                 .catch(err => {
+//                   reject(err);
+//                 });
+//             } else {
+//               resolve(res.data);
+//             }
+//           } else {
+//             reject(res.errMsg);
+//           }
+//           if (!page.isNet) {
+//             page.isNet = true;
+//           }
+//         },
+//         fail: function(err) {
+//           console.log("11");
+//           reject(err);
+//           if (!isOne) {
+//             return;
+//           }
+//           page.isNet = false;
+//           page.isRequested = false;
+//           // 记录本次请求，加载时，执行page实例的reloadFn即可
+//           // page.reloadFn = request(url, data, method, page, 1);
+//           var requests = page.reloadFn;
+//           console.log(page.reloadFn)
+//           requests.push(request(url, data, method, page, 1));
+//           page.reloadFn = requests
+//           isOne = false;
+//         }
+//       });
+//     });
+//   };
+
+//   if (type) {
+//     page.isRequested = true;
+//   }
+
+//   return type ? cachFn : cachFn();
+// }
 
 /**
  * 检查微信会话是否过期

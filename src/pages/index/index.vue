@@ -139,7 +139,7 @@
         <div class="head _b790fd0">
           <div class="title _b790fd0">{{newUserZoneInfo.title}}</div>
           <div
-            @click="$NewUserZone$goActivity"
+            @click="gotoNewer"
             class="more _b790fd0"
             :data-url="newUserZoneInfo.url"
           >{{newUserZoneInfo.subtitle}}</div>
@@ -164,7 +164,7 @@
           </div>
         </div>
         <div
-          @click="goActivity"
+          @click="gotoNewer"
           class="div-more _b790fd0"
           data-wpygoactivity-a="newUserZoneInfo.url"
         >
@@ -552,14 +552,11 @@ export default {
     pagingFooter
   },
   methods: {
-    // 跳转
-    jump(e) {
-      var url = e.currentTarget.dataset.url;
-      if (url.indexOf("/index") || url.indexOf("/invite")) {
-        wx.switchTab({ url: url });
-      } else {
-        wx.navigateTo({ url: url });
-      }
+    // 跳转到新人专区
+    gotoNewer(e) {
+      wx.navigateTo({
+        url: '/pages/newer/main'
+      })
     },
     // 跳转详情
     goDetail(e) {

@@ -275,38 +275,36 @@ export default {
     },
     // 跳转到参与明细
     goJoinList() {
-      
       wx.navigateTo({
         url: "/pages/join_list/main?id=" + this.data.is_id
       });
     },
     // 查看物流
     gotologistics() {
-      console.log('查看物流');
-      
+      console.log("查看物流");
     },
     // 选择地址
     gotoAddress() {
       wx.chooseAddress({
         success: function(res) {
           console.log(JSON.stringify(res));
-          const res = await util.request(
+          util
+            .request(
               api.AddressSave,
               {
                 address: JSON.stringify(res)
               },
               "POST",
               this
-            );
-            if (res.data && res.code === 0) {
-              // this.totalData = res.data;
-              console.log(res.data);
-
-              this.data = res.data;
-            } else {
-            }
+            )
+            .then(res => {
+              console.log(res);
+            })
+            .catch(err => {
+              console.log(err);
+            });
         }
-      })
+      });
     },
     makePhoneCall() {
       wx.makePhoneCall({

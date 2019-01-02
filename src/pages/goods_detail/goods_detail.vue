@@ -202,7 +202,7 @@
       @makeBuy="makeBuy"
     />
     <!-- 返回頂部 -->
-    <back-top :showBackTop="showBackTop" />
+    <back-top :showBackTop="showBackTop&&currentTab==1" />
     <!-- 底部没有更多 -->
     <paging-footer
       :showNoMore="showNoMore"
@@ -266,7 +266,7 @@ export default {
       // 商品id
       dgoods_id: "",
       duobaoData: null,
-      currentTab: 1,
+      currentTab: 0,
       page: 1,
       hasMore: !0,
       showNoMore: !1,

@@ -304,6 +304,7 @@ export default {
 @import "../../common/style/8.scss";
 @import "../../common/style/9.scss";
 @import "../../common/style/curtain.scss";
+@import "../../common/style/variable";
 
 page {
   background: #d03430;
@@ -444,7 +445,7 @@ page {
   left: 238rpx;
   width: 72rpx;
   height: 72rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/dialog/dialog_close.png")
+  background: url(#{$img_url}dialog_close.png)
     no-repeat;
   background-size: 100% 100%;
 }
