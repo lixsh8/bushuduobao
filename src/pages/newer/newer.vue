@@ -14,7 +14,7 @@
     <div class="banner">
       <div
         class="box indexBanner"
-        v-if="duobaoData&&duobaoData.goodsInfo&&duobaoData.goodsInfo.dgoods_image.length>0"
+        v-if="banners.length>0"
       >
         <swiper
           :autoplay="config.autoplay"
@@ -24,18 +24,18 @@
           :indicatorColor="config.indicatorColor"
           :indicatorDots="config.indicatorDots"
           :interval="config.interval"
-          v-if="duobaoData.goodsInfo.dgoods_image.length>1"
+          v-if="banners.length>1"
         >
           <swiper-item
             catchtap="onBanner"
             class="banner-wrap"
-            v-for="(img, index) in duobaoData.goodsInfo.dgoods_image"
-            :key="index"
+            v-for="banner in banners"
+            :key="banner.pic"
           >
             <img
               class="pic"
               mode="widthFix"
-              :src="img"
+              :src="banner.pic"
             />
           </swiper-item>
         </swiper>
@@ -77,19 +77,19 @@
       <!-- 已开奖 -->
       <div
         class="award"
-        v-if="duobaoData&&duobaoData.prizeInfo"
+        v-if="duobaoData"
       >
         <div class="avatar-box">
           <img
-            :src="duobaoData.prizeInfo.avatarUrl"
+            src="https://resource.xiaotaotao123.cn/wxapp_img/avatar.png"
             alt=""
           />
-          <div class="username">{{duobaoData.prizeInfo.nickName}}</div>
+          <div class="username">小飞飞小飞飞小飞飞小飞飞</div>
         </div>
         <div class="award-bd">
-          <div class="award-item">中奖号码：{{duobaoData.prizeInfo.winNumber}}</div>
-          <div class="award-item">本期参与：{{duobaoData.prizeInfo.buyTimes}}</div>
-          <div class="award-item">中奖时间：{{duobaoData.prizeInfo.date}}</div>
+          <div class="award-item">中奖号码：10000123</div>
+          <div class="award-item">本期参与：5份</div>
+          <div class="award-item">中奖时间：2018-12-19 10:1</div>
         </div>
       </div>
 
@@ -100,17 +100,11 @@
         </div>
         <div class="my-money">
           <div class="my-money-hd">当前收益</div>
-          <div
-            class="my-money-bd"
-            @click="goIncome()"
-          >¥{{duobaoData.hb_amount}}</div>
+          <div class="my-money-bd">¥{{duobaoData.hb_amount}}</div>
         </div>
       </div>
 
-      <div
-        class="join-count"
-        @click="goJoinList()"
-      >
+      <div class="join-count">
         <div class="join-count-t">已有{{duobaoData.joinNumber}}人参与</div>
         <img
           src="/static/images/icon_arr_gray.png"
@@ -193,13 +187,9 @@
     <!-- 购买弹窗 -->
     <buyModal
       :showBuyModal="showBuyModal"
-      :totalNum="totalNum"
-      :leftNum="leftNum"
-      :buyNum="buyNum"
-      :totalPrice="totalPrice"
       @closeBuyModal="closeBuyModal"
       @changeNum="changeNum"
-      @makeBuy="makeBuy"
+      :buyNum="buyNum"
     />
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
@@ -211,19 +201,10 @@
     <!-- 底部按钮 -->
     <div
       class="fixed-btn"
-      @click="gotobuy"
+      @click="goBuy"
     >立即参与</div>
     <!-- 快速导航 -->
     <quick-navigate />
-    <!-- 机会不足弹窗 -->
-    <ls-dialog
-      :showDialog="showDialog"
-      :openType="openType"
-      :dialogTitle="dialogTitle"
-      :dialogContent="dialogContent"
-      @okBtnHandler="okBtnHandler"
-      @closeDialog="closeDialog"
-    />
   </div>
 </template>
 
@@ -238,12 +219,11 @@ import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
 import buyModal from "@/components/buyModal";
-import lsDialog from "@/components/lsDialog";
 
 export default {
   data() {
     return {
-      title: "商品详情",
+      title: "参与结果",
       headerBackground: "#fff",
       titleColor: "black",
       showCustomBar: !0,
@@ -261,10 +241,6 @@ export default {
       },
       banners: [],
       article: "",
-      // 购买期数id
-      is_id: "",
-      // 商品id
-      dgoods_id: "",
       duobaoData: null,
       currentTab: 1,
       page: 1,
@@ -273,15 +249,7 @@ export default {
       canScroll: !0,
       scrollTimer: null,
       showBuyModal: !1,
-      buyNum: 1,
-      leftNum: 0,
-      totalNum: 0,
-      price: 0,
-      totalPrice: 0,
-      showDialog: !1,
-      dialogTitle: "参与机会不足",
-      dialogContent: "可邀请好友赞助更多机会哦！",
-      openType: "share",
+      buyNum: 0,
       historyList: []
     };
   },
@@ -292,7 +260,6 @@ export default {
     pagingFooter,
     quickNavigate,
     buyModal,
-    lsDialog,
     wxParse
   },
 
@@ -316,79 +283,18 @@ export default {
     navigate(href, e) {
       // do something
     },
-    // 弹出购买弹窗
-    gotobuy() {
-      console.log("showBuyModal");
+    // 购买
+    goBuy() {
       this.showBuyModal = !0;
     },
-    // 购买
-    async makeBuy() {
-      const res = await util.request(
-        api.JoinDuobao,
-        { buy_times: this.buyNum, is_id: this.is_id },
-        "POST",
-        this
-      );
-      if (res.data && res.code === 0) {
-        this.showDialog = !0;
-        wx.navigateTo({
-          url: "/pages/result/main?id=" + this.is_id
-        });
-      } else if (res.code === 402) {
-        this.showDialog = !0;
-      }
-    },
     changeNum(e) {
-      var num = e || 0;
-      this.buyNum = num;
-      this.totalPrice = num * this.price;
-      console.log(this.buyNum);
+      this.buyNum = e || 0;
+      console.log(this.buyNum)
     },
-    // 关闭购买弹窗
+    // 关闭
     closeBuyModal() {
       this.showBuyModal = !1;
-    },
-    // 关闭dialog
-    closeDialog() {
-      console.log("closeDialog--click");
-      this.showDialog = !1;
-    },
-    // 跳转到收益规则
-    goIncome() {
-      wx.navigateTo({
-        url:
-          "/pages/income_rules/main?id=" +
-          this.is_id +
-          "&income=" +
-          this.duobaoData.hb_amount
-      });
-    },
-    // 跳转到参与明细
-    goJoinList() {
-      console.log('goJoinList');
-      
-      wx.navigateTo({
-        url: "/pages/join_list/main?id=" + this.is_id
-      });
     }
-  },
-
-  // 分享
-  onShareAppMessage(res) {
-    if (res.from === "button") {
-      // 来自页面内转发按钮
-      console.log(res);
-      return {
-        title: this.totalData.share.title,
-        imageUrl: this.totalData.share.img,
-        path: this.totalData.share.link
-      };
-    }
-    return {
-      title: this.totalData.share.title,
-      imageUrl: this.totalData.share.img,
-      path: this.totalData.share.link
-    };
   },
 
   // 滚动加载更多
@@ -407,7 +313,7 @@ export default {
 
       const DuobaoHistory = await util.request(
         api.DuobaoHistory,
-        { page: page, dgoods_id: this.dgoods_id },
+        { page: page },
         "GET",
         this
       );
@@ -445,24 +351,17 @@ export default {
     if (res.data && res.code === 0) {
       // this.totalData = res.data;
       console.log(res.data);
-      let info = res.data.goodsInfo;
 
       this.duobaoData = res.data;
       this.title = res.data.title;
-      this.is_id = info.is_id;
-      this.dgoods_id = info.dgoods_id;
-      this.article = info.dgoods_body;
-      this.totalNum = info.is_totalnum;
-      this.leftNum = info.is_oddnum;
-      this.price = info.dgoods_hb;
-      this.totalPrice = info.dgoods_hb;
+      this.article = res.data.goodsInfo.dgoods_body;
     } else {
     }
 
     // 往期回顾
     const resDuobaoHistory = await util.request(
       api.DuobaoHistory,
-      { page: 1, dgoods_id: this.dgoods_id },
+      { page: 1 },
       "GET",
       this
     );

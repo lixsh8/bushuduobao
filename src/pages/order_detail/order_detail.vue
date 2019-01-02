@@ -11,52 +11,89 @@
 
     <!-- 正文 -->
     <!-- 订单进度 -->
-    <div class="process-sec">
+    <div
+      class="process-sec"
+      v-if="data&&data.join_state"
+    >
       <div class="process">
         <div class="process-item process-1">
-          <div class="process-t">待开奖</div>
+          <div class="process-t active">待开奖</div>
           <img
             src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process1.png"
             alt=""
           >
         </div>
         <div class="process-item process-2">
-          <div class="process-t">待开奖</div>
+          <div
+            class="process-t"
+            :class="{active:data.join_state>1}"
+          >已开奖</div>
           <img
+            v-if="data.join_state>1"
+            src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process2_active.png?v=201812001"
+            alt=""
+          >
+          <img
+            v-else
             src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process2.png?v=201812001"
             alt=""
           >
         </div>
         <div class="process-item process-3">
-          <div class="process-t">待开奖</div>
+          <div
+            class="process-t"
+            :class="{active:data.join_state>8}"
+          >待发货</div>
           <img
+            v-if="data.join_state>8"
+            src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process3_active.png?v=201812001"
+            alt=""
+          >
+          <img
+            v-else
             src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process3.png?v=201812001"
             alt=""
           >
         </div>
         <div class="process-item process-4">
-          <div class="process-t">待开奖</div>
+          <div
+            class="process-t"
+            :class="{active:data.join_state>9}"
+          >已发货</div>
           <img
+            v-if="data.join_state>9"
+            src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process4_active.png?v=201812001"
+            alt=""
+          >
+          <img
+            v-else
             src="https://resource.xiaotaotao123.cn/wxapp_img/logistics_process4.png?v=201812001"
             alt=""
           >
         </div>
       </div>
-      <div class="process-desc">恭喜中奖，已发货</div>
+      <div class="process-desc">{{data.join_state_name}}</div>
     </div>
 
     <!-- 信息 -->
-    <div class="info-sec">
+    <div
+      class="info-sec"
+      v-if="data"
+    >
       <!-- 物流信息 -->
-      <div class="logistics">
+      <div
+        class="logistics"
+        v-if="data.deliveryState==1"
+        @click="gotologistics"
+      >
         <img
           class="logistics-icon"
           :src="logisticsIcon"
           alt=""
         />
         <div class="logistics-info">
-          <div class="logistics-node">[代收点]已签收，签收人凭取货码签收。感谢您使用中通快递已签收，签收人凭取货码签收。感谢您使用中通快递</div>
-          <div class="logistics-time">2018-12-19 23:49:52</div>
+          <div class="logistics-node">{{data.deliveryInfo.title}}</div>
+          <div class="logistics-time">{{data.deliveryInfo.time}}</div>
         </div>
         <img
           class="arr-r"
@@ -66,53 +103,79 @@
       </div>
       <!-- 地址信息 -->
       <div class="address-panel">
-        <div class="info">
-          <div class="r-name">收货人：HAPPY</div>
-          <div class="r-tel">13682989812</div>
+        <div
+          class="has-address"
+          v-if="data.receivingState==1"
+        >
+          <div class="info">
+            <div class="r-name">收货人：{{data.receivingInfo.deliveryName}}</div>
+            <div class="r-tel">{{data.receivingInfo.deliveryPhone}}</div>
+          </div>
+          <div class="address">收货地址：{{data.receivingInfo.deliveryAddress}}</div>
         </div>
-        <div class="address">收货地址：深圳市南山区西丽街道</div>
+        <div
+          class="no-address"
+          @click="gotoAddress"
+          v-if="data.receivingState==2"
+        >
+          去添加地址
+        </div>
       </div>
       <!-- 产品信息 -->
       <div class="goods-panel">
         <div class="goods-info">
           <img
             class="goods-avatar"
-            src="https://resource.xiaotaotao123.cn/wxapp_img/avatar.png"
+            :src="data.dgoods_image"
             alt=""
           >
-          <div class="goods-title">原宿文艺女帆布包 商品规格：32cm*36cm 工测量误差见谅 商品描述：高品质涤棉牛...</div>
+          <div class="goods-title">{{data.dgoods_name}}</div>
         </div>
         <div class="price-info">
           <div class="price-item">
             <div class="price-t">参与总额</div>
-            <div class="price-cnt">参￥9.00</div>
+            <div class="price-cnt">参￥{{data.dgoods_hb}}</div>
           </div>
-          <div class="price-item">
+          <div
+            class="price-item"
+            v-if="data.freight"
+          >
             <div class="price-t">运费</div>
-            <div class="price-cnt">参￥9.00</div>
+            <div class="price-cnt">￥{{data.freight}}</div>
           </div>
         </div>
 
         <div class="price-total-wrapper">
           <div class="total-t">红包支付总价</div>
-          <div class="total-num">￥100</div>
+          <div class="total-num">￥{{data.dgoods_total_hb}}</div>
         </div>
       </div>
     </div>
     <!-- 我的号码和收益 -->
-    <div class="income-panel">
-      <div class="income-item">
+    <div
+      class="income-panel"
+      v-if="data"
+    >
+      <div
+        class="income-item"
+        :data-is_id="data.is_id"
+        @click="goJoinList"
+      >
         <div class="income-t">号码份数</div>
-        <div class="income-num">52</div>
+        <div class="income-num">{{data.buy_times}}</div>
         <img
           class="arr-r"
           src="/static/images/icon_arr_gray.png"
           alt=""
         >
       </div>
-      <div class="income-item">
+      <div
+        class="income-item"
+        :data-is_id="data.is_id"
+        @click="goIncome"
+      >
         <div class="income-t">当前收益</div>
-        <div class="income-num">￥511112</div>
+        <div class="income-num">￥{{data.hb_amount}}</div>
         <img
           class="arr-r"
           src="/static/images/icon_arr_gray.png"
@@ -122,14 +185,27 @@
     </div>
 
     <!-- 订单信息 -->
-    <div class="order-panel">
-      <div class="order-item">订单编号：075355839266603030</div>
-      <div class="order-item">下单时间：2018-12-19 23:49:52</div>
-      <div class="order-item">开奖时间：1075355839266603030</div>
-      <div class="order-item">下单时间：2018012-19 23:49:52</div>
+    <div
+      class="order-panel"
+      v-if="data"
+    >
+      <div class="order-item">订单编号：{{data.order_id}}</div>
+      <div class="order-item">下单时间：{{data.orderDate}}</div>
+      <div
+        class="order-item"
+        v-if="data.prizeDate"
+      >开奖时间：{{data.prizeDate}}</div>
+      <div
+        class="order-item"
+        v-if="data.deliveryDate"
+      >发货时间：{{data.deliveryDate}}</div>
+      <div
+        class="order-item"
+        v-if="data.receivingDate"
+      >收货时间：{{data.receivingDate}}</div>
       <div
         class="btn-copy"
-        @click="copyOrderNo('123456789')"
+        @click="copyOrderNo(data.order_id)"
       >复制</div>
     </div>
 
@@ -137,7 +213,6 @@
     <div
       class="btn-kf"
       @click="makePhoneCall"
-      v-if="!isNet"
     >
       <img
         :src="kfIcon"
@@ -154,7 +229,9 @@
 </template>
 
 <script type="text/ecmascript-6">
-// import util from "@/utils/util";
+import util from "@/utils/util";
+import api from "@/utils/api";
+// import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 
@@ -167,14 +244,7 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       isNet: !0,
-      navs: [
-        { id: 1, name: "全部" },
-        { id: 2, name: "已开奖" },
-        { id: 3, name: "已开奖" },
-        { id: 4, name: "已开奖" },
-        { id: 5, name: "已开奖" }
-      ],
-      list: [1, 2, 3, 4]
+      data: null
     };
   },
 
@@ -192,18 +262,58 @@ export default {
     }
   },
 
-  onLoad(ev) {
-    // console.log(util.wxRequest)
-  },
-
   methods: {
+    // 跳转到收益规则
+    goIncome() {
+      wx.navigateTo({
+        url:
+          "/pages/income_rules/main?id=" +
+          this.data.is_id +
+          "&detail=1&income=" +
+          this.data.hb_amount
+      });
+    },
+    // 跳转到参与明细
+    goJoinList() {
+      
+      wx.navigateTo({
+        url: "/pages/join_list/main?id=" + this.data.is_id
+      });
+    },
+    // 查看物流
+    gotologistics() {
+      console.log('查看物流');
+      
+    },
+    // 选择地址
+    gotoAddress() {
+      wx.chooseAddress({
+        success: function(res) {
+          console.log(JSON.stringify(res));
+          const res = await util.request(
+              api.AddressSave,
+              {
+                address: JSON.stringify(res)
+              },
+              "POST",
+              this
+            );
+            if (res.data && res.code === 0) {
+              // this.totalData = res.data;
+              console.log(res.data);
+
+              this.data = res.data;
+            } else {
+            }
+        }
+      })
+    },
     makePhoneCall() {
       wx.makePhoneCall({
-        phoneNumber: "15888888888"
+        phoneNumber: this.data.servicePhone
       });
     },
     copyOrderNo(No) {
-
       wx.setClipboardData({
         data: No,
         success(res) {
@@ -217,11 +327,31 @@ export default {
         }
       });
     }
+  },
+  async onLoad(e) {
+    var orderId = e.orderId;
+
+    const res = await util.request(
+      api.OderDetail,
+      {
+        order_id: orderId
+      },
+      "GET",
+      this
+    );
+    if (res.data && res.code === 0) {
+      // this.totalData = res.data;
+      console.log(res.data);
+
+      this.data = res.data;
+    } else {
+    }
   }
 };
 </script>
 
 <style lang='scss'>
+@import "../../common/style/variable";
 @import "../../common/style/mixin";
 
 page {
@@ -241,10 +371,14 @@ page {
       display: inline-block;
       font-size: 14px;
       line-height: 1;
-      color: #ff5540;
 
       .process-t {
+        color: #d9d1cf;
         padding-bottom: 10px;
+
+        &.active {
+          color: #ff5540;
+        }
       }
       img {
         display: block;
@@ -331,6 +465,12 @@ page {
         width: 50%;
         text-align: right;
       }
+    }
+
+    .no-address {
+      text-align: center;
+      background: url(#{$img_url}/icon_arr_gray.png) no-repeat right center;
+      background-size: 15px;
     }
   }
 

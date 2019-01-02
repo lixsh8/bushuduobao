@@ -18,11 +18,12 @@
     >
       <div
         class="tab-item"
-        :class="{active: currentTab===index}"
+        :class="{active: currentType===item.id}"
         :style="{width: (100/navs.length) + '%'}"
         v-for="(item, index) in navs"
-        :key="index"
-        @click="changeTab(index)"
+        :data-index="index"
+        :key="item.id"
+        @click="changeTab(item.id)"
       >
         <div class="tab-cnt">{{item.name}}</div>
       </div>
@@ -36,33 +37,46 @@
         class="item"
         v-for="(item, index) in list"
         :key="index"
-        @click="goDetail(item)"
+        @click="goDetail(item.order_id)"
       >
         <div class="item-hd">
           <div class="order-no">订单号:1075355839266603030</div>
-          <div class="order-status">恭喜中奖，已发货</div>
+          <div class="order-status">{{item.join_state}}</div>
         </div>
         <div class="item-bd">
           <img
-            src="https://resource.xiaotaotao123.cn/wxapp_img/avatar.png"
+            :src="item.dgoods_image"
             class="avatar"
           />
           <div class="info">
-            <div class="title">【秒杀即将结束】亚克力小夜灯(商 品材质： 亚克力+PP+电子元件...</div>
-            <div class="count-wrapper">号码份数：<div class="count">5</div>
+            <div class="title">{{item.dgoods_name}}</div>
+            <div class="count-wrapper">号码份数：<div class="count">{{item.buy_times}}</div>
             </div>
           </div>
         </div>
-        <div class="item-ft">
+        <div class="item-ft" v-if="item.showlogistics">
           <div
             class="btn-logistics"
-            @click.stop="goLogistics(item)"
+            @click.stop="goLogistics(item.order_id)"
           >查看物流</div>
+        </div>
+        <div class="item-ft" v-if="item.showAddress">
+          <div
+            class="btn-logistics"
+            @click.stop="setAddress()"
+          >收货地址</div>
         </div>
       </div>
 
     </div>
-
+    
+    <!-- 返回頂部 -->
+    <back-top :showBackTop="showBackTop" />
+    <!-- 底部没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore"
+      noMoreTips="没有更多数据了"
+    />
     <!-- 快速导航 -->
     <!-- <quick-navigate /> -->
     <back-top />
@@ -71,8 +85,12 @@
 </template>
 
 <script type="text/ecmascript-6">
+import util from "@/utils/util";
+import api from "@/utils/api";
+// import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import backTop from "@/components/backTop";
+import pagingFooter from "@/components/pagingFooter";
 import quickNavigate from "@/components/quickNavigate";
 
 export default {
@@ -85,20 +103,26 @@ export default {
       customBarStyle: "black",
       headerHeight: 46,
       navs: [
-        { id: 1, name: "全部" },
-        { id: 2, name: "已开奖" },
-        { id: 3, name: "已开奖" },
-        { id: 4, name: "已开奖" },
-        { id: 5, name: "已开奖" }
+        { id: 0, name: "全部" },
+        { id: 1, name: "待开奖" },
+        { id: 8, name: "未中奖" },
+        { id: 9, name: "已中奖" }
       ],
-      currentTab: 0,
-      list: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11, 12, 13, 14, 15]
+      canRequest: !0,
+      canScroll: !0,
+      requestTimer: null,
+      page: 1,
+      page_size: 10,
+      hasMore: !0,
+      currentType: 0,
+      list: []
     };
   },
 
   components: {
     headBar,
     backTop,
+    pagingFooter,
     quickNavigate
   },
 
@@ -108,15 +132,44 @@ export default {
     }
   },
 
-  mounted(ev) {},
-
   onShow(ev) {
     // console.log(this.globalData.statusBarHeight);
   },
 
   methods: {
+    // 参与列表
+    async getList(idx) {
+      if (!this.canRequest) {
+        return;
+      }
+      this.currentType = idx;
+      this.canRequest = !1;
+      const res = await util.request(
+        api.OderList,
+        {
+          page: 1,
+          type: this.currentType,
+          page_size: this.page_size
+        },
+        "GET",
+        this
+      );
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+
+        this.list = res.data.list;
+        this.hasMore = res.data.hasMore;
+      } else {
+      }
+      if (this.requestTimer) clearTimeout(this.requestTimer);
+      this.requestTimer = setTimeout(() => {
+        this.canRequest = !0;
+      }, 2000);
+    },
+    // 切换tab
     changeTab(idx) {
-      this.currentTab = idx;
+      this.getList(idx);
     },
     goLogistics(oid) {
       wx.navigateTo({ url: "/pages/logistics/main?orderId=" + oid });
@@ -124,6 +177,62 @@ export default {
     goDetail(oid) {
       wx.navigateTo({ url: "/pages/order_detail/main?orderId=" + oid });
     }
+  },
+
+  // 滚动加载更多
+  async onReachBottom() {
+    if (this.hasMore && this.canScroll) {
+      let list = this.list;
+      let page = this.page; // eslint-disable-line
+
+      page++;
+      this.canScroll = false;
+
+      wx.showToast({
+        title: "数据加载中...", // 提示的内容,
+        icon: "loading", // 图标,
+        duration: 1000 // 延迟时间,
+      });
+
+      const res = await util.request(
+        api.OderList,
+        {
+          page: page,
+          type: this.currentType,
+          page_size: this.page_size
+        },
+        "GET",
+        this
+      );
+
+      if (
+        res.data &&
+        res.code === 0 &&
+        res.data.list &&
+        res.data.list.length > 0
+      ) {
+        // this.totalData = res.data;
+        var data = res.data;
+        this.list = list.concat(data.list);
+        this.hasMore = data.hasMore;
+        this.page = data.page;
+        if (data.hasMore) {
+          this.showNoMore = !1;
+        } else {
+          this.showNoMore = !0;
+        }
+      }
+      if (this.scrollTimer) clearTimeout(this.scrollTimer);
+      this.scrollTimer = setTimeout(() => {
+        this.canScroll = true;
+      }, 1500);
+    } else if (!this.hasMore && this.currentTab === 1) {
+      this.showNoMore = !0;
+    }
+  },
+  // 页面加载
+  onLoad() {
+    this.getList(0);
   }
 };
 </script>

@@ -148,9 +148,9 @@
           <div
             @click="goDetail"
             class="GoodCardA _b790fd0"
-            :data-is_id="item.dgoods_id"
+            :data-is_id="item.is_id"
             v-for="item in newUserZoneInfo.list"
-            :key="item.dgoods_id"
+            :key="item.is_id"
           >
             <image
               class="_b790fd0"
@@ -319,12 +319,14 @@
           <div class="RecommendGoods-list">
             <block
               v-for="item in duobao.list"
-              :key="item.dgoods_id"
+              :key="item.is_id"
             >
               <div
                 class="GoodCardA"
                 data-index=""
                 v-if="!item.showAd"
+                @click="goDetail"
+                :data-is_id="item.is_id"
               >
                 <!-- 广告 -->
                 <img
@@ -335,8 +337,7 @@
                 />
                 <!-- 商品 -->
                 <div v-else
-                  @click="goDetail"
-                  :data-is_id="item.is_id"
+                  class="a1"
                 >
                   <img
                     mode="aspectFill"
@@ -562,6 +563,8 @@ export default {
     },
     // 跳转详情
     goDetail(e) {
+      console.log(e);
+      
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
       });
@@ -630,7 +633,7 @@ export default {
     },
     // 兑换步数
     async exchangeStep() {
-      const res = await util.request(api.IndexExchangeStep, null, "GET", this);
+      const res = await util.request(api.IndexExchangeStep, null, "POST", this);
       if (res.data && res.code === 0) {
         // this.totalData = res.data;
         console.log(res.data);
@@ -706,22 +709,22 @@ export default {
 
     this.checkAuth();
     // 获取首页数据
-    // request.get(api.Index, null).then(res => {
-    //   this.hb_amount = res.data.hb_amount;
-    //   this.bubble = res.data.bubble;
-    //   this.menuList = res.data.menuList;
-    //   this.banner = res.data.banner;
-    // });
-    const res = await util.request(api.Index, null, "GET", this);
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-
+    request.get(api.Index, null).then(res => {
       this.hb_amount = res.data.hb_amount;
       this.bubble = res.data.bubble;
       this.menuList = res.data.menuList;
       this.banner = res.data.banner;
-    }
+    });
+    // const res = await util.request(api.Index, null, "GET", this);
+    // if (res.data && res.code === 0) {
+    //   // this.totalData = res.data;
+    //   console.log(res.data);
+
+    //   this.hb_amount = res.data.hb_amount;
+    //   this.bubble = res.data.bubble;
+    //   this.menuList = res.data.menuList;
+    //   this.banner = res.data.banner;
+    // }
     // 获取步数
     this.getWeRunData();
     // 获取新手专区数据 act=duobao&op=newbornZone

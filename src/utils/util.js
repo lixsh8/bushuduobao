@@ -95,7 +95,7 @@ function request(url, data = {}, method = "GET", page, type) {
         data: data,
         method: method,
         header: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
           Authorization: "cjt " + wx.getStorageSync("token")
         },
         success: function(res) {

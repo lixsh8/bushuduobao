@@ -12,19 +12,37 @@
     <!-- 正文 -->
     <div class="list-wrapper">
       <div class="list-filter">
-        <div class="chb"></div>
+        <div
+          class="chb"
+          :class="{checked:isshowmine === 1}"
+          @click="showList"
+        ></div>
         <div class="filter-title">
           仅显示 我的号码
         </div>
       </div>
 
-      <div class="list">
+      <div
+        class="list"
+        v-if="list"
+      >
 
-        <div class="item" v-for="(item,index) in list" data-index="index" :key="index">
-          <img src="/static/images/blackHome.png" alt="" class="avatar">
-          <div class="username">panel</div>
-          <div class="number">号码：15484848</div>
-          <div class="time">21312323123123123</div>
+        <div
+          class="item"
+          v-for="(item,index) in list"
+          data-index="index"
+          :key="index"
+        >
+          <img
+            :src="item.avatarUrl"
+            alt=""
+            class="avatar"
+          >
+          <div class="username">{{item.nickName}}</div>
+          <div class="info">
+            <div class="number">号码：{{item.number}}</div>
+            <div class="time">{{item.date}}</div>
+          </div>
         </div>
 
       </div>
@@ -47,7 +65,6 @@ import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
 import wxParse from "mpvue-wxparse";
-import { setTimeout, clearTimeout } from "timers";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
@@ -62,7 +79,17 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
-      list: [1, 2, 3]
+      id: "",
+      isshowmine: 0,
+      page: 1,
+      page_size: 20,
+      hasMore: !0,
+      canRequest: !0,
+      requestTimer: null,
+      canScroll: !0,
+      showNoMore: !1,
+      scrollTimer: null,
+      list: null
     };
   },
 
@@ -81,17 +108,65 @@ export default {
     }
   },
 
-  mounted(ev) {
-  },
+  mounted(ev) {},
 
   methods: {
+    async getList() {
+      // 参与列表
+      if (!this.canRequest) {
+        return;
+      }
+      this.canRequest = !1;
+      const res = await util.request(
+        api.JoinList,
+        {
+          page: 1,
+          is_id: this.id,
+          isshowmine: this.isshowmine,
+          page_size: this.page_size
+        },
+        "GET",
+        this
+      );
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+
+        this.list = res.data.list;
+        this.hasMore = res.data.hasMore;
+      } else {
+      }
+      if (this.requestTimer) clearTimeout(this.requestTimer);
+      this.requestTimer = setTimeout(() => {
+        this.canRequest = !0;
+      }, 2000);
+    },
+    showList() {
+      var isshowmine = this.isshowmine;
+      if (!this.canRequest) {
+        wx.showToast({
+          title: '你点击的太快了',
+          icon: 'warn'
+        });
+        
+        return;
+      }
+      this.page = 1;
+      if (isshowmine === 1) {
+        this.isshowmine = 0;
+      } else {
+        this.isshowmine = 1;
+      }
+      this.getList();
+    }
   },
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.currentTab === 1 && this.canScroll) {
-      let list = this.historyList;
+    if (this.hasMore && this.canScroll) {
+      let list = this.list;
       let page = this.page;
+
       page++;
       this.canScroll = false;
 
@@ -101,25 +176,30 @@ export default {
         duration: 1000 // 延迟时间,
       });
 
-      const DuobaoHistory = await util.request(
+      const res = await util.request(
         api.JoinList,
-        { page: page, id: this.id },
+        {
+          page: page,
+          is_id: this.id,
+          isshowmine: this.isshowmine,
+          page_size: this.page_size
+        },
         "GET",
         this
       );
 
       if (
-        DuobaoHistory.data &&
-        DuobaoHistory.code === 0 &&
-        DuobaoHistory.data.list &&
-        DuobaoHistory.data.list.length > 0
+        res.data &&
+        res.code === 0 &&
+        res.data.list &&
+        res.data.list.length > 0
       ) {
         // this.totalData = res.data;
-        var data = DuobaoHistory.data;
-        this.historyList = list.concat(data.list);
-        this.hasMore = DuobaoHistory.data.hasMore;
-        this.page = DuobaoHistory.data.page;
-        if (DuobaoHistory.data.hasMore) {
+        var data = res.data;
+        this.list = list.concat(data.list);
+        this.hasMore = data.hasMore;
+        this.page = data.page;
+        if (data.hasMore) {
           this.showNoMore = !1;
         } else {
           this.showNoMore = !0;
@@ -135,48 +215,84 @@ export default {
   },
   // 页面加载
   async onLoad(e) {
-    var id = e.id;
+    this.id = e.id;
 
-    // 往期回顾
-    const res = await util.request(
-      api.JoinList,
-      { page: 1, id: id },
-      "GET",
-      this
-    );
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-
-      this.list = res.data.list;
-      this.hasMore = res.data.hasMore;
-    } else {
-    }
+    this.getList();
   }
 };
 </script>
 
 <style lang='scss' scoped>
 @import "../../common/style/variable";
+@import "../../common/style/mixin";
 
-.list-filter{
+.list-filter {
   display: flex;
   flex-direction: row;
   height: 40px;
   font-size: 14px;
   color: #333;
-  background: #F8F8F8;
+  background: #f8f8f8;
 
-  .chb{
+  .chb {
     width: 40px;
     height: 40px;
+    background: url(#{$img_url}/icon_chb.png) no-repeat center;
+    background-size: 17px;
+
+    &.checked {
+      background: url(#{$img_url}/icon_chb_checked.png) no-repeat center;
+      background-size: 17px;
+    }
   }
-  .filter-title{
+  .filter-title {
     line-height: 40px;
   }
 }
 
-.list{
-  
+.list {
+  background: #fff;
+  color: #333;
+
+  .item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px 0;
+    line-height: 1;
+    overflow: hidden;
+    border-bottom: 1px solid #e9e9e9;
+
+    .avatar {
+      display: block;
+      width: 34px;
+      height: 34px;
+      margin: 0 10px 0 15px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .username {
+      width: 32%;
+      overflow: hidden;
+      flex-shrink: 0;
+      font-size: 14px;
+      @include sg_line_ellipsis;
+    }
+    .info {
+      flex: 1;
+      padding-right: 15px;
+      text-align: right;
+
+      .number {
+        font-size: 14px;
+        color: #333;
+      }
+      .time {
+        padding-top: 6px;
+        font-size: 12px;
+        color: #888899;
+      }
+    }
+  }
 }
 </style>

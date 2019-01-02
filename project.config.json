@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 9,
+			"current": 7,
 			"list": [
 				{
 					"id": 0,
@@ -72,13 +72,13 @@
 					"id": 6,
 					"name": "商品詳情",
 					"pathName": "pages/goods_detail/main",
-					"query": "id=48"
+					"query": "id=61"
 				},
 				{
-					"id": -1,
+					"id": 7,
 					"name": "订单详情",
 					"pathName": "pages/order_detail/main",
-					"query": ""
+					"query": "orderId=1912290002100001041"
 				},
 				{
 					"id": -1,

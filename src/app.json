@@ -2,6 +2,8 @@
   "pages": [
     "pages/index/main",
     "pages/duobao/main",
+    "pages/duobao_history/main",
+    "pages/newer/main",
     "pages/invite/main",
     "pages/welfare_ad/main",
     "pages/order/main",
