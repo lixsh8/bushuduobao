@@ -6,6 +6,7 @@
       :autoplay="autoplay"
       :interval="interval"
       :duration="duration"
+      loop="false"
       vertical="true"
       :current="currentTab"
       @change="changeTab"
@@ -29,7 +30,29 @@ export default {
     };
   },
 
-  props: ["messages", "indicatorDots", "autoplay", "interval", "duration"],
+  // props: ["messages", "indicatorDots", "autoplay", "interval", "duration"],
+  props: {
+    messages: {
+      type: Array,
+      default: []
+    },
+    indicatorDots: {
+      type: Boolean,
+      default: !1
+    },
+    autoplay: {
+      type: Boolean,
+      default: !0
+    },
+    interval: {
+      type: Number,
+      default: 3000
+    },
+    duration: {
+      type: Number,
+      default: 1000
+    }
+  },
 
   methods: {
     changeTab(e) {
@@ -41,7 +64,6 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-@import "../common/common";
 
 .message {
   width: 250px;
@@ -53,6 +75,7 @@ export default {
   swiper,
   swiper-item {
     height: 24px;
+    line-height: 24px;
   }
 
   .cover {

@@ -28,9 +28,9 @@ const api = {
   JoinList: ApiRootUrl + "?act=duobao&op=getBuyTimesDetail",
 
   // 订单 
-  OderList: ApiRootUrl + "?act=duobao_order&op=oderList",
+  OderList: ApiRootUrl + "?act=duobao_order&op=orderList",
   OderDetail: ApiRootUrl + "?act=duobao_order&op=orderDetail",
-  AddressSave: ApiRootUrl + "?act=duobao_order&op=orderDetail",
+  AddressSave: ApiRootUrl + "?act=address&op=saveAddress",
   
 
 

@@ -96,14 +96,19 @@
       <div class="my-join-wrapper">
         <div class="my-join">
           <div class="my-join-hd">我的号码</div>
-          <div class="my-join-bd">{{duobaoData.buyNumbers}}</div>
+          <div class="my-join-bd">{{duobaoData.buyNumbers||"0"}}</div>
         </div>
         <div class="my-money">
           <div class="my-money-hd">当前收益</div>
           <div
+          v-if="duobaoData.hb_amount==0"
             class="my-money-bd"
             @click="goIncome()"
-          >¥{{duobaoData.hb_amount}}</div>
+          >¥{{duobaoData.hb_amount||"0"}}</div>
+          <div class="my-money-bd-emy" v-else @click="goIncome()">
+            参与后获得
+            <img :src="helpIcon" alt="">
+          </div>
         </div>
       </div>
 
@@ -299,6 +304,9 @@ export default {
   computed: {
     icon_pack_sm() {
       return this.globalData.img_url + "icon_pack_sm.png";
+    },
+    helpIcon() {
+      return this.globalData.img_url + "icon_help_gray.png";
     }
   },
 
@@ -650,6 +658,19 @@ page {
       padding-top: 10px;
       font-size: 18px;
       color: #ff3b30;
+    }
+    .my-money-bd-emy{
+      padding-top: 10px;
+      font-size: 16px;
+      color: #BEBEBE;
+      line-height: 1;
+
+      img{
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        vertical-align: middle;
+      }
     }
   }
 

@@ -10,140 +10,11 @@
     />
 
     <!-- 正文 -->
-    <!-- banner -->
-    <div class="banner">
-      <div
-        class="box indexBanner"
-        v-if="banners.length>0"
-      >
-        <swiper
-          :autoplay="config.autoplay"
-          :circular="config.circular"
-          :duration="config.duration"
-          :indicatorActiveColor="config.indicatorActiveColor"
-          :indicatorColor="config.indicatorColor"
-          :indicatorDots="config.indicatorDots"
-          :interval="config.interval"
-          v-if="banners.length>1"
-        >
-          <swiper-item
-            catchtap="onBanner"
-            class="banner-wrap"
-            v-for="banner in banners"
-            :key="banner.pic"
-          >
-            <img
-              class="pic"
-              mode="widthFix"
-              :src="banner.pic"
-            />
-          </swiper-item>
-        </swiper>
-      </div>
-    </div>
-
-    <!-- info -->
-    <div
-      class="info"
-      v-if="duobaoData&&duobaoData.goodsInfo"
-    >
-      <div class="price">
-        <img
-          :src="icon_pack_sm"
-          alt=""
-        />
-        <div class="sale-price">￥{{duobaoData.goodsInfo.dgoods_hb}}</div>
-        <div class="source-price-t">市场价<div class="source-price">￥{{duobaoData.goodsInfo.dgoods_market_price}}</div>
-        </div>
-      </div>
-
-      <div class="goods-name">{{duobaoData.goodsInfo.dgoods_name}}</div>
-      <!-- 进度条 -->
-      <div
-        class="progress"
-        style=""
-      >
-        <div class="progress-bar">
-          <div
-            class="progress-cnt"
-            :style="{width: duobaoData.goodsInfo.is_rate}"
-          ></div>
-        </div>
-        <div class="progress-desc">
-          <div class="progress-desc-total">满{{duobaoData.goodsInfo.is_totalnum}}份开奖</div>
-          <div class="progress-desc-left">差{{duobaoData.goodsInfo.is_oddnum}}份</div>
-        </div>
-      </div>
-      <!-- 已开奖 -->
-      <div
-        class="award"
-        v-if="duobaoData"
-      >
-        <div class="avatar-box">
-          <img
-            src="https://resource.xiaotaotao123.cn/wxapp_img/avatar.png"
-            alt=""
-          />
-          <div class="username">小飞飞小飞飞小飞飞小飞飞</div>
-        </div>
-        <div class="award-bd">
-          <div class="award-item">中奖号码：10000123</div>
-          <div class="award-item">本期参与：5份</div>
-          <div class="award-item">中奖时间：2018-12-19 10:1</div>
-        </div>
-      </div>
-
-      <div class="my-join-wrapper">
-        <div class="my-join">
-          <div class="my-join-hd">我的号码</div>
-          <div class="my-join-bd">{{duobaoData.buyNumbers}}</div>
-        </div>
-        <div class="my-money">
-          <div class="my-money-hd">当前收益</div>
-          <div class="my-money-bd">¥{{duobaoData.hb_amount}}</div>
-        </div>
-      </div>
-
-      <div class="join-count">
-        <div class="join-count-t">已有{{duobaoData.joinNumber}}人参与</div>
-        <img
-          src="/static/images/icon_arr_gray.png"
-          alt=""
-        />
-      </div>
-    </div>
-
-    <!-- 商品详情和往期揭晓tab -->
     <div class="tab">
-      <div class="tab-nav">
-        <div
-          class="nav-item"
-          :class="{active: currentTab == 0}"
-          @click="changeTab(0)"
-        >商品详情</div>
-        <div
-          class="nav-item"
-          :class="{active: currentTab == 1}"
-          @click="changeTab(1)"
-        >往期揭晓</div>
-      </div>
       <div class="tab-content">
         <div
-          class="content-item"
-          :class="{active: currentTab == 0}"
-        >
-          <wx-parse
-            v-if="article"
-            :content="article"
-            @preview="preview"
-            @navigate="navigate"
-          />
-        </div>
-
-        <div
-          class="content-item"
-          :class="{active: currentTab == 1}"
-        >
+          class="content-item active"
+         >
           <div
             class="duobao-list"
             v-if="historyList&&historyList.length>0"
@@ -184,13 +55,6 @@
       </div>
     </div>
 
-    <!-- 购买弹窗 -->
-    <buyModal
-      :showBuyModal="showBuyModal"
-      @closeBuyModal="closeBuyModal"
-      @changeNum="changeNum"
-      :buyNum="buyNum"
-    />
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
@@ -198,13 +62,6 @@
       :showNoMore="showNoMore"
       noMoreTips="没有更多数据了"
     />
-    <!-- 底部按钮 -->
-    <div
-      class="fixed-btn"
-      @click="goBuy"
-    >立即参与</div>
-    <!-- 快速导航 -->
-    <quick-navigate />
   </div>
 </template>
 
@@ -212,13 +69,11 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import wxParse from "mpvue-wxparse";
 import { setTimeout, clearTimeout } from "timers";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
-import buyModal from "@/components/buyModal";
 
 export default {
   data() {
@@ -228,28 +83,11 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
-      // 轮播图配置
-      config: {
-        current: 0,
-        indicatorDots: !0,
-        indicatorColor: "#ccc",
-        indicatorActiveColor: "#808080",
-        autoplay: !1,
-        interval: 5000,
-        duration: 500,
-        circular: !0
-      },
-      banners: [],
-      article: "",
-      duobaoData: null,
-      currentTab: 1,
       page: 1,
       hasMore: !0,
       showNoMore: !1,
       canScroll: !0,
       scrollTimer: null,
-      showBuyModal: !1,
-      buyNum: 0,
       historyList: []
     };
   },
@@ -258,48 +96,15 @@ export default {
     headBar,
     backTop,
     pagingFooter,
-    quickNavigate,
-    buyModal,
-    wxParse
-  },
-
-  computed: {
-    icon_pack_sm() {
-      return this.globalData.img_url + "icon_pack_sm.png";
-    }
-  },
-
-  mounted(ev) {
-    console.log(this.globalData.resourceUrl);
+    quickNavigate
   },
 
   methods: {
-    changeTab(idx) {
-      this.currentTab = idx;
-    },
-    preview(src, e) {
-      // do something
-    },
-    navigate(href, e) {
-      // do something
-    },
-    // 购买
-    goBuy() {
-      this.showBuyModal = !0;
-    },
-    changeNum(e) {
-      this.buyNum = e || 0;
-      console.log(this.buyNum)
-    },
-    // 关闭
-    closeBuyModal() {
-      this.showBuyModal = !1;
-    }
   },
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.currentTab === 1 && this.canScroll) {
+    if (this.hasMore && this.canScroll) {
       let list = this.historyList;
       let page = this.page;
       page++;
@@ -345,19 +150,6 @@ export default {
   },
   // 页面加载
   async onLoad(e) {
-    var id = e.id;
-    // 夺宝详情
-    const res = await util.request(api.DuobaoDetail, { id: id }, "GET", this);
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-
-      this.duobaoData = res.data;
-      this.title = res.data.title;
-      this.article = res.data.goodsInfo.dgoods_body;
-    } else {
-    }
-
     // 往期回顾
     const resDuobaoHistory = await util.request(
       api.DuobaoHistory,

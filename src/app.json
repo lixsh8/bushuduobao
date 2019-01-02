@@ -37,7 +37,7 @@
       },
       {
         "pagePath": "pages/duobao/main",
-        "text": "夺宝",
+        "text": "兑商品",
         "iconPath": "/static/images/tab/duobao.png",
         "selectedIconPath": "/static/images/tab/duobao_selected.png"
       },

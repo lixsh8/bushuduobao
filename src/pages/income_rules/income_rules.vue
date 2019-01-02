@@ -14,13 +14,16 @@
       <div class="income-hd">当前收益</div>
       <div class="income-bd">￥{{income}}</div>
     </div>
+    <div class="rules-title">
+      收益规则
+    </div>
     <div class="rules">
       <wx-parse
-          v-if="article"
-          :content="article"
-          @preview="preview"
-          @navigate="navigate"
-        />
+        v-if="article"
+        :content="article"
+        @preview="preview"
+        @navigate="navigate"
+      />
     </div>
     <!-- 底部按钮 -->
     <div
@@ -46,8 +49,10 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
-      income: '-',
-      article: "<div style='background:#eee;'><div style='color:#fff;padding:10px;'>12121212</div></div>"
+      income: "-",
+      detail: "",
+      article:
+        "<div style='background:#eee;'><div style='color:#fff;padding:10px;'>12121212</div></div>"
     };
   },
 
@@ -63,18 +68,25 @@ export default {
   methods: {
     // 购买
     goBuy() {
-      wx.navigateBack({
-        delta: 1
-      })
+      if (this.detail) {
+        wx.navigateTo({
+          url: "/pages/goods_detail/main?id=" + this.id
+        });
+      } else {
+        wx.navigateBack({
+          delta: 1
+        });
+      }
     }
   },
 
   // 页面加载
   async onLoad(e) {
-    var { id, income } = e;
+    var { id, income, detail } = e;
 
     this.id = id;
-    this.income = income
+    this.income = income;
+    this.detail = detail;
   }
 };
 </script>
@@ -82,8 +94,34 @@ export default {
 <style lang='scss' scoped>
 @import "../../common/style/variable";
 
-.income{}
-.rules{
+.income-box {
+  width: 345px;
+  height: 130px;
+  margin: 15px auto;
+  background: url(#{$img_url}duobao_bg.png) no-repeat center;
+  background-size: 100%;
+
+  .income-hd {
+    text-align: center;
+    line-height: 1;
+    padding-top: 30px;
+    font-size: 16px;
+    color: #fff;
+  }
+  .income-bd {
+    text-align: center;
+    line-height: 1;
+    padding-top: 10px;
+    font-size: 40px;
+    color: #fff;
+  }
+}
+.rules-title {
+  padding: 15px 15px 0 15px;
+  font-size: 16px;
+  color: #333;
+}
+.rules {
   padding: 15px;
 }
 
@@ -103,7 +141,7 @@ export default {
     rgba(255, 58, 57, 1) 100%
   );
 }
-.fixed-btn-cover{
+.fixed-btn-cover {
   height: 50px;
 }
 </style>

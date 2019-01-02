@@ -6,7 +6,7 @@
       <div class="dialog-bd">{{dialogContent}}</div>
       <div class="dialog-ft">
         <div class="btn btn-cancel" @click="close">取消</div>
-        <button class="btn btn-ok" @click="okBtnHandler" :open-type="share">邀请好友</button>
+        <button class="btn btn-ok" @click="okBtnHandler" :open-type="openType">邀请好友</button>
       </div>
     </div>
   </div>

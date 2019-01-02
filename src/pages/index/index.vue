@@ -144,24 +144,18 @@
             :data-url="newUserZoneInfo.url"
           >{{newUserZoneInfo.subtitle}}</div>
         </div>
-        <div class="list _b790fd0">
-          <div
+        <div class="list">
+          <block
             @click="goDetail"
-            class="GoodCardA _b790fd0"
             :data-is_id="item.is_id"
             v-for="item in newUserZoneInfo.list"
             :key="item.is_id"
-          >
-            <image
-              class="_b790fd0"
-              mode="aspectFill"
-              :src="item.dgoods_image"
-            />
-            <div class="GoodCardA-title _b790fd0">
-              {{item.dgoods_name}}
-            </div>
-            <div class="GoodCardA-price _b790fd0">{{item.dgoods_market_price}}</div>
-          </div>
+           >
+            <goods-item
+                :goodsItem="item"
+                @btnClickHandler="btnClickHandler"
+              />
+          </block>
         </div>
         <div
           @click="gotoNewer"
@@ -320,87 +314,12 @@
             <block
               v-for="item in duobao.list"
               :key="item.is_id"
-            >
-              <div
-                class="GoodCardA"
-                data-index=""
-                v-if="!item.showAd"
-                @click="goDetail"
-                :data-is_id="item.is_id"
-              >
-                <!-- 广告 -->
-                <img
-                  class="ad"
-                  mode="aspectFill"
-                  :src="item.pic"
-                  v-if="item.appId"
+             >
+              <goods-item
+                  :goodsItem="item"
+                  @btnClickHandler="btnClickHandler"
                 />
-                <!-- 商品 -->
-                <div v-else
-                  class="a1"
-                >
-                  <img
-                    mode="aspectFill"
-                    :src="item.dgoods_image"
-                  />
-                  <!-- <div
-                    class="statusLogo"
-                    v-if="!item.ownStock&&item.dgoods_id"
-                   >已售罄</div> -->
-                  <div class="GoodCardA-title">
-                    {{item.dgoods_name}}
-                  </div>
-                  <!-- <div class="GoodCardA-labels">
-                    <img
-                      class="free"
-                      mode="aspectFit"
-                      :src="item.dgoods_image"
-                      />
-                  </div> -->
-                  <div class="GoodCardA-price">
-                    <div class="coinStep">
-                      <text class="step">{{item.dgoods_market_price}}</text>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  class="makeSubmit"
-                  formType="submit"
-                ></button>
-              </div>
-
-              <ad
-                class="ad-banner"
-                unitId="adunit-35c5d7764460c855"
-                v-if="item.showAd==1"
-              ></ad>
-
-              <ad
-                class="ad-banner"
-                unitId="adunit-33e3062f3743e51e"
-                v-if="item.showAd==2"
-              ></ad>
-
             </block>
-
-            <!-- loading -->
-            <!-- <div
-              class="loading-tip _be7d132"
-              v-if="showTip"
-            >
-              <div
-                class="text _be7d132"
-                v-if="loadText&&loading"
-              >{{tip.text}}</div>
-              <block v-else>
-                <img
-                  class="loading-icon _be7d132"
-                  mode="aspectFit"
-                  :src="tips.noMore.icon"
-                />
-                <text class="loading-text _be7d132">{{tips.noMore.text}}</text>
-              </block>
-            </div> -->
           </div>
         </div>
 
@@ -425,6 +344,7 @@
 
 <script>
 import headBar from "@/components/headBar";
+import goodsItem from "@/components/goodsItem";
 import backTop from "@/components/backTop";
 import authModal from "@/components/authModal";
 import pagingFooter from "@/components/pagingFooter";
@@ -547,6 +467,7 @@ export default {
 
   components: {
     headBar,
+    goodsItem,
     backTop,
     authModal,
     pagingFooter
@@ -564,6 +485,13 @@ export default {
       
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
+      });
+    },
+    // 点击购买按钮
+    btnClickHandler(ev) {
+      console.log(ev);
+      wx.navigateTo({
+        url: "/pages/goods_detail/main?id=" + ev
       });
     },
     beginChallenge() {
@@ -1926,12 +1854,9 @@ ad {
   padding-right: 30rpx;
 }
 
-.list._b790fd0 {
+.list {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
-  width: 686rpx;
-  margin-left: 32rpx;
 }
 
 .list .GoodCardA._b790fd0 {
@@ -2245,9 +2170,9 @@ ad {
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;
-  width: 686rpx;
+  /* width: 686rpx; */
   margin-top: 32rpx;
-  margin-left: 32rpx;
+  /* margin-left: 32rpx; */
   padding-bottom: 10rpx;
 }
 

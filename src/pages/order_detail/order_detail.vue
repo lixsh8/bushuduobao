@@ -102,21 +102,24 @@
         >
       </div>
       <!-- 地址信息 -->
-      <div class="address-panel">
+      <div
+        class="address-panel"
+        v-if="receivingState==1||receivingState==2"
+      >
         <div
           class="has-address"
-          v-if="data.receivingState==1"
+          v-if="receivingState==1 && receivingInfo"
         >
           <div class="info">
-            <div class="r-name">收货人：{{data.receivingInfo.deliveryName}}</div>
-            <div class="r-tel">{{data.receivingInfo.deliveryPhone}}</div>
+            <div class="r-name">收货人：{{receivingInfo.deliveryName}}</div>
+            <div class="r-tel">{{receivingInfo.deliveryPhone}}</div>
           </div>
-          <div class="address">收货地址：{{data.receivingInfo.deliveryAddress}}</div>
+          <div class="address">收货地址：{{receivingInfo.deliveryAddress}}</div>
         </div>
         <div
           class="no-address"
           @click="gotoAddress"
-          v-if="data.receivingState==2"
+          v-if="receivingState==2"
         >
           去添加地址
         </div>
@@ -243,7 +246,9 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
-      isNet: !0,
+      orderId: "",
+      receivingInfo: null,
+      receivingState: '',
       data: null
     };
   },
@@ -285,13 +290,16 @@ export default {
     },
     // 选择地址
     gotoAddress() {
+      var _this = this;
       wx.chooseAddress({
         success: function(res) {
+          var data = res;
           console.log(JSON.stringify(res));
           util
             .request(
               api.AddressSave,
               {
+                order_id: _this.orderId,
                 address: JSON.stringify(res)
               },
               "POST",
@@ -299,6 +307,16 @@ export default {
             )
             .then(res => {
               console.log(res);
+              if (res.code === 0) {
+                console.log(data);
+                
+                _this.receivingState = 1;
+                _this.receivingInfo = {};
+                _this.receivingInfo.deliveryName = data.telNumber;
+                _this.receivingInfo.deliveryPhone = data.userName;
+                _this.receivingInfo.deliveryAddress =
+                  data.provinceName + data.cityName + data.countyName + data.detailInfo;
+              }
             })
             .catch(err => {
               console.log(err);
@@ -328,6 +346,7 @@ export default {
   },
   async onLoad(e) {
     var orderId = e.orderId;
+    this.orderId = orderId;
 
     const res = await util.request(
       api.OderDetail,
@@ -342,6 +361,9 @@ export default {
       console.log(res.data);
 
       this.data = res.data;
+      this.receivingState = res.data.receivingState;
+      this.receivingInfo = res.data.receivingInfo;
+      
     } else {
     }
   }
