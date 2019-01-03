@@ -38,7 +38,7 @@
           <div
             class="prize-common-num"
             v-if="item.hb>0"
-          >￥{{item.hb}}<text></text>
+          ><div class="unit">￥</div>{{item.hb}}
           </div>
           <div class="prize-common-name">{{item.title}}</div>
         </div>
@@ -93,7 +93,7 @@
           data-type="0"
           openType="share"
         >
-          邀请新人赚5-20币
+          邀请新人永久加成
         </button>
 
         <div class="middleArea">
@@ -356,7 +356,7 @@ export default {
   data() {
     return {
       title: "首页",
-      headerBackground: "#8054ff",
+      headerBackground: "#FF696C",
       titleColor: "#fff",
       showBackTop: true,
       isNet: true,
@@ -692,6 +692,7 @@ export default {
 </script>
 
 <style scoped lang='scss'>
+@import "../../common/style/variable";
 .page {
   position: relative;
 }
@@ -918,7 +919,7 @@ button::after {
   width: 750rpx;
   min-height: 676rpx;
   position: relative;
-  background: url("https://pic6.zhuanstatic.com/zhuanzh/n_v2d2ef78c357f0437180b7b39f07d38edd.png")
+  background: url("#{$img_url}index_banner_bg.png")
     no-repeat center top;
   background-size: 750rpx 441rpx;
   padding-top: 30rpx;
@@ -976,18 +977,10 @@ button::after {
 }
 
 .topArea .powerCoin .agentCoinInteger {
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/newIndex/powerCoin.png")
+  background: url(#{$img_url}icon_pack_xsm.png)
     no-repeat 12rpx center;
   background-size: 34rpx 34rpx;
   padding-left: 56rpx;
-}
-
-.topArea .powerCoin .agentCoinDecimal {
-  background: url(https://pic4.zhuanstatic.com/zhuanzh/n_v28392c9ee3bc545d1a5b2fee86a7d4582.png)
-    no-repeat right center;
-  background-size: 24rpx 24rpx;
-  padding-right: 24rpx;
-  margin-left: 8rpx;
 }
 
 .topArea .powerCoin .addCoin {
@@ -1193,14 +1186,14 @@ button::after {
   margin-top: 16rpx;
   width: 256rpx;
   height: 56rpx;
-  background: url("https://pic3.zhuanstatic.com/zhuanzh/n_v292ba40e6cc8b4a63844e2ac8f7ef1c2c.png")
+  background: url(#{$img_url}index_btn.png)
     no-repeat center center;
   background-size: 256rpx 56rpx;
   font-family: PingFang-SC-HK;
   font-size: 24rpx;
   line-height: 56rpx;
   text-align: center;
-  color: #7d54ff;
+  color: #FF3B30;
 }
 
 .topArea .inviteNew {
@@ -1214,7 +1207,7 @@ button::after {
   margin: 10rpx auto 0;
   padding-top: 41rpx;
   box-sizing: border-box;
-  background: url("https://pic4.zhuanstatic.com/zhuanzh/n_v2d2f6a56ed4354dbca10d0b7d1e878e50.png")
+  background: url(#{$img_url}index_invite_btn.png)
     no-repeat;
   background-size: 100% 100%;
   font-size: 32rpx;
@@ -1303,21 +1296,24 @@ button::after {
 }
 
 .prize-common-num {
-  width: 96rpx;
-  height: 96rpx;
-  padding-top: 32rpx;
-  padding-left: 6rpx;
+  width: 44px;
+  height: 44px;
+  padding-top: 16px;
   box-sizing: border-box;
-  background: url("https://pic1.zhuanstatic.com/zhuanzh/n_v2983c3325dfb7402dadb12e2cfb4c5f60.png")
+  background: url(#{$img_url}icon_pack_float.png)
     no-repeat center top;
   background-size: 100% 100%;
   font-family: "DIN Condensed";
-  font-weight: bold;
-  font-size: 44rpx;
+  font-size: 16px;
   text-align: center;
-  line-height: 44rpx;
-  color: #c94900;
+  line-height: 22px;
+  color: #FFECBA;
   margin: 0 auto;
+
+  .unit{
+    display: inline-block;
+    font-size: 10px;
+  }
 }
 
 .prize-common-num text {

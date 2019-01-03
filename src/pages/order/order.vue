@@ -18,7 +18,7 @@
     >
       <div
         class="tab-item"
-        :class="{active: currentType===item.id}"
+        :class="{active: currentType==item.id}"
         :style="{width: (100/navs.length) + '%'}"
         v-for="(item, index) in navs"
         :data-index="index"
@@ -54,13 +54,19 @@
             </div>
           </div>
         </div>
-        <div class="item-ft" v-if="item.showlogistics">
+        <div
+          class="item-ft"
+          v-if="item.showlogistics"
+        >
           <div
             class="btn-logistics"
             @click.stop="goLogistics(item.order_id)"
           >查看物流</div>
         </div>
-        <div class="item-ft" v-if="item.showAddress">
+        <div
+          class="item-ft"
+          v-if="item.showAddress"
+        >
           <div
             class="btn-logistics"
             @click.stop="setAddress()"
@@ -69,7 +75,7 @@
       </div>
 
     </div>
-    
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
@@ -132,29 +138,25 @@ export default {
     }
   },
 
-  onShow(ev) {
-    // console.log(this.globalData.statusBarHeight);
-  },
-
   methods: {
     // 参与列表
     async getList(idx) {
       if (!this.canRequest) {
         return;
       }
-      this.currentType = idx;
       this.canRequest = !1;
       const res = await util.request(
         api.OderList,
         {
           page: 1,
-          type: this.currentType,
+          type: idx,
           page_size: this.page_size
         },
         "GET",
         this
       );
       if (res.data && res.code === 0) {
+        this.currentType = idx;
         // this.totalData = res.data;
         console.log(res.data);
 
@@ -231,8 +233,13 @@ export default {
     }
   },
   // 页面加载
-  onLoad() {
-    this.getList(0);
+  onLoad(e) {
+    var type = e.type || 0;
+    this.getList(type);
+  },
+  onShow(e) {
+    // var type = e.type || 0;
+    // this.currentType = type;
   }
 };
 </script>

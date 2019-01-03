@@ -10,6 +10,7 @@
     "pages/order_detail/main",
     "pages/goods_detail/main",
     "pages/join_list/main",
+    "pages/pack_list/main",
     "pages/income_rules/main",
     "pages/result/main",
     "pages/logistics/main",
@@ -26,7 +27,7 @@
   },
   "tabBar": {
     "color": "#2E3135",
-    "selectedColor": "#7C54FF",
+    "selectedColor": "#FF3A39",
     "backgroundColor": "#fff",
     "list": [
       {

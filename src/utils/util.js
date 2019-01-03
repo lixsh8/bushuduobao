@@ -34,9 +34,9 @@ function request(url, data = {}, method = "GET") {
       },
       success: function(res) {
         // console.log('请求成功，url:', url);
-        // console.log('请求参数，data:', data);
+        console.log("请求参数，data:", JSON.stringify(res));
         if (res.statusCode === 200) {
-          if (res.data.errno === 401) {
+          if (res.data.code === 401) {
             // 需要登录后才可以操作
             let code = null;
             return login()
@@ -55,8 +55,10 @@ function request(url, data = {}, method = "GET") {
                   "POST"
                 )
                   .then(res => {
-                    if (res.errno === 0) {
+                    if (res.code === 0) {
                       // 存储用户信息
+                      console.log("重新登录后的token", res.data.token);
+
                       wx.setStorageSync("userInfo", res.data.userInfo);
                       wx.setStorageSync("token", res.data.token);
                       resolve(res);
@@ -296,7 +298,7 @@ function wxRequest(obj, cb, page, type) {
         var requests = page.reloadFn;
         // console.log(page.reloadFn)
         requests.push(request(obj, cb, page, 1));
-        page.reloadFn = requests
+        page.reloadFn = requests;
         isOne = false;
       }
     });

@@ -31,7 +31,10 @@ const api = {
   OderList: ApiRootUrl + "?act=duobao_order&op=orderList",
   OderDetail: ApiRootUrl + "?act=duobao_order&op=orderDetail",
   AddressSave: ApiRootUrl + "?act=address&op=saveAddress",
-  
+
+  // 我的
+  MineIndex: ApiRootUrl + "?act=home&op=index",
+  PackList: ApiRootUrl + "?act=home&op=hbDetail",
 
 
   // 首页数据接口
@@ -53,7 +56,7 @@ const api = {
   // 微信登录静默登录
   Login: ApiRootUrl + "?act=little&op=getToken",
   // 微信登录 授权获取用户信息登录
-  AuthLoginByWeixin: ApiRootUrl + "auth/loginByWeixin",
+  AuthLoginByWeixin: ApiRootUrl + "act=little&op=updateUserInfo",
   // 获取微信统一下单prepay_id
   PayPrepayId: ApiRootUrl + "pay/prepay",
   // （pay单独使用）获取微信统一下单prepay_id

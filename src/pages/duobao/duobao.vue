@@ -74,7 +74,7 @@ export default {
   data() {
     return {
       title: "兑商品",
-      headerBackground: "#de5b75",
+      headerBackground: "#FF696C",
       titleColor: "white",
       showCustomBar: !0,
       customBarStyle: "white",
@@ -100,7 +100,7 @@ export default {
 
   computed: {
     bg() {
-      return this.globalData.img_url + "duobao_bg.png";
+      return this.globalData.img_url + "duobao_banner.png";
     }
   },
 

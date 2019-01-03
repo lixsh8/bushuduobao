@@ -10,21 +10,25 @@
     <div class="bg-gray _7bb4318">
       <div class="wrapper">
 
-        <div class="mine">
+        <div
+          class="mine"
+          v-if="data"
+        >
 
           <div class="mine-head">
             <image
               class="mine-head-portrait"
               mode="aspectFit"
-              :src="mine.portrait"
+              :src="data&&data.avatarUrl"
             />
             <div class="mine-head-myinfo">
-              <div class="mine-head-myinfo-nickname">{{mine.nickName}}</div>
+              <div class="mine-head-myinfo-nickname">{{data&&data.nickName}}</div>
               <div class="mine-head-myinfo-coininfo">步数币
-                <text>{{mine.userCoin}}</text>
-                <text>|</text>兑换
-                <text>{{mine.exchangeCount}}</text>件</div>
-              <div class="mine-head-myinfo-tip">您已连续签到{{mine.signInDays}}天，每日签到可领签到奖励哦~</div>
+                <text>{{data&&data.hb_amount}}</text>
+                <!-- <text>|</text>兑换 -->
+                <!-- <text>{{}}</text>件-->
+              </div>
+              <div class="mine-head-myinfo-tip">{{data&&data.tips}}</div>
             </div>
           </div>
 
@@ -32,13 +36,13 @@
             <div class="mine-orderList-title">
               <div class="mine-orderList-title-tip1">我的订单</div>
               <div
-                bindtap="navToOrder"
+                @click="navToOrder"
                 class="mine-orderList-title-tip2"
               >查看我的全部订单</div>
             </div>
             <div class="mine-orderList-orders">
               <div
-                bindtap="jumpHandle"
+                @click="jumpHandle(item.type)"
                 class="orderItem"
                 v-for="(item,index) in orderList"
                 :key="index"
@@ -57,46 +61,40 @@
             </div>
           </div>
 
+          <!-- 操作列表 -->
           <div class="mine-operationList">
-            <div
-              bindtap="jumpHandle"
-              class="operationItem"
-              v-for="(item,index) in operationList"
+            <block
+              v-for="(item,index) in data.menuList"
               :key="index"
-            >
-              <image
-                class="operationIcon"
-                mode="aspectFit"
-                :src="item.icon"
-              />
-              <div class="operationTxt">{{item.title}}</div>
-            </div>
-            <button
-              class="feed-back"
-              openType="feedback"
-            >
-              <image
-                class="deviceIcon"
-                mode="aspectFit"
-                src="https://pic1.zhuanstatic.com/zhuanzh/n_v29b5c0541050e42b781f9f8f581abc574.png"
-              />
-              <div class="feed-back-item">意见反馈</div>
-            </button>
-            <div
-              bindtap="gotoMessage"
-              class="operationItem"
-            >
-              <image
-                class="operationIcon"
-                mode="aspectFit"
-                src="https://pic1.zhuanstatic.com/zhuanzh/n_v24fabf5d6b8094b369c525a62fd59f32f.png"
-              />
+             >
+             <button
+                class="operationItem"
+                :openType="item.type"
+                v-if="item.type"
+               >
+                <image
+                  class="operationIcon"
+                  mode="aspectFit"
+                  :src="item.img"
+                />
+                <div class="operationTxt">{{item.title}}</div>
+              </button>
+
               <div
-                class="orderNum"
-                v-if="unreadMessage"
-              >{{unreadMessage}}</div>
-              <div class="operationTxt">联系卖家</div>
-            </div>
+                v-else
+                bindtap="jumpHandle"
+                class="operationItem"
+               >
+                <image
+                  class="operationIcon"
+                  mode="aspectFit"
+                  :src="item.img"
+                />
+                <div class="operationTxt">{{item.title}}</div>
+              </div>
+              
+            </block>
+
           </div>
 
           <image
@@ -107,21 +105,23 @@
             v-if="showGoldAd==1"
           />
 
+
+          <!-- 推荐 -->
           <div
             class="mine-recommends"
-            v-if="recommends.length>0"
+            v-if="data&&data.recommendList&&data.recommendList.length>0"
           >
             <div class="header">精品推荐</div>
             <div class="recommends">
               <div
                 bindtap="onRecommend"
                 class="recommend"
-                v-for="(recommend,index) in recommends"
+                v-for="(recommend,index) in data.recommendList"
                 :key="index"
               >
                 <image
                   class="icon"
-                  :src="recommend.pic"
+                  :src="recommend.img"
                 />
                 <div class="title">{{recommend.title}}</div>
               </div>
@@ -131,7 +131,7 @@
           <div
             class="box _3142106 indexBanner"
             v-if="banners.length>0"
-          >
+           >
             <swiper
               autoplay="config.autoplay"
               bindchange="bannerChange"
@@ -182,10 +182,9 @@
               </div>
             </div>
 
+            <ad unitId="adunit-b195e9267cb30a9e"></ad>
+
           </div>
-
-          <ad unitId="adunit-b195e9267cb30a9e"></ad>
-
         </div>
       </div>
     </div>
@@ -194,208 +193,23 @@
 
 <script>
 import headBar from "@/components/headBar";
+import util from "@/utils/util";
+import api from "@/utils/api";
+// import request from "@/utils/request";
 
 export default {
   data() {
     return {
       title: "我的",
-      headerBackground: "#8054ff",
+      headerBackground: "#FF696C",
       titleColor: "#fff",
-      mine: {
-        portrait:
-          "http://pic1.zhuanstatic.com/zhuanzh/n_v239767dd54209407082b9651f1ce97d12.png",
-        nickName: "qwe0620b54b",
-        signInDays: 1,
-        respCode: 0,
-        respMsg: null,
-        userCoin: "16.000",
-        exchangeCount: 0,
-        unPayOrder: 0,
-        unDeliveryOrder: 0,
-        unReceiveOrder: 0,
-        refundOrder: 0,
-        showGoldAd: 1
-      },
-      banners: [
-        {
-          appId: "wxe20f2a757ccbbce3",
-          actId: "4560400557191899351:8461665943529147392",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v221559d55f21244e7943427145a4e1aee.jpg?w=800&h=800",
-          title: "新人免费领百元大奖",
-          url: "pages/index/index?ChannelID=TG001&IndirectChannel=LK"
-        }
-      ],
-      unreadMessage: 0,
-      unreadQuery: null,
       orderList: [
-        {
-          title: "待支付",
-          log: "wait-pay",
-          icon:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v23c485f7a2e4d4f3487680e7a018fc12c.png",
-          path: "/subPages/order/order?status=1",
-          orderNum: ""
-        },
-        {
-          title: "待发货",
-          log: "wait-deliver",
-          icon:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v237c3d7a18b874de688193cd7124117c7.png",
-          path: "/subPages/order/order?status=2",
-          orderNum: ""
-        },
-        {
-          title: "已发货",
-          log: "has-deliver",
-          icon:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2e8f2fb8d550941148dfacb1cad08bc74.png",
-          path: "/subPages/order/order?status=3",
-          orderNum: null
-        },
-        {
-          title: "退款",
-          log: "refund",
-          icon:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2046f7279cd7f46a19e234cceffaa681b.png",
-          path: "/subPages/order/order?status=4",
-          orderNum: 0
-        }
+        { type: "1", icon: "/static/images/icon_order_dkj.png", title: "待开奖" },
+        { type: "9", icon: "/static/images/icon_order_yzj.png", title: "已中奖" },
+        { type: "8", icon: "/static/images/icon_order_wzj.png", title: "未中奖" }
       ],
-      operationList: [
-        {
-          title: "历史兑换",
-          log: "exchage-click",
-          icon:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v237e03ca0769b414aba00befbd951dc10.png",
-          path: "/pages/detail/runningExchangeDetail"
-        },
-        {
-          title: "步数记录",
-          log: "coin-detail",
-          icon:
-            "https://pic3.zhuanstatic.com/zhuanzh/n_v2b486fea469304cd6bd7fec598ae894a0.png",
-          path: "/pages/detail/runningDetail"
-        },
-        {
-          title: "步数规则",
-          log: "rule-click",
-          icon:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v28b55ec3a2f104a34ae009e49dc12ce1f.png",
-          path: "/subPages/rule/runningRule"
-        },
-        {
-          title: "助力记录",
-          log: "oncoin-click",
-          icon:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2def7ec4a112a42f8b591d5ef4055b54f.png",
-          path: "/pages/activity/oneCoinFree"
-        },
-        {
-          title: "常见问题",
-          log: "strategy-click",
-          icon:
-            "https://pic1.zhuanstatic.com/zhuanzh/n_v2d8b198d1b4a047418e852b93cefc0c4d.png",
-          path: "/subPages/strategy/strategy"
-        },
-        {
-          title: "在线客服",
-          log: "online-service",
-          icon:
-            "https://pic5.zhuanstatic.com/zhuanzh/n_v262fd78378b124e3c826de830f029b95b.png",
-          path:
-            "https://m.zhuanzhuan.com/system/zzappimservice/index.html?skillId=10003&robot=42"
-        }
-      ],
-      advExtraData: {
-        path: "bubuhuan/box/pages/position1"
-      },
-      recommends: [
-        {
-          appId: "wxe20f2a757ccbbce3",
-          actId: "2182652141771081143:6302086029329439744",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v290f15f56d6fd44e0876af756e38bd244.png?w=800&h=800",
-          title: "最强抽奖",
-          url: "pages/index/index?ChannelID=TG001&IndirectChannel=LK"
-        },
-        {
-          appId: "wx7d2e1dd8fd7ea905",
-          actId: "2182652141771081143:6006420485069176832",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v25c4a280e47ce40c58404d853d973f5fe.png?w=800&h=800",
-          title: "疯狂消星星",
-          url:
-            "pages/index/index?gdt_vid=wandehai&weixinadinfo=0001&channel=wandehai.h5xxxstar.3407"
-        },
-        {
-          appId: "wx13dd723fb3aa9c5f",
-          actId: "2182652141771081143:5188764942770712576",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v247f0900a525744999c65a41a382ebadb.png?w=800&h=800",
-          title: "运动赚",
-          url: "pages/step/step?chl=tiantbus&s=tiantbus"
-        },
-        {
-          appId: "wxbdfee33ea394a980",
-          actId: "2182652141771081143:7823665070077815808",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v279560d922f2c4befa48b574f08226650.png?w=800&h=800",
-          title: "狂暴西游",
-          url: "?from=2051"
-        },
-        {
-          appId: "wxc3a8c0b476dfa08c",
-          actId: "2182652141771081143:8677627763932911616",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v24274e27a71e64a5f94d57d6a509eac4c.png?w=800&h=800",
-          title: "够货",
-          url: "pages/home/index?scene=c%3D149"
-        },
-        {
-          appId: "wx8b3a98563fc40251",
-          actId: "2182652141771081143:2313007257289895936",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2ae58ba5c21be4caa9c44a5277ff2b80a.png?w=800&h=800",
-          title: "攻城三国",
-          url: "?from=2051"
-        },
-        {
-          appId: "wx371df2518b80e0c3",
-          actId: "2182652141771081143:3695010499574038528",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2508dc30d52e245bdb7fb1ff5849554d1.png?w=800&h=800",
-          title: "集步运动",
-          url:
-            "pages/index/index?origin=bububaoUV&ald_media_id=8103&ald_link_key=70fc7c9cb18fdd9b"
-        },
-        {
-          appId: "wx79ade44c39cefc7f",
-          actId: "2182652141771081143:6579252075545804800",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2058652af38f64ea881e0346d468e51fc.jpg?w=800&h=800",
-          title: "传奇来了",
-          url: "?chid=1966&subchid=cq_zhuan01"
-        },
-        {
-          appId: "wx591a9df1eaf73a4b",
-          actId: "2182652141771081143:6894526864229345280",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2c8aaefc81320480885d176f7dec90840.png?w=800&h=800",
-          title: "决战沙城",
-          url: "?from=2051"
-        },
-        {
-          appId: "wx06317e9fcb72749f",
-          actId: "2182652141771081143:4374684052516854784",
-          pic:
-            "https://pic2.zhuanstatic.com/zhuanzh/n_v2480b5c7c429442bd9d420067b4e60150.png?w=800&h=800",
-          title: "猜词赢红包",
-          url:
-            "/pages/index/index?gdt_vid=wandehai&weixinadinfo=0001&channel=wandehai.h5wzcc.01408"
-        }
-      ],
-      showGoldAd: 0
+      banners: [],
+      data: null
     };
   },
 
@@ -403,11 +217,28 @@ export default {
     headBar
   },
 
-  methods: {},
+  methods: {
+    navToOrder() {
+      wx.navigateTo({
+        url: '/pages/order/main'
+      });
+    },
+    jumpHandle(e) {
+      wx.navigateTo({
+        url: '/pages/order/main?type=' + e
+      });
+    }
+  },
 
-  created() {},
-
-  onLoad() {}
+  async onLoad() {
+    const res = await util.request(api.MineIndex, "GET", this);
+    if (res.data && res.code === 0) {
+      // this.totalData = res.data;
+      console.log(res.data);
+      this.data = res.data;
+    } else {
+    }
+  }
 };
 </script>
 
@@ -415,6 +246,7 @@ export default {
 @import "../../common/style/0.scss";
 @import "../../common/style/8.scss";
 @import "../../common/style/curtain.scss";
+@import "../../common/style/variable.scss";
 
 .wrapper {
   position: static;
@@ -469,7 +301,7 @@ page {
 .mine-head {
   width: 100%;
   height: 265rpx;
-  background: url(https://pic3.zhuanstatic.com/zhuanzh/n_v289278f6da68f48c3a726eac1b4d2a134.png)
+  background: url(#{$img_url}mine_banner.png)
     no-repeat center center;
   background-size: 100% 265rpx;
   display: flex;
@@ -640,6 +472,8 @@ page {
   margin: 0 0 24rpx;
   text-align: center;
   position: relative;
+  line-height: 1;
+  background: none!important;
 }
 
 .mine-operationList .operationItem .operationIcon {

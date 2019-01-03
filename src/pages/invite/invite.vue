@@ -739,7 +739,7 @@ page {
 .topBg {
   width: 750rpx;
   height: 511rpx;
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/inviteTopbgNew.png)
+  background: url(#{$img_url}invite_bg.png)
     no-repeat;
   background-size: 100% 100%;
 }
