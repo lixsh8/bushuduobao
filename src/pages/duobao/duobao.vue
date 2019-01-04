@@ -25,6 +25,7 @@
       <div class="scroll-message">
         <scroll-message
           :messages="messages"
+          :autoplay="autoplay"
           @change="change"
         />
       </div>
@@ -74,7 +75,7 @@ export default {
   data() {
     return {
       title: "兑商品",
-      headerBackground: "#FF696C",
+      headerBackground: "#ff5b5c",
       titleColor: "white",
       showCustomBar: !0,
       customBarStyle: "white",
@@ -83,7 +84,9 @@ export default {
       hasMore: !0,
       showNoMore: !1,
       canScroll: !0,
+      aa: "",
       scrollTimer: null,
+      autoplay: !0,
       messages: [1111111, 2222222222222, 33333333333333, 444444444444],
       list: null
     };
@@ -100,7 +103,7 @@ export default {
 
   computed: {
     bg() {
-      return this.globalData.img_url + "duobao_banner.png";
+      return this.globalData.img_url + "duobao_bg.png?v=1";
     }
   },
 
@@ -118,10 +121,10 @@ export default {
     },
     // 消息滚动事件
     change(ev) {
-      console.log(ev);
-      if (ev === this.list.length - 1) {
-        this.getMessage();
-      }
+      // console.log(ev);
+      // if (ev === this.list.length - 1) {
+      //   this.getMessage();
+      // }
     },
     // 点击购买按钮
     btnClickHandler(ev) {
@@ -179,6 +182,15 @@ export default {
     }
   },
 
+  onShow() {
+    this.autoplay = true;
+    console.log("onShow" + this.autoplay);
+
+  },
+  onHide() {
+    this.autoplay = false;
+    console.log("onHide" + this.autoplay);
+  },
   // 页面加载
   async onLoad(e) {
     // 列表

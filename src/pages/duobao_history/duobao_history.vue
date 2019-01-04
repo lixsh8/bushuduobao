@@ -78,7 +78,7 @@ import pagingFooter from "@/components/pagingFooter";
 export default {
   data() {
     return {
-      title: "参与结果",
+      title: "最新开奖",
       headerBackground: "#fff",
       titleColor: "black",
       showCustomBar: !0,

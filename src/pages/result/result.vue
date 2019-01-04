@@ -12,27 +12,40 @@
     <!-- 正文 -->
     <!-- banner -->
     <div class="banner">
-      <div class="suc-tips">参与成功</div>
-      <div class="btn-order">订单详情</div>
+      <div class="suc-tips"><img
+          mode="widthFix"
+          :src="sucTxt"
+          alt=""
+        ></div>
+      <div
+        class="btn-order"
+        @click="goOrderDetail"
+      >订单详情</div>
     </div>
 
     <div class="share-panel">
       <img
         class="share-img"
         mode="widthFix"
-        src="http://img12.360buyimg.com/n1/jfs/t2014/94/1522737578/284282/12f3dd7f/56c6d05aN2bb596ad.jpg"
+        :src="bannerImg"
       />
       <div class="share-btn-wrapper">
-        <div class="share-btn">
+        <button
+          class="share-btn"
+          openType="share"
+        >
           <img
-            src="/static/images/tab/duobao_selected.png"
+            :src="hyImg"
             alt=""
           >
           <div class="btn-title">晒单给好友</div>
-        </div>
-        <div class="share-btn">
+        </button>
+        <div
+          class="share-btn"
+          @click="savePic"
+        >
           <img
-            src="/static/images/tab/duobao_selected.png"
+            :src="pyqImg"
             alt=""
           >
           <div class="btn-title">保存海报</div>
@@ -41,7 +54,11 @@
     </div>
 
     <!-- list -->
-    <div class="list-title"></div>
+    <div class="list-title"><img
+        mode="widthFix"
+        :src="listTitle"
+        alt=""
+      ></div>
     <div
       class="goods-list"
       v-if="list"
@@ -60,8 +77,6 @@
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
 
-    <!-- 快速导航 -->
-    <quick-navigate />
   </div>
 </template>
 
@@ -84,7 +99,7 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       banner: null,
-      ifShowRules: !0,
+      orderId: "",
       list: null
     };
   },
@@ -97,25 +112,58 @@ export default {
     rulesModal
   },
 
+  computed: {
+    bannerImg() {
+      return this.globalData.img_url + "result_banner.png";
+    },
+    hyImg() {
+      return this.globalData.img_url + "icon_hy.png";
+    },
+    pyqImg() {
+      return this.globalData.img_url + "icon_pyq.png";
+    },
+    listTitle() {
+      return this.globalData.img_url + "like_title.png";
+    },
+    sucTxt() {
+      return this.globalData.img_url + "sucTxt.png";
+    }
+  },
+
   methods: {
-    // 规则弹窗
-    showRules() {
-      this.ifShowRules = !0;
-    },
-    clsRulesModal() {
-      this.ifShowRules = !1;
-    },
     // 点击购买按钮
     btnClickHandler(ev) {
       console.log(ev);
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + ev
       });
+    },
+    // 点击查看订单详情
+    goOrderDetail() {
+      wx.navigateTo({
+        url: "/pages/order_detail/main?orderId=" + this.orderId
+      });
+    },
+    // 保存图片
+    savePic() {
+      wx.getImageInfo({
+        src: "https://resourcecdn.xiaotaotao123.cn/wxapp_img/result_banner.png",
+        success: function(sres) {
+          wx.saveImageToPhotosAlbum({
+            filePath: sres.path,
+            success: function(fres) {
+              console.log(fres);
+            }
+          });
+        }
+      });
     }
   },
 
   // 页面加载
   async onLoad(e) {
+    this.orderId = this.$root.$mp.query.orderId;
+    console.log('this.orderId=' + this.orderId);
     // 列表
     const res = await util.request(api.IndexNewZone, "GET", this);
     if (res.data && res.code === 0) {
@@ -137,17 +185,20 @@ export default {
 .banner {
   width: 100%;
   height: 146px;
-  background: url(#{$img_url}duobao_bg.png) no-repeat center;
+  background: url(#{$img_url}result_top_banner.png) no-repeat center;
   background-size: 100%;
 
   .suc-tips {
-    width: 100%;
+    width: 151px;
+    height: 33px;
+    margin: 0 auto;
     padding-top: 33px;
-    padding-bottom: 14px;
-    font-size: 24px;
-    color: #fff;
-    line-height: 1;
-    text-align: center;
+    padding-bottom: 10px;
+
+    img {
+      display: block;
+      width: 100%;
+    }
   }
 
   .btn-order {
@@ -172,27 +223,30 @@ export default {
   border-radius: 6px;
   padding: 12px;
 
-  .share-img{
+  .share-img {
     display: block;
     width: 100%;
   }
 
-  .share-btn-wrapper{
+  .share-btn-wrapper {
     display: flex;
     flex-direction: row;
     margin-top: 22px;
 
-    .share-btn{
+    .share-btn {
       width: 50%;
+      display: block;
+      background: none !important;
+      border: none !important;
 
-      img{
+      img {
         display: block;
         width: 44px;
         height: 44px;
         margin: 0 auto;
       }
 
-      .btn-title{
+      .btn-title {
         padding-top: 8px;
         padding-bottom: 26px;
         text-align: center;
@@ -204,12 +258,20 @@ export default {
   }
 }
 
+button::after {
+  border: none;
+}
+
 /* 商品列表 */
-.list-title{
-  width: 100%;
-  height: 14px;
-  background: url(#{$img_url}) no-repeat center;
-  background-size: 100%;
+.list-title {
+  width: 182px;
+  height: 16px;
+  margin: 30px auto 20px auto;
+
+  img {
+    display: block;
+    width: 100%;
+  }
 }
 .goods-list {
   display: flex;

@@ -37,7 +37,11 @@
             ></div>
           </div>
         </div>
-        <div class="buy-chance">今日剩余<text>1</text>份参与机会<button class="add-chance" @click="okBtnHandler" open-type="share">提升</button>
+        <div class="buy-chance">今日剩余<text>1</text>份参与机会<button
+            class="add-chance"
+            @click="okBtnHandler"
+            open-type="share"
+          >提升</button>
         </div>
       </div>
 
@@ -90,11 +94,11 @@ export default {
       this.$emit("changeNum", e.target.value);
     },
     plus() {
-      this.$emit("changeNum", this.buyNum + 1);
+      this.$emit("changeNum", this.buyNum * 1 + 1);
     },
     minus() {
       if (this.buyNum <= 1) return;
-      this.$emit("changeNum", this.buyNum - 1);
+      this.$emit("changeNum", this.buyNum * 1 - 1);
     },
     makeBuy() {
       this.$emit("makeBuy");
@@ -168,7 +172,7 @@ export default {
         .num-wrapper {
           width: 94px;
           font-size: 0;
-          border: 1px solid #EDEBE9;
+          border: 1px solid #edebe9;
           border-radius: 5px;
 
           .btn {
@@ -190,9 +194,9 @@ export default {
             text-align: center;
             font-size: 14px;
             line-height: 24px;
-            color: #9B9B9B;
-            border-left: 1px solid #EDEBE9;
-            border-right: 1px solid #EDEBE9;
+            color: #9b9b9b;
+            border-left: 1px solid #edebe9;
+            border-right: 1px solid #edebe9;
           }
           .num-btn-plus {
             background: url(#{$img_url}/icon_plus.png) no-repeat center;
@@ -201,62 +205,62 @@ export default {
         }
       }
 
-      .buy-chance{
+      .buy-chance {
         padding: 12px 0;
         font-size: 12px;
-        color: #9B9B9B;
+        color: #9b9b9b;
         text-align: right;
 
-        text{
+        text {
           display: inline-block;
           vertical-align: center;
-          color: #FF3B30;
+          color: #ff3b30;
         }
 
-        .add-chance{
+        .add-chance {
           display: inline-block;
           padding: 0;
           vertical-align: center;
-          width:32px;
-          height:16px;
+          width: 32px;
+          height: 16px;
           margin: 0 0 0 10px !important;
           line-height: 16px;
           text-align: center;
           font-size: 10px;
-          color: #FF3B30;
-          border-radius:2px;
-          background: #fff!important;
-          box-shadow: none!important;
-          outline: 0!important;
-          border:1px solid #FF3B30!important;
+          color: #ff3b30;
+          border-radius: 2px;
+          background: #fff !important;
+          box-shadow: none !important;
+          outline: 0 !important;
+          border: 1px solid #ff3b30 !important;
         }
-        button::after{
-          padding: 0!important;
+        button::after {
+          padding: 0 !important;
           margin: 0 !important;
-          border: none!important;
+          border: none !important;
         }
       }
     }
 
-    .buy-ft{
+    .buy-ft {
       display: flex;
       flex-direction: row;
       align-items: center;
-      border-top: 10px solid #F5F5F5;
+      border-top: 10px solid #f5f5f5;
 
-      .total-t{
+      .total-t {
         width: 36px;
         margin-left: 15px;
         font-size: 12px;
         flex-shrink: 0;
       }
-      .total{
+      .total {
         flex: 1;
         font-size: 21px;
         color: #ff3b30;
         overflow: hidden;
       }
-      .makeBuy{
+      .makeBuy {
         flex-shrink: 0;
         width: 130px;
         height: 48px;
@@ -264,10 +268,13 @@ export default {
         text-align: center;
         font-size: 18px;
         color: #fff;
-        background:linear-gradient(135deg,rgba(255,106,107,1) 0%,rgba(255,58,57,1) 100%);
+        background: linear-gradient(
+          135deg,
+          rgba(255, 106, 107, 1) 0%,
+          rgba(255, 58, 57, 1) 100%
+        );
       }
     }
-
   }
 
   &.show {

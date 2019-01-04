@@ -101,13 +101,20 @@
         <div class="my-money">
           <div class="my-money-hd">当前收益</div>
           <div
-          v-if="duobaoData.hb_amount==0"
+            v-if="duobaoData.hb_amount==0"
             class="my-money-bd"
             @click="goIncome()"
           >¥{{duobaoData.hb_amount||"0"}}</div>
-          <div class="my-money-bd-emy" v-else @click="goIncome()">
+          <div
+            class="my-money-bd-emy"
+            v-else
+            @click="goIncome()"
+          >
             参与后获得
-            <img :src="helpIcon" alt="">
+            <img
+              :src="helpIcon"
+              alt=""
+            >
           </div>
         </div>
       </div>
@@ -219,7 +226,7 @@
       @click="gotobuy"
     >立即参与</div>
     <!-- 快速导航 -->
-    <quick-navigate />
+    <!-- <quick-navigate /> -->
     <!-- 机会不足弹窗 -->
     <ls-dialog
       :showDialog="showDialog"
@@ -338,12 +345,22 @@ export default {
         this
       );
       if (res.data && res.code === 0) {
-        this.showDialog = !0;
         wx.navigateTo({
-          url: "/pages/result/main?id=" + this.is_id
+          url: "/pages/result/main?id=" + this.is_id + "&orderId=" + res.data.order_id
         });
       } else if (res.code === 402) {
         this.showDialog = !0;
+      } else {
+        wx.showModal({
+          title: "提示",
+          content: res.msg || "购买失败",
+          showCancel: true,
+          cancelText: "取消",
+          cancelColor: "#000000",
+          confirmText: "确定",
+          confirmColor: "#3CC51F",
+          success: res => {}
+        });
       }
     },
     changeNum(e) {
@@ -373,8 +390,8 @@ export default {
     },
     // 跳转到参与明细
     goJoinList() {
-      console.log('goJoinList');
-      
+      console.log("goJoinList");
+
       wx.navigateTo({
         url: "/pages/join_list/main?id=" + this.is_id
       });
@@ -446,8 +463,11 @@ export default {
     }
   },
   // 页面加载
-  async onLoad(e) {
-    var id = e.id;
+  async onLoad() {
+    var id = this.$root.$mp.query.id;
+    console.log(id);
+
+    // var id = e.id;
     // 夺宝详情
     const res = await util.request(api.DuobaoDetail, { id: id }, "GET", this);
     if (res.data && res.code === 0) {
@@ -659,13 +679,13 @@ page {
       font-size: 18px;
       color: #ff3b30;
     }
-    .my-money-bd-emy{
+    .my-money-bd-emy {
       padding-top: 10px;
       font-size: 16px;
-      color: #BEBEBE;
+      color: #bebebe;
       line-height: 1;
 
-      img{
+      img {
         display: inline-block;
         width: 20px;
         height: 20px;

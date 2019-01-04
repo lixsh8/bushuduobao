@@ -66,12 +66,12 @@
             <block
               v-for="(item,index) in data.menuList"
               :key="index"
-             >
-             <button
+            >
+              <button
                 class="operationItem"
-                :openType="item.type"
-                v-if="item.type"
-               >
+                :openType="item.open_type"
+                v-if="item.open_type && item.open_type!='address'"
+              >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -82,9 +82,11 @@
 
               <div
                 v-else
-                bindtap="jumpHandle"
+                @click="jump"
+                :data-type="item.open_type"
+                :data-url="item.link"
                 class="operationItem"
-               >
+              >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -92,7 +94,7 @@
                 />
                 <div class="operationTxt">{{item.title}}</div>
               </div>
-              
+
             </block>
 
           </div>
@@ -104,7 +106,6 @@
             src="https://pic3.zhuanstatic.com/zhuanzh/n_v24a4648bd88534e93835fd54c8454d864.jpg"
             v-if="showGoldAd==1"
           />
-
 
           <!-- 推荐 -->
           <div
@@ -131,7 +132,7 @@
           <div
             class="box _3142106 indexBanner"
             v-if="banners.length>0"
-           >
+          >
             <swiper
               autoplay="config.autoplay"
               bindchange="bannerChange"
@@ -204,9 +205,21 @@ export default {
       headerBackground: "#FF696C",
       titleColor: "#fff",
       orderList: [
-        { type: "1", icon: "/static/images/icon_order_dkj.png", title: "待开奖" },
-        { type: "9", icon: "/static/images/icon_order_yzj.png", title: "已中奖" },
-        { type: "8", icon: "/static/images/icon_order_wzj.png", title: "未中奖" }
+        {
+          type: "1",
+          icon: "/static/images/icon_order_dkj.png",
+          title: "待开奖"
+        },
+        {
+          type: "9",
+          icon: "/static/images/icon_order_yzj.png",
+          title: "已中奖"
+        },
+        {
+          type: "8",
+          icon: "/static/images/icon_order_wzj.png",
+          title: "未中奖"
+        }
       ],
       banners: [],
       data: null
@@ -220,13 +233,25 @@ export default {
   methods: {
     navToOrder() {
       wx.navigateTo({
-        url: '/pages/order/main'
+        url: "/pages/order/main"
       });
     },
     jumpHandle(e) {
       wx.navigateTo({
-        url: '/pages/order/main?type=' + e
+        url: "/pages/order/main?type=" + e
       });
+    },
+    jump(e) {
+      var data = e.currentTarget.dataset;
+      if (data.type === "address") {
+        wx.chooseAddress({
+          success(res) {}
+        });
+      } else {
+        wx.navigateTo({
+          url: data.url
+        });
+      }
     }
   },
 
@@ -301,8 +326,7 @@ page {
 .mine-head {
   width: 100%;
   height: 265rpx;
-  background: url(#{$img_url}mine_banner.png)
-    no-repeat center center;
+  background: url(#{$img_url}mine_banner.png) no-repeat center center;
   background-size: 100% 265rpx;
   display: flex;
   justify-content: flex-start;
@@ -473,7 +497,7 @@ page {
   text-align: center;
   position: relative;
   line-height: 1;
-  background: none!important;
+  background: none !important;
 }
 
 .mine-operationList .operationItem .operationIcon {

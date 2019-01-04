@@ -11,6 +11,7 @@ export default {
   },
   async onShow(opts) {
     console.log("onShow" + JSON.stringify(opts));
+    
     const checkSession = await util.checkSession();
     
     if (!checkSession || !wx.getStorageSync("token")) {
@@ -21,6 +22,8 @@ export default {
           api.Login,
           { code: loginResult.code }
         );
+        console.log('app全局登录');
+        
         if (tokenResult && tokenResult.data && tokenResult.data.token) {
           wx.setStorageSync("token", tokenResult.data.token);
         }

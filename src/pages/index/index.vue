@@ -31,16 +31,30 @@
         <div
           @click="handlePrize"
           class="prize-common"
+          :data-type="item.type"
+          :data-id="item.id"
           :class="item.type"
           v-for="(item, index) in bubble"
           :key="index"
         >
-          <div
-            class="prize-common-num"
-            v-if="item.hb>0"
-          ><div class="unit">￥</div>{{item.hb}}
-          </div>
-          <div class="prize-common-name">{{item.title}}</div>
+          <block v-if="item.type==='attendanceReward' ||item.type==='newReward'">
+            <div
+              class="prize-common-num"
+              v-if="item.hb>0"
+            >
+              <div class="unit">￥</div>{{item.hb}}
+            </div>
+            <div class="prize-common-name">{{item.title}}</div>
+          </block>
+          <block v-else>
+            <div
+              class="prize-common-num"
+              v-if="item.hb>0"
+            >
+              <div class="unit"></div>
+            </div>
+            <div class="prize-common-name">{{item.title}}</div>
+          </block>
         </div>
 
         <!-- 分享金币 -->
@@ -150,11 +164,11 @@
             :data-is_id="item.is_id"
             v-for="item in newUserZoneInfo.list"
             :key="item.is_id"
-           >
+          >
             <goods-item
-                :goodsItem="item"
-                @btnClickHandler="btnClickHandler"
-              />
+              :goodsItem="item"
+              @btnClickHandler="btnClickHandler"
+            />
           </block>
         </div>
         <div
@@ -174,12 +188,15 @@
         <div class="head _2edb85c">
           <div class="title _2edb85c">{{latestAward&&latestAward.title}}</div>
           <div
-            @click="$OneCoinZone$goActivity"
+            @click="goDuobaoHistory"
             class="more _2edb85c"
             :data-url="latestAward&&latestAward.subtitle"
           >{{latestAward&&latestAward.subtitle}}</div>
         </div>
-        <div class="box _2edb85c">
+        <div
+          class="box _2edb85c"
+          v-if="latestAward"
+        >
           <swiper
             class="swiper _2edb85c"
             :autoplay="config.autoplay"
@@ -192,7 +209,6 @@
           >
             <swiper-item
               class="swiper-item _2edb85c"
-              v-if="latestAward"
               v-for="(item, index) in latestAward.list"
               :data-index="index"
               :key="index"
@@ -314,11 +330,11 @@
             <block
               v-for="item in duobao.list"
               :key="item.is_id"
-             >
+            >
               <goods-item
-                  :goodsItem="item"
-                  @btnClickHandler="btnClickHandler"
-                />
+                :goodsItem="item"
+                @btnClickHandler="btnClickHandler"
+              />
             </block>
           </div>
         </div>
@@ -364,12 +380,7 @@ export default {
       authModalShow: !1,
       hb_amount: 0,
       // 金币列表
-      bubble: [
-        // { coin: 10, name: "签到", className: "signin-prize" },
-        // { coin: 110, name: "新手", className: "new-user-prize" },
-        // { coin: 110, name: "广告", className: "adv-prize" },
-        // { coin: 10, name: "collect", className: "collect-prize" }
-      ],
+      bubble: null,
       // 步数
       totalStep: 0,
       loadingWeRunData: !1,
@@ -473,16 +484,52 @@ export default {
     pagingFooter
   },
   methods: {
+    // 获取气泡红包
+    getPacks() {
+      var _this = this;
+      api
+        .getPacks()
+        .then(function(res) {
+          console.log(11);
+          _this.hb_amount = res.data.hb_amount;
+          _this.bubble = res.data.bubble;
+        });
+    },
+    // 点击气泡获取金币
+    handlePrize(e) {
+      var type = e.currentTarget.dataset.type;
+      if (type) {
+        console.log(type);
+      }
+    },
+    // 统一跳转
+    jump(e) {
+      var url = e.currentTarget.dataset.url;
+      if (url.indexOf("/invite") > 0) {
+        wx.switchTab({
+          url: url
+        });
+      } else {
+        wx.navigateTo({
+          url: url
+        });
+      }
+    },
+    goDuobaoHistory() {
+      wx.navigateTo({
+        url: "/pages/duobao_history/main"
+      });
+    },
     // 跳转到新人专区
     gotoNewer(e) {
       wx.navigateTo({
-        url: '/pages/newer/main'
-      })
+        url: "/pages/newer/main"
+      });
     },
     // 跳转详情
     goDetail(e) {
       console.log(e);
-      
+
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
       });
@@ -510,8 +557,8 @@ export default {
     },
     // 获取微信步数
     getWeRunData() {
-      console.log('正在获取步数...');
-      
+      console.log("正在获取步数...");
+
       var _this = this;
       _this.loadingWeRunData = !0;
       wx.getWeRunData({
@@ -521,13 +568,10 @@ export default {
           const iv = res.iv;
           console.log(res);
           request
-            .get(
-              "https://devapi.xiaotaotao123.cn/?act=index&op=getStep",
-              {
-                iv: encodeURIComponent(iv),
-                encrypted_data: encodeURIComponent(encryptedData)
-              }
-            )
+            .get("https://devapi.xiaotaotao123.cn/?act=index&op=getStep", {
+              iv: encodeURIComponent(iv),
+              encrypted_data: encodeURIComponent(encryptedData)
+            })
             .then(res => {
               console.log(res);
               _this.totalStep = res.data;
@@ -589,6 +633,12 @@ export default {
     }
   },
 
+  // 下拉刷新
+  onPullDownRefresh() {
+    console.log("刷新");
+    wx.stopPullDownRefresh();
+  },
+
   // 滚动加载
   async onReachBottom() {
     if (this.hasMore) {
@@ -597,11 +647,11 @@ export default {
       page++;
 
       wx.showToast({
-        title: '数据加载中...', // 提示的内容,
-        icon: 'loading', // 图标,
+        title: "数据加载中...", // 提示的内容,
+        icon: "loading", // 图标,
         duration: 1000 // 延迟时间,
       });
-      
+
       const Duobao = await util.request(
         api.IndexDuobao,
         { page: page },
@@ -609,7 +659,12 @@ export default {
         this
       );
       console.log(Duobao.data);
-      if (Duobao.data && Duobao.code === 0 && Duobao.data.list && Duobao.data.list.length > 0) {
+      if (
+        Duobao.data &&
+        Duobao.code === 0 &&
+        Duobao.data.list &&
+        Duobao.data.list.length > 0
+      ) {
         // this.totalData = res.data;
         var data = Duobao.data;
         data.list = list.concat(data.list);
@@ -635,23 +690,13 @@ export default {
     this.checkAuth();
     // 获取首页数据
     request.get(api.Index, null).then(res => {
-      this.hb_amount = res.data.hb_amount;
-      this.bubble = res.data.bubble;
       this.menuList = res.data.menuList;
       this.banner = res.data.banner;
     });
-    // const res = await util.request(api.Index, null, "GET", this);
-    // if (res.data && res.code === 0) {
-    //   // this.totalData = res.data;
-    //   console.log(res.data);
-
-    //   this.hb_amount = res.data.hb_amount;
-    //   this.bubble = res.data.bubble;
-    //   this.menuList = res.data.menuList;
-    //   this.banner = res.data.banner;
-    // }
     // 获取步数
     this.getWeRunData();
+    // 获取红包
+    this.getPacks();
     // 获取新手专区数据 act=duobao&op=newbornZone
     const resNewZone = await util.request(api.IndexNewZone, null, "GET", this);
     if (resNewZone.data && resNewZone.code === 0) {
@@ -919,8 +964,7 @@ button::after {
   width: 750rpx;
   min-height: 676rpx;
   position: relative;
-  background: url("#{$img_url}index_banner_bg.png")
-    no-repeat center top;
+  background: url("#{$img_url}index_banner_bg.png") no-repeat center top;
   background-size: 750rpx 441rpx;
   padding-top: 30rpx;
   box-sizing: border-box;
@@ -977,8 +1021,7 @@ button::after {
 }
 
 .topArea .powerCoin .agentCoinInteger {
-  background: url(#{$img_url}icon_pack_xsm.png)
-    no-repeat 12rpx center;
+  background: url(#{$img_url}icon_pack_xsm.png) no-repeat 12rpx center;
   background-size: 34rpx 34rpx;
   padding-left: 56rpx;
 }
@@ -1186,14 +1229,13 @@ button::after {
   margin-top: 16rpx;
   width: 256rpx;
   height: 56rpx;
-  background: url(#{$img_url}index_btn.png)
-    no-repeat center center;
+  background: url(#{$img_url}index_btn.png) no-repeat center center;
   background-size: 256rpx 56rpx;
   font-family: PingFang-SC-HK;
   font-size: 24rpx;
   line-height: 56rpx;
   text-align: center;
-  color: #FF3B30;
+  color: #ff3b30;
 }
 
 .topArea .inviteNew {
@@ -1207,8 +1249,7 @@ button::after {
   margin: 10rpx auto 0;
   padding-top: 41rpx;
   box-sizing: border-box;
-  background: url(#{$img_url}index_invite_btn.png)
-    no-repeat;
+  background: url(#{$img_url}index_invite_btn.png) no-repeat;
   background-size: 100% 100%;
   font-size: 32rpx;
   color: #ffffff;
@@ -1300,17 +1341,16 @@ button::after {
   height: 44px;
   padding-top: 16px;
   box-sizing: border-box;
-  background: url(#{$img_url}icon_pack_float.png)
-    no-repeat center top;
+  background: url(#{$img_url}icon_pack_float.png) no-repeat center top;
   background-size: 100% 100%;
   font-family: "DIN Condensed";
   font-size: 16px;
   text-align: center;
   line-height: 22px;
-  color: #FFECBA;
+  color: #ffecba;
   margin: 0 auto;
 
-  .unit{
+  .unit {
     display: inline-block;
     font-size: 10px;
   }
@@ -1370,8 +1410,8 @@ button::after {
 .invite-new-prize,
 .invitationReward {
   position: absolute;
-  top: 120rpx;
-  right: 120rpx;
+  top: 50rpx;
+  right: 80rpx;
   z-index: 100;
 }
 

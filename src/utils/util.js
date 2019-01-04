@@ -1,5 +1,5 @@
 // import wx from 'wx';
-import api from "@/utils/api";
+// import api from "@/utils/api";
 
 function formatTime(date) {
   var year = date.getFullYear();
@@ -38,41 +38,49 @@ function request(url, data = {}, method = "GET") {
         if (res.statusCode === 200) {
           if (res.data.code === 401) {
             // 需要登录后才可以操作
-            let code = null;
-            return login()
-              .then(res => {
-                code = res.code;
-                return getUserInfo();
-              })
-              .then(userInfo => {
-                // 登录远程服务器
-                request(
-                  api.AuthLoginByWeixin,
-                  {
-                    code: code,
-                    userInfo: userInfo
-                  },
-                  "POST"
-                )
-                  .then(res => {
-                    if (res.code === 0) {
-                      // 存储用户信息
-                      console.log("重新登录后的token", res.data.token);
+            console.log("即将调用login函数");
+            wx.switchTab({
+              url: "/pages/index/main"
+            });
 
-                      wx.setStorageSync("userInfo", res.data.userInfo);
-                      wx.setStorageSync("token", res.data.token);
-                      resolve(res);
-                    } else {
-                      reject(res);
-                    }
-                  })
-                  .catch(err => {
-                    reject(err);
-                  });
-              })
-              .catch(err => {
-                reject(err);
-              });
+            // let code = null;
+            // return login()
+            //   .then(res => {
+            //     console.log("调用login函数回调1");
+            //     code = res.code;
+            //     return getUserInfo();
+            //   })
+            //   .then(userInfo => {
+            //     // 登录远程服务器
+            //     console.log("userInfo的回调");
+            //     request(
+            //       api.AuthLoginByWeixin,
+            //       {
+            //         code: code,
+            //         userInfo: userInfo
+            //       },
+            //       "POST"
+            //     )
+            //       .then(res => {
+            //         console.log("调用login函数回调2");
+            //         if (res.code === 0) {
+            //           // 存储用户信息
+            //           console.log("重新登录后的token", res.data.token);
+
+            //           wx.setStorageSync("userInfo", res.data.userInfo);
+            //           wx.setStorageSync("token", res.data.token);
+            //           resolve(res);
+            //         } else {
+            //           reject(res);
+            //         }
+            //       })
+            //       .catch(err => {
+            //         reject(err);
+            //       });
+            //   })
+            //   .catch(err => {
+            //     reject(err);
+            //   });
           } else {
             resolve(res.data);
           }
@@ -82,7 +90,7 @@ function request(url, data = {}, method = "GET") {
       },
       fail: function(err) {
         reject(err);
-        // console.log('请求失败，url', url);
+        console.log('请求失败，url', url);
         // console.log('请求参数，data:', data);
       }
     });
@@ -199,7 +207,10 @@ function login() {
     wx.login({
       success: function(res) {
         if (res.code) {
+          console.log("login函数");
+
           // 登录远程服务器
+          // request(api.Login, { code: res.code });
           // console.log('微信登陆成功', res)
           resolve(res);
         } else {
@@ -220,22 +231,23 @@ function getUserInfo() {
     // 查看button是否授权
     wx.getSetting({
       success: function(res) {
+        console.log("getUserInfo函数");
         if (res.authSetting["scope.userInfo"]) {
           // 已经授权，可以直接调用 getUserInfo 获取头像昵称
           wx.getUserInfo({
             withCredentials: true,
             success: function(res) {
-              // console.log('获取用户信息成功', res);
+              console.log("获取用户信息成功", res);
               resolve(res);
             },
             fail: function(err) {
-              // console.log('获取用户信息失败', err);
+              console.log("获取用户信息失败", err);
               reject(err);
             }
           });
         } else {
           // 没有授权
-          // console.log('但获取用户信息失败，未同意button授权');
+          console.log("但获取用户信息失败，未同意button授权");
         }
       }
     });

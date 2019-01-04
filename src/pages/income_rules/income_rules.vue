@@ -36,8 +36,8 @@
 
 <script type="text/ecmascript-6">
 import headBar from "@/components/headBar";
-// import util from "@/utils/util";
-// import api from "@/utils/api";
+import util from "@/utils/util";
+import api from "@/utils/api";
 // import request from "@/utils/request";
 import wxParse from "mpvue-wxparse";
 
@@ -63,8 +63,6 @@ export default {
 
   computed: {},
 
-  mounted(ev) {},
-
   methods: {
     // 购买
     goBuy() {
@@ -81,12 +79,21 @@ export default {
   },
 
   // 页面加载
-  async onLoad(e) {
-    var { id, income, detail } = e;
+  async onLoad() {
+    var { id, income, detail } = this.$root.$mp.query;
 
     this.id = id;
     this.income = income;
     this.detail = detail;
+    
+    const res = await util.request(api.IncomeRule, { id: id }, "GET", this);
+    if (res.data && res.code === 0) {
+      // this.totalData = res.data;
+      console.log(res.data);
+
+      this.article = res.data.content;
+    } else {
+    }
   }
 };
 </script>
@@ -98,7 +105,7 @@ export default {
   width: 345px;
   height: 130px;
   margin: 15px auto;
-  background: url(#{$img_url}duobao_bg.png) no-repeat center;
+  background: url(#{$img_url}shouyi_banner.png) no-repeat center;
   background-size: 100%;
 
   .income-hd {

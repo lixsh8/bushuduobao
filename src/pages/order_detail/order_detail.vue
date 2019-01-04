@@ -345,8 +345,10 @@ export default {
     }
   },
   async onLoad(e) {
-    var orderId = e.orderId;
-    this.orderId = orderId;
+    
+    var orderId = this.$root.$mp.query.orderId;
+    this.orderId = orderId
+    console.log(orderId);
 
     const res = await util.request(
       api.OderDetail,

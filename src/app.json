@@ -14,7 +14,6 @@
     "pages/income_rules/main",
     "pages/result/main",
     "pages/logistics/main",
-    "pages/index/index",
     "pages/mine/main"
   ],
   "window": {
@@ -55,5 +54,6 @@
         "selectedIconPath": "/static/images/tab/mine_selected.png"
       }
     ]
-  }
+  },
+  "navigateToMiniProgramAppIdList": ["wx4d822debd05bd127", "wxf6f81470006a6e0b"]
 }

@@ -107,10 +107,8 @@ export default {
     }
   },
 
-  mounted(ev) {},
-
   onShow(ev) {
-    console.log(this.globalData.statusBarHeight);
+    // console.log(this.globalData.statusBarHeight);
   },
 
   methods: {

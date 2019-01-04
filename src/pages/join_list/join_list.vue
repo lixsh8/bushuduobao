@@ -215,7 +215,7 @@ export default {
   },
   // 页面加载
   async onLoad(e) {
-    this.id = e.id;
+    this.id = this.$root.$mp.query.id;
 
     this.getList();
   }

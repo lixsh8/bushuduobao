@@ -21,24 +21,27 @@
 
       <scroll-div class="ad-list _7200772">
         <div
-          bindtap="getCoin"
+          @click="getCoin"
+          :data-appid="item.appid"
+          :data-url="item.url"
+          :gotStatus="item.gotStatus"
           class="ad-list-item _7200772"
           v-for="(item,index) in list"
           :key="index"
         >
           <image
             class="pic _7200772"
-            :src="item.pic"
+            :src="item.img"
           />
           <div class="box _7200772">
             <div class="title _7200772">{{item.title}}</div>
-            <div class="content _7200772">{{item.desc}}</div>
+            <div class="content _7200772">{{item.description}}</div>
           </div>
           <div class="status _7200772">
             <image
               class="_7200772"
               src="https://pic3.zhuanstatic.com/zhuanzh/n_v2f9803264f4c64352a5febfc9ca5fca8e.png"
-              v-if="item.gotStatus==0"
+              v-if="item.gotStatus"
             />
             <image
               class="_7200772"
@@ -50,242 +53,27 @@
       </scroll-div>
 
     </div>
-
-    <!-- 快速导航 -->
-    <quick-navigate/>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+import util from "@/utils/util";
+import api from "@/utils/api";
+// import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 
 export default {
   data() {
     return {
-      title: "广告福利",
+      title: "赚红包",
       headerBackground: "#8054ff",
       titleColor: "#fff",
       showCustomBar: !0,
       customBarStyle: "white",
-      list: [
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v2a32fd8f035ea48e5b72e59006ccd113f.png",
-          url:
-            "/pages/index/index?gdt_vid=wandehai&weixinadinfo=0001&channel=wandehai.h5wzcc.01408",
-          title: "猜词赢红包",
-          desc: "填字猜词，成语闯关！",
-          actId: "8444757676530818001:3555819730003056640",
-          type: null,
-          clickCount: null,
-          appId: "wx06317e9fcb72749f",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v2c63020b066a74f79b2a3f62550bf2da1.png",
-          url: "pages/index/index?ChannelID=TG001&IndirectChannel=LK",
-          title: "最强抽奖",
-          desc: "新人免费领百元大奖",
-          actId: "8444757676530818001:7650129710392610816",
-          type: null,
-          clickCount: null,
-          appId: "wxe20f2a757ccbbce3",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v247f0900a525744999c65a41a382ebadb.png",
-          url: "pages/step/step?chl=tiantbus&s=tiantbus",
-          title: "运动赚",
-          desc: "微信步数换红包，每天走路就能领现金！",
-          actId: "8444757676530818001:9019485040512249856",
-          type: null,
-          clickCount: null,
-          appId: "wx13dd723fb3aa9c5f",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v2ae58ba5c21be4caa9c44a5277ff2b80a.png",
-          url: "?from=2051",
-          title: "攻城三国",
-          desc: "开局送华佗，灭董卓，收吕布，十天称霸三国！",
-          actId: "8444757676530818001:6811051636138594304",
-          type: null,
-          clickCount: null,
-          appId: "wx8b3a98563fc40251",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v279560d922f2c4befa48b574f08226650.png",
-          url: "?from=2051",
-          title: "狂暴西游",
-          desc: "如果你连1元都不想冲，那就来这个西游吧，无限资源！",
-          actId: "8444757676530818001:1069756340382281728",
-          type: null,
-          clickCount: null,
-          appId: "wxbdfee33ea394a980",
-          gotStatus: 0,
-          field1: null,
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v2058652af38f64ea881e0346d468e51fc.jpg",
-          url: "?chid=1966&subchid=cq_zhuan01",
-          title: "传奇来了",
-          desc: "传奇复古经典版，来玩就是我兄弟！",
-          actId: "8444757676530818001:5595753046679727104",
-          type: null,
-          clickCount: null,
-          appId: "wx79ade44c39cefc7f",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v24274e27a71e64a5f94d57d6a509eac4c.png",
-          url: "pages/home/index?scene=c%3D149",
-          title: "够货",
-          desc: "来够货，购好货，一元白拿",
-          actId: "8444757676530818001:551858039226903552",
-          type: null,
-          clickCount: null,
-          appId: "wxc3a8c0b476dfa08c",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v2c8aaefc81320480885d176f7dec90840.png",
-          url: "?from=2051",
-          title: "决战沙城",
-          desc: "传奇世界正版授权，全民抢BOSS，橙装人人有",
-          actId: "8444757676530818001:7843845176170357760",
-          type: null,
-          clickCount: null,
-          appId: "wx591a9df1eaf73a4b",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v25c4a280e47ce40c58404d853d973f5fe.png",
-          url:
-            "pages/index/index?gdt_vid=wandehai&weixinadinfo=0001&channel=wandehai.h5xxxstar.3407",
-          title: "疯狂消星星",
-          desc: "最火热消除玩法，无尽关卡等你来挑战！",
-          actId: "8444757676530818001:7392508140993186816",
-          type: null,
-          clickCount: null,
-          appId: "wx7d2e1dd8fd7ea905",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        },
-        {
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v2508dc30d52e245bdb7fb1ff5849554d1.png",
-          url:
-            "pages/index/index?origin=bububaoUV&ald_media_id=8103&ald_link_key=70fc7c9cb18fdd9b",
-          title: "集步运动",
-          desc: "走走路免费领话费、优惠券等众多爆款商品",
-          actId: "8444757676530818001:2044681693656238080",
-          type: null,
-          clickCount: null,
-          appId: "wx371df2518b80e0c3",
-          gotStatus: 0,
-          field1: "",
-          field2: null,
-          field3: null,
-          field4: null,
-          field5: null,
-          field6: null,
-          field7: null,
-          field8: null,
-          field9: null
-        }
-      ],
-      deviceType: "",
-      selectedIndex: "",
-      timer: null,
+      list: null,
+      viewTimer: null,
+      num: 0,
       count: 0
     };
   },
@@ -297,9 +85,57 @@ export default {
 
   computed: {},
 
-  mounted(ev) {},
+  methods: {
+    getCoin(e) {
+      var _this = this;
+      let { appid, link, gotStatus } = e.currentTarget.dataset;
+      if (_this.viewTimer) clearInterval(_this.viewTimer);
+      wx.navigateToMiniProgram({
+        appId: appid,
+        path: link,
+        extraData: {
+          foo: "bar"
+        },
+        envVersion: "develop",
+        success(res) {
+          console.log("跳转成功");
+          if (gotStatus) return;
+          _this.viewTimer = setInterval(() => {
+            _this.num++;
+          }, 1000);
+        }
+      });
+    },
+    getPrize() {
+      wx.showModal({
+        title: "提示", // 提示的标题,
+        content: "恭喜你获得多少金币" // 提示的内容,
+      });
 
-  methods: {}
+      console.log("恭喜你获得多少金币");
+    }
+  },
+
+  onShow(e) {
+    console.log("show" + this.num);
+    if (this.num >= 10) {
+      this.getPrize();
+    }
+    if (this.viewTimer) clearInterval(this.viewTimer);
+    this.num = 0;
+  },
+
+  async onLoad(e) {
+    // 列表
+    const res = await util.request(api.WelfareAd, "GET", this);
+    if (res.data && res.code === 0) {
+      // this.totalData = res.data;
+      console.log(res.data);
+
+      this.list = res.data;
+    } else {
+    }
+  }
 };
 </script>
 

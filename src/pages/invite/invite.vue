@@ -746,11 +746,10 @@ page {
 
 .topBg .gotReward {
   font-family: PingFangSC-Semibold;
-  font-weight: 600;
-  font-size: 120rpx;
-  color: #ac4700;
+  font-size: 60px;
+  color: #FF6742;
   text-align: center;
-  padding-top: 125rpx;
+  padding-top: 100rpx;
 }
 
 .topBg .gotReward text {
@@ -759,7 +758,7 @@ page {
 
 .topBg .tips {
   font-size: 24rpx;
-  color: #ac4700;
+  color: #FF6742;
   text-align: center;
   margin-top: 16rpx;
 }
@@ -785,7 +784,7 @@ page {
   font-weight: 600;
   font-size: 32rpx;
   color: #ac4700;
-  margin: 42rpx auto 0;
+  margin: 60rpx auto 0;
 }
 
 .topBg .bottomTips {

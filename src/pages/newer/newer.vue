@@ -11,9 +11,19 @@
 
     <!-- 正文 -->
     <!-- banner -->
-    <div class="banner" v-if="banner">
-      <img :src="banner.img" alt="" mode="widthFix">
-      <div class="rule-btn" @click="showRules">活动规则</div>
+    <div
+      class="banner"
+      v-if="banner"
+    >
+      <img
+        :src="banner"
+        alt=""
+        mode="widthFix"
+      >
+      <div
+        class="rule-btn"
+        @click="showRules"
+      >活动规则</div>
     </div>
 
     <!-- list -->
@@ -37,7 +47,7 @@
     <!-- 规则弹窗 -->
     <rules-modal
       :ifShowRules="ifShowRules"
-      rules="<div style='height:100px;'>1111<span style='color:red'>222222</span></div><div>1111<span style='color:red'>222222</span></div><div>1111<span style='color:red'>222222</span></div><div>1111<span style='color:red'>222222</span></div><div>1111<span style='color:red'>222222</span></div><div>1111<span style='color:red'>222222</span></div><div>1111<span style='color:red;height:50px;'>222222</span></div>"
+      :rules="rules"
       @clsRulesModal="clsRulesModal"
     />
 
@@ -64,8 +74,8 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
-      banner: null,
-      ifShowRules: !0,
+      // banner: null,
+      ifShowRules: !1,
       list: null
     };
   },
@@ -76,6 +86,12 @@ export default {
     backTop,
     quickNavigate,
     rulesModal
+  },
+
+  computed: {
+    banner() {
+      return this.globalData.img_url + "banner_newer.png";
+    }
   },
 
   methods: {
@@ -104,7 +120,8 @@ export default {
       console.log(res.data);
 
       this.list = res.data.list;
-      this.banner = res.data.banner
+      this.rules = res.data.rules;
+      // this.banner = res.data.banner
       this.hasMore = res.data.hasMore;
     } else {
     }
@@ -124,7 +141,7 @@ export default {
     height: auto;
   }
 
-  .rule-btn{
+  .rule-btn {
     position: absolute;
     top: 10px;
     right: 0;
@@ -135,7 +152,7 @@ export default {
     font-size: 12px;
     color: #fff;
     border-radius: 12px 0 0 12px;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0, 0, 0, 0.5);
   }
 }
 
