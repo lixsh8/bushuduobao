@@ -74,6 +74,9 @@
       </block>
     </div>
 
+    <!-- 无数据 -->
+    <no-data :showNoData="!list||list.length<=0" />
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
 

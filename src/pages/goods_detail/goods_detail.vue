@@ -171,7 +171,7 @@
               class="duobao-item"
               v-for="item in historyList"
               :key="item.id"
-            >
+             >
               <div class="duobao-hd">
                 <div class="user-t">中奖者：</div>
                 <img
@@ -198,6 +198,9 @@
             </div>
 
           </div>
+
+          <!-- 无数据 -->
+          <no-data :showNoData="!historyList||historyList.length<=0" />
         </div>
       </div>
     </div>
@@ -482,7 +485,7 @@ export default {
       this.article = info.dgoods_body;
       this.totalNum = info.is_totalnum;
       this.leftNum = info.is_oddnum;
-      this.price = info.dgoods_hb;
+      this.price = info.db_hbAmount;
       this.totalPrice = info.dgoods_hb;
     } else {
     }

@@ -18,7 +18,7 @@
           <div
             class="duobao-list"
             v-if="historyList&&historyList.length>0"
-          >
+           >
 
             <div
               class="duobao-item"
@@ -51,6 +51,9 @@
             </div>
 
           </div>
+
+          <!-- 无数据 -->
+          <no-data :showNoData="!historyList||historyList.length<=0" />
         </div>
       </div>
     </div>

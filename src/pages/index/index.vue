@@ -148,7 +148,7 @@
       <!-- 新人专区 -->
       <div
         class="new _b790fd0"
-        v-if="newUserZoneInfo&&newUserZoneInfo.list"
+        v-if="newUserZoneInfo&&newUserZoneInfo.list&&newUserZoneInfo.list.length>0"
       >
         <div class="head _b790fd0">
           <div class="title _b790fd0">{{newUserZoneInfo.title}}</div>
@@ -184,7 +184,7 @@
       <!-- 最新开奖 -->
       <div
         class="one-coin _2edb85c"
-        v-if="latestAward&&latestAward.list"
+        v-if="latestAward&&latestAward.list&&latestAward.list.length>0"
       >
         <div class="head _2edb85c">
           <div class="title _2edb85c">{{latestAward&&latestAward.title}}</div>
@@ -289,10 +289,10 @@
         </div>
       </div>
 
-      <!-- 夺宝  -->
+      <!-- 兑换商品夺宝  -->
       <div
         class="duobao"
-        v-if="duobao&&duobao.list"
+        v-if="duobao&&duobao.list&&duobao.list.length>0"
       >
         <div class="Recommend">
           <div class="Recommend-title">
@@ -344,6 +344,15 @@
 
     </div>
 
+    <!-- 签到弹窗 -->
+    <signModal
+      :ifShowSign="ifShowSign"
+      :days="days"
+      :packAmount="packAmount"
+      @clsSignModal="clsSignModal"
+      @subBtnClick="subBtnClick"
+    />
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
@@ -362,6 +371,7 @@
 <script>
 import headBar from "@/components/headBar";
 import goodsItem from "@/components/goodsItem";
+import signModal from "@/components/signModal";
 import backTop from "@/components/backTop";
 import authModal from "@/components/authModal";
 import pagingFooter from "@/components/pagingFooter";
@@ -379,7 +389,10 @@ export default {
       isNet: true,
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
+      ifShowSign: !0,
+      days: 0,
       hb_amount: 0,
+      packAmount: 0,
       // 金币列表
       bubble: null,
       // 步数
@@ -422,11 +435,28 @@ export default {
   components: {
     headBar,
     goodsItem,
+    signModal,
     backTop,
     authModal,
     pagingFooter
   },
   methods: {
+    // 关闭签到按钮
+    clsSignModal(ev) {
+      this.ifShowSign = false;
+    },
+    // 预订提醒按钮
+    subBtnClick(ev) {
+      var _this = this;
+      console.log(ev);
+      // this.ifShowSign = false
+      api.sendMessage("form_id=" + ev).then(function(res) {
+        console.log(res);
+        if (res.code === 1) {
+          _this.ifShowSign = false
+        }
+      });
+    },
     // 获取气泡红包
     getPacks() {
       var _this = this;
@@ -462,16 +492,9 @@ export default {
 
             // 签到气泡点击弹窗
             if (type === "attendanceReward") {
-              wx.showModal({
-                title: "提示",
-                content: res.msg,
-                showCancel: true,
-                cancelText: "取消",
-                cancelColor: "#000000",
-                confirmText: "确定",
-                confirmColor: "#3CC51F",
-                success: res => {}
-              });
+              _this.ifShowSign = true;
+              _this.packAmount = res.data.hb;
+              _this.days = res.data.continueSign
             } else if (type === "newReward") {
               // 新用户
             } else {
@@ -1433,7 +1456,7 @@ button::after {
   position: absolute;
   top: 60rpx;
   left: 50rpx;
-  z-index: 100;
+  z-index: 89;
 }
 /* 邀请拉新红包 */
 .invite-new-prize,
@@ -1441,7 +1464,7 @@ button::after {
   position: absolute;
   top: 200rpx;
   left: 50rpx;
-  z-index: 100;
+  z-index: 89;
 }
 
 /* 好友夺宝兑换 */
@@ -1449,28 +1472,28 @@ button::after {
   position: absolute;
   top: 20rpx;
   right: 80rpx;
-  z-index: 100;
+  z-index: 89;
 }
 /* 兑换商品收益 */
 .duobaoReward {
   position: absolute;
   top: 140rpx;
   right: 80rpx;
-  z-index: 100;
+  z-index: 89;
 }
 
 .recall-user-prize {
   position: absolute;
   top: 40rpx;
   right: 20rpx;
-  z-index: 100;
+  z-index: 89;
 }
 
 .friend-help-prize {
   position: absolute;
   top: 290rpx;
   left: 10rpx;
-  z-index: 100;
+  z-index: 89;
 }
 
 .activity-challenge {

@@ -38,7 +38,7 @@
         v-for="(item, index) in list"
         :key="index"
         @click="goDetail(item.order_id)"
-      >
+       >
         <div class="item-hd">
           <div class="order-no">订单号:1075355839266603030</div>
           <div class="order-status">{{item.join_state}}</div>
@@ -75,6 +75,9 @@
       </div>
 
     </div>
+
+    <!-- 无数据 -->
+    <no-data :showNoData="!list||list.length<=0" />
 
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />

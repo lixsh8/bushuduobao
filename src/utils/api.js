@@ -11,6 +11,11 @@ const api = {
   IndexDuobao: ApiRootUrl + "?act=duobao&op=index",
   WelfareAd: ApiRootUrl + "?act=index&op=makeMoney",
   IndexPackPrize: ApiRootUrl + "?act=index&op=getIndexInfo",
+  // 发送消息模板
+  sendMessage: r =>
+    request.get("?act=friend&op=sendMsg", r, {
+      baseURL: ApiRootUrl
+    }),
   // 看广告得红包 
   ZHBAdReward: ApiRootUrl + "?act=index&op=getAdReward",
   // 获取首页要登录才显示的数据
@@ -27,6 +32,7 @@ const api = {
   // 好友加成页面
   Friend: ApiRootUrl + "?act=friend&op=index",
   FriendUserlist: ApiRootUrl + "?act=friend&op=userlist",
+  Promotelist: ApiRootUrl + "?act=friend&op=getAdditionLog",
 
   getFriendData: r =>
     request.get("?act=friend&op=index", null, {

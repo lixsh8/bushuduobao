@@ -47,6 +47,9 @@
       </block>
     </div>
 
+    <!-- 无数据 -->
+    <no-data :showNoData="!list||list.length<=0" />
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
@@ -56,7 +59,7 @@
     />
 
     <!-- 快速导航 -->
-    <quick-navigate />
+    <!-- <quick-navigate /> -->
   </div>
 </template>
 
@@ -70,6 +73,7 @@ import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import scrollMessage from "@/components/scrollMessage";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 
 export default {
   data() {
@@ -98,6 +102,7 @@ export default {
     backTop,
     quickNavigate,
     pagingFooter,
+    noData,
     scrollMessage
   },
 

@@ -1,4 +1,4 @@
-<!-- 红包记录 -->
+<!-- 加成明细 -->
 <template>
   <div style="height:100%;">
     <head-bar
@@ -24,13 +24,16 @@
           :key="index"
         >
           <div class="l">
-            <div class="title">{{item.change_type}}</div>
-            <div class="time">{{item.add_time}}</div>
+            <div class="title">{{item.title}}</div>
+            <div class="time">{{item.date}}</div>
           </div>
-          <div class="r"><div class="num">{{item.change_hb_amount}}</div>币</div>
+          <div class="r"><div class="num">{{item.addition}}</div></div>
         </div>
 
       </div>
+
+      <!-- 无数据 -->
+      <no-data :showNoData="!list||list.length<=0" />
     </div>
 
     <!-- 返回頂部 -->
@@ -92,11 +95,9 @@ export default {
     async getList() {
       // 列表
       const res = await util.request(
-        api.PackList,
+        api.Promotelist,
         {
           page: 1,
-          is_id: this.id,
-          isshowmine: this.isshowmine,
           page_size: this.page_size
         },
         "GET",
@@ -129,11 +130,9 @@ export default {
       });
 
       const res = await util.request(
-        api.PackList,
+        api.Promotelist,
         {
           page: page,
-          is_id: this.id,
-          isshowmine: this.isshowmine,
           page_size: this.page_size
         },
         "GET",
@@ -161,7 +160,7 @@ export default {
       this.scrollTimer = setTimeout(() => {
         this.canScroll = true;
       }, 1000);
-    } else if (!this.hasMore && this.currentTab === 1) {
+    } else if (!this.hasMore) {
       this.showNoMore = !0;
     }
   },

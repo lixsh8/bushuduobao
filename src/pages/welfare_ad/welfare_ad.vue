@@ -53,6 +53,9 @@
         </div>
       </scroll-div>
 
+      <!-- 无数据 -->
+      <no-data :showNoData="!list||list.length<=0" />
+
     </div>
   </div>
 </template>

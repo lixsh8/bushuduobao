@@ -27,11 +27,11 @@
           >活动规则</div>
 
           <div class="topBg">
-            <div class="gotReward">
+            <div class="gotReward" @click="goPromoteList">
               {{totalData.plusNum}}
               <!-- <text>币</text> -->
             </div>
-            <div class="tips">
+            <div class="tips" @click="goPromoteList">
               <!-- 累计奖励{{totalData.accumulateReward}}红包 -->
               加成倍数越高，到手红包越大
               <text bindtap="goDetailPage">查看明细</text>
@@ -202,6 +202,12 @@ export default {
   },
 
   methods: {
+    // 跳转到加成明细
+    goPromoteList() {
+      wx.navigateTo({
+        url: '/pages/promote_list/main'
+      })
+    },
     showRule() {
       this.ruleDialogShow = !0;
     },

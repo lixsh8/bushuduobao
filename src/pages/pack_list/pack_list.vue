@@ -31,6 +31,9 @@
         </div>
 
       </div>
+
+      <!-- 无数据 -->
+    <no-data :showNoData="!list||list.length<=0" />
     </div>
 
     <!-- 返回頂部 -->
@@ -161,7 +164,7 @@ export default {
       this.scrollTimer = setTimeout(() => {
         this.canScroll = true;
       }, 1000);
-    } else if (!this.hasMore && this.currentTab === 1) {
+    } else if (!this.hasMore) {
       this.showNoMore = !0;
     }
   },
