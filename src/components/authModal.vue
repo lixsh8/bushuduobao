@@ -37,7 +37,7 @@ export default {
   props: {
     authModalShow: {
       type: Boolean,
-      default: !0
+      default: !1
     },
     AuthModalTitle: {
       type: String,
@@ -47,8 +47,8 @@ export default {
   computed: {},
   methods: {
     authModalOnGetUserInfo(e) {
-      // console.log(e.target);
-      this.$emit('getUserInfo', e.target);
+      console.log("modal内部" + this.authModalShow);
+      this.$emit("getUserInfos", e.target);
       this.authModalShow = !1;
     }
   },

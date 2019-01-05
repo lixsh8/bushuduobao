@@ -11,8 +11,16 @@ const api = {
   IndexDuobao: ApiRootUrl + "?act=duobao&op=index",
   WelfareAd: ApiRootUrl + "?act=index&op=makeMoney",
   IndexPackPrize: ApiRootUrl + "?act=index&op=getIndexInfo",
+  // 看广告得红包 
+  ZHBAdReward: ApiRootUrl + "?act=index&op=getAdReward",
+  // 获取首页要登录才显示的数据
   getPacks: r =>
     request.get("?act=index&op=getIndexInfo", null, {
+      baseURL: ApiRootUrl
+    }),
+  // 红包气泡点击请求
+  clickPacks: r =>
+    request.post("?act=index&op=getBubbleReward", r, {
       baseURL: ApiRootUrl
     }),
 

@@ -16,6 +16,7 @@
             v-if="customBarStyle==='white'"
           >
             <image
+              v-if="ifBack"
               @click="navBack"
               class="back _c71564c"
               mode="aspectFit"
@@ -33,6 +34,7 @@
             v-else
           >
             <image
+              v-if="ifBack"
               @click="navBack"
               class="back _c71564c"
               mode="aspectFit"
@@ -57,6 +59,11 @@
 
 <script>
 export default {
+  data() {
+    return {
+      ifBack: true
+    };
+  },
   props: {
     title: {
       type: String,
@@ -90,13 +97,13 @@ export default {
   },
   methods: {
     navBack() {
-      console.log('back');
+      console.log("back");
       wx.navigateBack({
         delta: 1,
         fail: function() {
-          console.log('backFailed');
-          
-          wx.switchTab({ url: '/pages/index/main' });
+          console.log("backFailed");
+
+          wx.switchTab({ url: "/pages/index/main" });
         }
       });
     },
@@ -106,7 +113,13 @@ export default {
       });
     }
   },
-  created() {
+  onLoad() {
+    var ifBack = this.$root.$mp.query.ifBack;
+    console.log(ifBack);
+    
+    if (ifBack === 0) {
+      this.ifBack = false;
+    }
   }
 };
 </script>

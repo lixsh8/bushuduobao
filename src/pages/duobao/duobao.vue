@@ -1,4 +1,4 @@
-<!-- 新人专区 -->
+<!-- 夺宝 兑换商品 -->
 <template>
   <div style="height:100%;">
     <head-bar
@@ -20,7 +20,7 @@
     </div>
 
     <!-- 滚动消息 -->
-    <div class="scroll-message-wrapper">
+    <div class="scroll-message-wrapper" v-if="messages && messages.length>0">
       <div class="message-icon"></div>
       <div class="scroll-message">
         <scroll-message
@@ -87,7 +87,7 @@ export default {
       aa: "",
       scrollTimer: null,
       autoplay: !0,
-      messages: [1111111, 2222222222222, 33333333333333, 444444444444],
+      messages: [],
       list: null
     };
   },
@@ -202,6 +202,7 @@ export default {
       this.list = res.data.list;
       this.banner = res.data.banner;
       this.hasMore = res.data.hasMore;
+      this.messages = res.data.rollingMessage;
     } else {
     }
   }

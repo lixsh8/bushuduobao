@@ -19,6 +19,27 @@ function formatNumber(n) {
   n = n.toString();
   return n[1] ? n : "0" + n;
 }
+
+/**
+ * json 转化为url参数
+ * @param {json} data
+ * @return {string} url
+ */
+function parseParams(data) {
+  try {
+    var tempArr = [];
+    for (var i in data) {
+      var key = encodeURIComponent(i);
+      var value = encodeURIComponent(data[i]);
+      tempArr.push(key + "=" + value);
+    }
+    var urlParamsStr = tempArr.join("&");
+    return urlParamsStr;
+  } catch (err) {
+    return "";
+  }
+}
+
 /**
  * 封封微信的的request
  */
@@ -34,13 +55,15 @@ function request(url, data = {}, method = "GET") {
       },
       success: function(res) {
         // console.log('请求成功，url:', url);
-        console.log("请求参数，data:", JSON.stringify(res));
+        // console.log("请求参数，data:", JSON.stringify(res));
         if (res.statusCode === 200) {
+          console.log(res.data);
+          
           if (res.data.code === 401) {
             // 需要登录后才可以操作
             console.log("即将调用login函数");
-            wx.switchTab({
-              url: "/pages/index/main"
+            wx.navigateTo({
+              url: "/pages/login/main"
             });
 
             // let code = null;
@@ -90,7 +113,7 @@ function request(url, data = {}, method = "GET") {
       },
       fail: function(err) {
         reject(err);
-        console.log('请求失败，url', url);
+        console.log("请求失败，url", url);
         // console.log('请求参数，data:', data);
       }
     });
@@ -331,6 +354,7 @@ const util = {
   showErrorToast,
   checkSession,
   login,
+  parseParams,
   getUserInfo
 };
 

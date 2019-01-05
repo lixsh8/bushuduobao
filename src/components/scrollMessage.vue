@@ -6,7 +6,7 @@
       :autoplay="autoplay"
       :interval="interval"
       :duration="duration"
-      loop="false"
+      :circular="circular"
       vertical="true"
       :current="currentTab"
       @change="changeTab"
@@ -15,7 +15,8 @@
         v-for="(item, index) in messages"
         :key="index"
       >
-        <text>{{item}}</text>
+        <!-- <text>{{item}}</text> -->
+        <rich-text :nodes="item"></rich-text>
       </swiper-item>
     </swiper>
     <div class="cover"></div>
@@ -39,6 +40,10 @@ export default {
     indicatorDots: {
       type: Boolean,
       default: !1
+    },
+    circular: {
+      type: Boolean,
+      default: !0
     },
     autoplay: {
       type: Boolean,

@@ -8,7 +8,7 @@
         alt=""
         mode="widthFix"
       />
-      <div class="top-tips">{{goodsItem.is_totalnum}}份即开奖</div>
+      <div class="top-tips" v-if="showTips">{{goodsItem.is_totalnum}}份即开奖</div>
       <div class="process">
         <div
           class="process-bar"
@@ -19,7 +19,7 @@
     </div>
     <div class="cnt">
       <div class="goods-title">{{goodsItem.dgoods_name}}</div>
-      <div class="join-btn" @click="btnClickHandler(goodsItem.is_id)">{{goodsItem.dgoods_hb}}元参与</div>
+      <div class="join-btn" @click="btnClickHandler(goodsItem.is_id)">{{goodsItem.dgoods_hb}}元红包参与</div>
     </div>
   </div>
 </template>
@@ -30,7 +30,7 @@ export default {
     return {};
   },
 
-  props: ["goodsItem"],
+  props: ["goodsItem", "showTips"],
 
   methods: {
     btnClickHandler(ev) {

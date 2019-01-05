@@ -5,6 +5,7 @@
     "pages/duobao_history/main",
     "pages/newer/main",
     "pages/invite/main",
+    "pages/promote_list/main",
     "pages/welfare_ad/main",
     "pages/order/main",
     "pages/order_detail/main",
@@ -14,7 +15,8 @@
     "pages/income_rules/main",
     "pages/result/main",
     "pages/logistics/main",
-    "pages/mine/main"
+    "pages/mine/main",
+    "pages/login/main"
   ],
   "window": {
     "backgroundTextStyle": "light",

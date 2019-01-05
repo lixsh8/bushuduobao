@@ -123,10 +123,10 @@
 					"query": ""
 				},
 				{
-					"id": -1,
+					"id": 15,
 					"name": "赚红包",
 					"pathName": "pages/welfare_ad/main",
-					"query": ""
+					"query": "aaa=11111&b=222&ifBack=0"
 				}
 			]
 		}

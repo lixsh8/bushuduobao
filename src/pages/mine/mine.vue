@@ -23,7 +23,7 @@
             />
             <div class="mine-head-myinfo">
               <div class="mine-head-myinfo-nickname">{{data&&data.nickName}}</div>
-              <div class="mine-head-myinfo-coininfo">步数币
+              <div class="mine-head-myinfo-coininfo">红包
                 <text>{{data&&data.hb_amount}}</text>
                 <!-- <text>|</text>兑换 -->
                 <!-- <text>{{}}</text>件-->

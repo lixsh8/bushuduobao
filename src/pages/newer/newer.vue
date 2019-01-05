@@ -36,6 +36,7 @@
         :key="item.is_id"
       >
         <goodsItem
+          showTips="true"
           :goodsItem="item"
           @btnClickHandler="btnClickHandler"
         />

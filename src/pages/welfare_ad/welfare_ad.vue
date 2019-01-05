@@ -1,4 +1,4 @@
-<!-- 广告福利 -->
+<!-- 赚红包广告福利 -->
 <template>
   <div style="height:100%;">
     <head-bar
@@ -15,13 +15,14 @@
       <div class="ad-banner _7200772">
         <image
           class="_7200772"
-          src="https://pic6.zhuanstatic.com/zhuanzh/n_v2b0a37aecfd014588a29a12162d865193.png"
+          :src="bannerImg"
         />
       </div>
 
       <scroll-div class="ad-list _7200772">
         <div
           @click="getCoin"
+          :data-id="item.id"
           :data-appid="item.appid"
           :data-url="item.url"
           :gotStatus="item.gotStatus"
@@ -40,12 +41,12 @@
           <div class="status _7200772">
             <image
               class="_7200772"
-              src="https://pic3.zhuanstatic.com/zhuanzh/n_v2f9803264f4c64352a5febfc9ca5fca8e.png"
+              :src="packImgOpened"
               v-if="item.gotStatus"
             />
             <image
               class="_7200772"
-              src="https://img1.zhuanstatic.com/common/img/gotcoin.png"
+              :src="packImg"
               v-else
             />
           </div>
@@ -67,13 +68,16 @@ export default {
   data() {
     return {
       title: "赚红包",
-      headerBackground: "#8054ff",
-      titleColor: "#fff",
+      headerBackground: "#fff",
+      titleColor: "#000",
       showCustomBar: !0,
-      customBarStyle: "white",
+      customBarStyle: "black",
       list: null,
       viewTimer: null,
+      currentId: null,
       num: 0,
+      second: 20000,
+      tips: "",
       count: 0
     };
   },
@@ -83,12 +87,23 @@ export default {
     quickNavigate
   },
 
-  computed: {},
+  computed: {
+    packImgOpened() {
+      return this.globalData.img_url + "zhb_pack.png";
+    },
+    packImg() {
+      return this.globalData.img_url + "zhb_pack_active.png";
+    },
+    bannerImg() {
+      return this.globalData.img_url + "banner_zhb.png";
+    }
+  },
 
   methods: {
     getCoin(e) {
       var _this = this;
-      let { appid, link, gotStatus } = e.currentTarget.dataset;
+      let { id, appid, link, gotStatus } = e.currentTarget.dataset;
+      this.currentId = id;
       if (_this.viewTimer) clearInterval(_this.viewTimer);
       wx.navigateToMiniProgram({
         appId: appid,
@@ -101,25 +116,52 @@ export default {
           console.log("跳转成功");
           if (gotStatus) return;
           _this.viewTimer = setInterval(() => {
+            console.log("1111");
+
             _this.num++;
           }, 1000);
         }
       });
     },
     getPrize() {
-      wx.showModal({
-        title: "提示", // 提示的标题,
-        content: "恭喜你获得多少金币" // 提示的内容,
-      });
+      var _this = this;
+      util
+        .request(api.ZHBAdReward, { advertid: _this.currentId }, "GET", _this)
+        .then(function(res) {
+          if (res.code === 0) {
+            console.log(res);
+
+            _this.list = res.data.list;
+
+            wx.showModal({
+              title: "提示", // 提示的标题,
+              content: res.msg,
+              showCancel: false,
+              confirmText: "收下"
+            });
+          } else {
+            // wx.showModal({
+            //   title: "提示", // 提示的标题,
+            //   content: _this.tips // 提示的内容,
+            // });
+          }
+        });
 
       console.log("恭喜你获得多少金币");
     }
   },
 
   onShow(e) {
-    console.log("show" + this.num);
-    if (this.num >= 10) {
+    console.log("show：打开应用多少秒=" + this.num);
+    if (this.num >= this.second) {
       this.getPrize();
+    } else if (this.num < this.second && this.num > 0) {
+      wx.showModal({
+        title: "提示", 
+        content: this.tips,
+        showCancel: false,
+        confirmText: "知道了"
+      });
     }
     if (this.viewTimer) clearInterval(this.viewTimer);
     this.num = 0;
@@ -132,7 +174,9 @@ export default {
       // this.totalData = res.data;
       console.log(res.data);
 
-      this.list = res.data;
+      this.list = res.data.list;
+      this.tips = res.data.tips;
+      this.second = res.data.second;
     } else {
     }
   }

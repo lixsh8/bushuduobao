@@ -69,14 +69,14 @@
           <div class="share-group-name">分享领币</div>
         </button> -->
 
-        <!-- 赚步数币 -->
+        <!-- 赚红包 -->
         <!-- <div
           @click="$RunningTopArea$navToAdv"
           class="adv-prize prize-common"
         >
           <div class="prize-common-num">10<text>币</text>
           </div>
-          <div class="prize-common-name">赚步数币</div>
+          <div class="prize-common-name">赚红包</div>
         </div> -->
 
         <!-- 领取 -->
@@ -98,7 +98,7 @@
             @click="exchangeStep"
             class="centerData-stepBottom breathe-btn"
             v-else
-          >点击兑换成步数币</div>
+          >点击兑换成红包</div>
         </div>
         <!-- 邀请按钮 -->
         <button
@@ -139,7 +139,7 @@
           v-if="banner"
         >
           <image
-            mode="aspectFit"
+            mode="aspectFill"
             :src="banner.img"
           />
         </div>
@@ -166,6 +166,7 @@
             :key="item.is_id"
           >
             <goods-item
+              showTips="true"
               :goodsItem="item"
               @btnClickHandler="btnClickHandler"
             />
@@ -352,7 +353,7 @@
     />
     <!-- 授权弹窗 -->
     <auth-modal
-      @getUserInfo="getUserInfo"
+      @getUserInfos="getUserInfos"
       :authModalShow="authModalShow"
     />
   </div>
@@ -403,71 +404,13 @@ export default {
       // 最新开奖
       latestAward: null,
       // banner
-      banners: [
-        {
-          appId: "wxe20f2a757ccbbce3",
-          actId: "7444024759441471890:8420599615471447040",
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v221559d55f21244e7943427145a4e1aee.jpg",
-          title: "新人免费领百元大奖",
-          url: "pages/index/index?ChannelID=TG001&IndirectChannel=LK"
-        },
-        {
-          appId: "wxbdfee33ea394a980",
-          actId: "7444024759441471890:5808073694722452480",
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v27434fcdc57294b4a8a3c7b1499f7eed8.gif",
-          title: "1元都不想冲？来这个西游吧，无限资源！",
-          url: "?from=2051"
-        },
-        {
-          appId: "wx79ade44c39cefc7f",
-          actId: "7444024759441471890:5229291174667191296",
-          pic:
-            "http://pic1.zhuanstatic.com/zhuanzh/n_v22ab511d8b13749318d1ab002032dc85d.gif",
-          title: "传奇复古1.76单机版，来玩就送麻痹戒指！",
-          url: "?chid=1966&subchid=cq_zhuan01"
-        }
-      ],
-      // 推荐商品 分类
-      tabs: [
-        { cateId: 0, cateName: "包邮专区", havePrice: "false" },
-        { cateId: 111, cateName: "付邮免费拿", havePrice: "true" },
-        { cateId: 100, cateName: "家居", havePrice: null },
-        { cateId: 101, cateName: "数码", havePrice: null },
-        { cateId: 103, cateName: "配饰", havePrice: null },
-        { cateId: 110, cateName: "食品", havePrice: null },
-        { cateId: 104, cateName: "美妆", havePrice: null },
-        { cateId: 106, cateName: "母婴", havePrice: null },
-        { cateId: 107, cateName: "电器", havePrice: null },
-        { cateId: 108, cateName: "图书", havePrice: null },
-        { cateId: 109, cateName: "鞋包", havePrice: null },
-        { cateId: 200, cateName: "其他", havePrice: null }
-      ],
+      banners: [],
       // 推荐商品 列表
       page: 1,
       hasMore: !0,
       showNoMore: !1,
       duobao: null,
-      // 提示
-      showTip: true,
-      tips: {
-        loading: {
-          icon:
-            "https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/common/load_more2.png",
-          text: "加载中…"
-        },
-        failed: {
-          icon:
-            "https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/common/load_more2.png",
-          text: "加载失败"
-        },
-        noMore: {
-          icon:
-            "https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/common/load_more2.png",
-          text: "没有更多了"
-        }
-      }
+      requestTimer: {}
     };
   },
   computed: {
@@ -487,25 +430,74 @@ export default {
     // 获取气泡红包
     getPacks() {
       var _this = this;
-      api
-        .getPacks()
-        .then(function(res) {
+
+      api.getPacks().then(function(res) {
+        if (res.code === 0) {
           console.log(11);
           _this.hb_amount = res.data.hb_amount;
           _this.bubble = res.data.bubble;
-        });
+
+          if (_this.requestTimer.getPacks) {
+            clearInterval(_this.requestTimer.getPacks);
+          }
+        }
+      });
     },
     // 点击气泡获取金币
     handlePrize(e) {
       var type = e.currentTarget.dataset.type;
+      var _this = this;
+      console.log(type);
+
       if (type) {
-        console.log(type);
+        api.clickPacks("type=" + type).then(function(res) {
+          console.log(res);
+          if (res.code === 0) {
+            var bubble = _this.bubble || [];
+            var index = bubble.findIndex(
+              (value, index, arr) => value.type === type
+            );
+            _this.bubble = bubble.splice(index, 1);
+            _this.hb_amount = res.data.hb_amount;
+
+            // 签到气泡点击弹窗
+            if (type === "attendanceReward") {
+              wx.showModal({
+                title: "提示",
+                content: res.msg,
+                showCancel: true,
+                cancelText: "取消",
+                cancelColor: "#000000",
+                confirmText: "确定",
+                confirmColor: "#3CC51F",
+                success: res => {}
+              });
+            } else if (type === "newReward") {
+              // 新用户
+            } else {
+              wx.showModal({
+                title: "提示",
+                content: res.msg,
+                showCancel: false,
+                cancelColor: "#000000",
+                confirmText: "知道了",
+                confirmColor: "#3CC51F",
+                success: res => {}
+              });
+            }
+          }
+        });
       }
     },
     // 统一跳转
     jump(e) {
       var url = e.currentTarget.dataset.url;
-      if (url.indexOf("/invite") > 0) {
+      if (
+        url.indexOf("/index") > 0 ||
+        url.indexOf("/duobao") > 0 ||
+        url.indexOf("/invite") > 0 ||
+        url.indexOf("/mine") > 0
+      ) {
         wx.switchTab({
           url: url
         });
@@ -546,14 +538,23 @@ export default {
         url: "/pages/welfare_ad/main"
       });
     },
-    getUserInfo(e) {
-      request.get(
-        "https://devapi.xiaotaotao123.cn/?act=little&op=updateUserInfo",
-        {
+    getUserInfos(e) {
+      var _this = this;
+      console.log("外面调用" + this.authModalShow);
+
+      request
+        .get("https://devapi.xiaotaotao123.cn/?act=little&op=updateUserInfo", {
           iv: encodeURIComponent(e.iv),
           encrypted_data: encodeURIComponent(e.encryptedData)
-        }
-      );
+        })
+        .then(function(res) {
+          if (res.code === 0) {
+            _this.authModalShow = false;
+            console.log(
+              "更新用户信息后：this.authModalShow=" + _this.authModalShow
+            );
+          }
+        });
     },
     // 获取微信步数
     getWeRunData() {
@@ -614,11 +615,14 @@ export default {
     },
     checkAuth() {
       // 查看是否授权
+      console.log("checkAuth");
+
       var _this = this;
       wx.getSetting({
         success(res) {
           if (res.authSetting["scope.userInfo"]) {
             // 已经授权，可以直接调用 getUserInfo 获取头像昵称
+            console.log("checkAuth");
             _this.authModalShow = !1;
             wx.getUserInfo({
               success(res) {
@@ -630,17 +634,67 @@ export default {
           }
         }
       });
+    },
+    // 获取新人专区列表
+    async getNewZone() {
+      const resNewZone = await util.request(
+        api.IndexNewZone,
+        null,
+        "GET",
+        this
+      );
+      if (resNewZone.data && resNewZone.code === 0) {
+        console.log(resNewZone.data);
+
+        this.newUserZoneInfo = resNewZone.data;
+      }
+    },
+    // 获取最新获奖列表
+    async getLatestAward() {
+      const resLatestAward = await util.request(
+        api.IndexLatestAward,
+        null,
+        "GET",
+        this
+      );
+      console.log(resLatestAward.data);
+      if (resLatestAward.data && resLatestAward.code === 0) {
+        // this.totalData = res.data;
+
+        this.latestAward = resLatestAward.data;
+      }
+    },
+    // 获取兑换列表
+    async getDuobaoList() {
+      const Duobao = await util.request(
+        api.IndexDuobao,
+        { page: 1 },
+        "GET",
+        this
+      );
+      console.log(Duobao.data);
+      if (Duobao.data && Duobao.code === 0) {
+        // this.totalData = res.data;
+
+        this.duobao = Duobao.data;
+        this.hasMore = Duobao.data.hasMore;
+      }
     }
   },
 
   // 下拉刷新
   onPullDownRefresh() {
     console.log("刷新");
+    this.getNewZone();
+    this.getLatestAward();
+    this.getDuobaoList();
     wx.stopPullDownRefresh();
   },
 
   // 滚动加载
   async onReachBottom() {
+    console.log("showAuthModal:" + this.authModalShow);
+
     if (this.hasMore) {
       let list = this.duobao.list;
       let page = this.page;
@@ -685,53 +739,29 @@ export default {
   // 页面加载
   async onLoad(options) {
     const { id } = options;
-    this.globalData.id = id;
+    var _this = this;
+    _this.globalData.id = id;
 
-    this.checkAuth();
+    _this.checkAuth();
     // 获取首页数据
     request.get(api.Index, null).then(res => {
-      this.menuList = res.data.menuList;
-      this.banner = res.data.banner;
+      _this.menuList = res.data.menuList;
+      _this.banner = res.data.banner;
     });
     // 获取步数
-    this.getWeRunData();
-    // 获取红包
-    this.getPacks();
+    _this.getWeRunData();
+    // 获取红包等数据需要登录的
+    _this.requestTimer.getPacks = setInterval(function() {
+      _this.getPacks();
+    }, 1000);
     // 获取新手专区数据 act=duobao&op=newbornZone
-    const resNewZone = await util.request(api.IndexNewZone, null, "GET", this);
-    if (resNewZone.data && resNewZone.code === 0) {
-      console.log(resNewZone.data);
+    _this.getNewZone();
 
-      this.newUserZoneInfo = resNewZone.data;
-    }
     // 最新开奖 IndexLatestAward
-    const resLatestAward = await util.request(
-      api.IndexLatestAward,
-      null,
-      "GET",
-      this
-    );
-    console.log(resLatestAward.data);
-    if (resLatestAward.data && resLatestAward.code === 0) {
-      // this.totalData = res.data;
-
-      this.latestAward = resLatestAward.data;
-    }
+    _this.getLatestAward();
 
     // 夺宝列表 IndexDuobao
-    const Duobao = await util.request(
-      api.IndexDuobao,
-      { page: 1 },
-      "GET",
-      this
-    );
-    console.log(Duobao.data);
-    if (Duobao.data && Duobao.code === 0) {
-      // this.totalData = res.data;
-
-      this.duobao = Duobao.data;
-      this.hasMore = Duobao.data.hasMore;
-    }
+    _this.getDuobaoList();
   }
 };
 </script>
@@ -1375,14 +1405,6 @@ button::after {
   line-height: 32rpx;
   padding: 0 12rpx;
 }
-/* 签到气泡红包 */
-.signin-prize,
-.attendanceReward {
-  position: absolute;
-  right: 40rpx;
-  top: 220rpx;
-}
-
 .adv-prize {
   position: absolute;
   top: 50rpx;
@@ -1398,19 +1420,41 @@ button::after {
 .breathe-btn {
   animation: breathe 1.2s infinite linear;
 }
+/* 签到气泡红包 */
+.signin-prize,
+.attendanceReward {
+  position: absolute;
+  right: 40rpx;
+  top: 260rpx;
+}
 /* 新用户红包 */
 .new-user-prize,
 .newReward {
   position: absolute;
-  top: 120rpx;
-  left: 70rpx;
+  top: 60rpx;
+  left: 50rpx;
   z-index: 100;
 }
 /* 邀请拉新红包 */
 .invite-new-prize,
 .invitationReward {
   position: absolute;
-  top: 50rpx;
+  top: 200rpx;
+  left: 50rpx;
+  z-index: 100;
+}
+
+/* 好友夺宝兑换 */
+.friendsduobaoReward {
+  position: absolute;
+  top: 20rpx;
+  right: 80rpx;
+  z-index: 100;
+}
+/* 兑换商品收益 */
+.duobaoReward {
+  position: absolute;
+  top: 140rpx;
   right: 80rpx;
   z-index: 100;
 }
