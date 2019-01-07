@@ -188,6 +188,7 @@ export default {
       reloadFn: [],
       f_title: "",
       f_subtitle: "",
+      page: 1,
       hasMore: !0,
       showNoMore: !1,
       eachCoin: ["5", "2", "5", "2", "6"],

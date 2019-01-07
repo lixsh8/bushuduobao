@@ -8,8 +8,9 @@ const request = new Fly();
 
 request.interceptors.request.use(request => {
   // 给所有请求添加自定义header，带上token信息让服务器验证用户登陆
-  request.headers["Authorization"] = 'cjt ' + wx.getStorageSync("token");
-  request.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8";
+  request.headers["Authorization"] = "cjt " + wx.getStorageSync("token");
+  request.headers["Content-Type"] =
+    "application/x-www-form-urlencoded; charset=UTF-8";
   // console.log('flyio发请求,request为', request);
   wx.showNavigationBarLoading();
   return request;
@@ -18,6 +19,16 @@ request.interceptors.request.use(request => {
 request.interceptors.response.use(
   (response, promise) => {
     wx.hideNavigationBarLoading();
+    if (response.data.code === 401 && wx.getStorageSync("ifDirectToLogin") != "1") {
+      wx.setStorageSync("ifDirectToLogin", "1");
+      wx.removeStorageSync("code");
+      wx.removeStorageSync("token");
+      wx.removeStorageSync("register_code");
+      wx.navigateTo({
+        url: "/pages/login/main"
+      });
+    }
+
     return promise.resolve(response.data);
   },
   (err, promise) => {
@@ -26,9 +37,7 @@ request.interceptors.response.use(
       title: err.message,
       icon: "none"
     });
-    wx.navigateTo({
-      url: "/pages/login/main"
-    });
+
     return promise.resolve();
   }
 );

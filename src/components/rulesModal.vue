@@ -5,10 +5,12 @@
       <div class="dialog-hd">活动规则</div>
       <div class="dialog-bd">
         <scroll-view scroll-y scroll-with-animation>
-          <wx-parse
+          <!-- <wx-parse
             v-if="rules"
             :content="rules"
-          />
+          /> -->
+
+          
         </scroll-view>
       </div>
       <div class="cls-btn" @click="clsRulesModal"></div>

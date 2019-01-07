@@ -12,18 +12,18 @@
     <!-- 正文 -->
     <div class="tab">
       <div class="tab-content">
-        <div
-          class="content-item active"
-         >
+        <div class="content-item active">
           <div
             class="duobao-list"
             v-if="historyList&&historyList.length>0"
-           >
+          >
 
             <div
               class="duobao-item"
+              @click="goDetail"
               v-for="item in historyList"
-              :key="item.id"
+              :data-is_id="item.is_id"
+              :key="item.is_id"
             >
               <div class="duobao-hd">
                 <div class="user-t">中奖者：</div>
@@ -103,6 +103,14 @@ export default {
   },
 
   methods: {
+    // 跳转详情
+    goDetail(e) {
+      console.log(e);
+
+      wx.navigateTo({
+        url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
+      });
+    }
   },
 
   // 滚动加载更多

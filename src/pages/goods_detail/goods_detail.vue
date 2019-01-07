@@ -170,7 +170,9 @@
             <div
               class="duobao-item"
               v-for="item in historyList"
-              :key="item.id"
+              :key="item.is_id"
+              :data-is_id="item.is_id"
+              @click="goDetail"
             >
               <div class="duobao-hd">
                 <div class="user-t">中奖者：</div>
@@ -227,6 +229,24 @@
     <!-- 底部按钮 -->
     <div
       class="fixed-btn"
+      @click="goNext"
+      v-if="is_end&&nextId"
+    >
+      <div class="btn-t">继续夺宝</div>
+      <div class="btn-sub-t">第{{nextId}}期正在进行中</div>
+    </div>
+    <div
+      v-else-if="is_end"
+      class="fixed-btn"
+    >已结束</div>
+    
+    <div
+      v-else-if="duobaoData&&duobaoData.useTime<=0"
+      class="fixed-btn"
+      @click="showInviteModal"
+    >参与机会不足，邀请好友赞助</div>
+    <div
+      class="fixed-btn"
       @click="gotobuy"
     >立即参与</div>
     <!-- 快速导航 -->
@@ -277,8 +297,12 @@ export default {
       },
       banners: [],
       article: "",
+      // 这期是否结束
+      is_end: 0,
       // 购买期数id
       is_id: "",
+      // 下一期id
+      nextId: "",
       // 商品id
       dgoods_id: "",
       duobaoData: null,
@@ -337,6 +361,8 @@ export default {
 
         this.duobaoData = res.data;
         this.title = res.data.title;
+        this.nextId = res.data.next_is_id;
+        this.useTime = res.data.useTime - 1;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
         this.article = info.dgoods_body;
@@ -344,7 +370,6 @@ export default {
         this.leftNum = info.is_oddnum;
         console.log("usetime" + res.data.useTime);
 
-        this.useTime = res.data.useTime - 1;
         this.price = info.db_hbAmount;
         this.totalPrice = info.db_hbAmount;
       } else {
@@ -375,6 +400,26 @@ export default {
     navigate(href, e) {
       // do something
     },
+    // 去下一期购买
+    goNext() {
+      if (this.nextId) {
+        wx.redirectTo({
+          url: "/pages/goods_detail/main?id=" + this.nextId
+        });
+      }
+    },
+    // 往期跳转详情
+    goDetail(e) {
+      console.log(e);
+
+      wx.redirectTo({
+        url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
+      });
+    },
+    // 弹窗邀请好友
+    showInviteModal() {
+      this.showDialog = true;
+    },
     // 弹出购买弹窗
     gotobuy() {
       console.log("showBuyModal");
@@ -382,8 +427,24 @@ export default {
     },
     // 购买
     async makeBuy() {
+      // 购买次数不够
       if (this.duobaoData.useTime <= 0) {
         this.showDialog = true;
+        return;
+      }
+      // 剩余的商品购买次数不足
+      if (this.buyNum > this.leftNum) {
+        wx.showModal({
+          title: "提示",
+          content: "购买失败，请输入正确份数",
+          showCancel: true,
+          cancelText: "取消",
+          cancelColor: "#000000",
+          confirmText: "确定",
+          confirmColor: "#3CC51F",
+          success: res => {}
+        });
+
         return;
       }
 
@@ -405,7 +466,26 @@ export default {
             res.data.order_id
         });
       } else if (res.code === 402) {
+        // 参与机会不足
         this.showDialog = !0;
+      } else if (res.code === 403) {
+        // 金额不足
+        wx.showModal({
+          title: "提示",
+          content: "红包不足，立即赚红包",
+          showCancel: true,
+          cancelText: "取消",
+          cancelColor: "#000000",
+          confirmText: "确定",
+          confirmColor: "#3CC51F",
+          success: res => {
+            if (res) {
+              wx.redirectTo({
+                url: '/pages/welfare_ad/main'
+              });
+            }
+          }
+        });
       } else {
         wx.showModal({
           title: "提示",
@@ -424,6 +504,7 @@ export default {
       this.buyNum = num;
       this.useTime = this.duobaoData.useTime - num;
       this.totalPrice = num * this.price;
+
       console.log(this.buyNum);
     },
     // 关闭购买弹窗
@@ -524,10 +605,12 @@ export default {
     }
   },
   // 页面加载
-  async onShow() {
+  async onLoad() {
     var id = this.$root.$mp.query.id;
     console.log(id);
 
+    // 重置tab
+    this.currentTab = 0;
     // var id = e.id;
     this.getData(id);
   }
@@ -868,5 +951,16 @@ page {
     rgba(255, 106, 107, 1) 0%,
     rgba(255, 58, 57, 1) 100%
   );
+
+  .btn-t{
+    padding-top: 10px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .btn-sub-t{
+    padding-top: 4px;
+    font-size: 10px;
+    line-height: 1;
+  }
 }
 </style>

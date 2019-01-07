@@ -59,7 +59,7 @@
       noMoreTips="没有更多数据了"
     />
     <!-- 快速导航 -->
-    <quick-navigate />
+    <!-- <quick-navigate /> -->
   </div>
 </template>
 
@@ -72,6 +72,7 @@ import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 
 export default {
@@ -100,6 +101,7 @@ export default {
     headBar,
     backTop,
     pagingFooter,
+    noData,
     quickNavigate,
     buyModal,
     wxParse

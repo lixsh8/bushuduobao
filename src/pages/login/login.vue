@@ -36,30 +36,45 @@ export default {
     // 购买
     async refresh() {
       console.log("login页面登录,即将登陆");
-      
-      let loginResult = await util.login();
-      console.log('loginResult');
-      if (loginResult && loginResult.code) {
-        console.log("login页面登录,222");
-        wx.setStorageSync("code", loginResult.code);
-        let tokenResult = await util.request(api.Login, {
-          code: loginResult.code,
-          register_code: ''
-        });
-        console.log("login页面登录tokenResult=" + JSON.stringify(tokenResult));
 
-        if (tokenResult && tokenResult.data && tokenResult.data.token) {
-          console.log("login页面登录,333");
-          wx.setStorageSync("token", tokenResult.data.token);
-          wx.setStorageSync(
-            "register_code",
-            tokenResult.data.user.register_code
+      if (!wx.getStorageSync("token")) {
+        let loginResult = await util.login();
+        console.log("loginResult");
+        if (loginResult && loginResult.code) {
+          console.log("login页面登录,222");
+          wx.setStorageSync("code", loginResult.code);
+          let tokenResult = await util.request(api.Login, {
+            code: loginResult.code,
+            register_code: ""
+          });
+          console.log(
+            "login页面登录tokenResult=" + JSON.stringify(tokenResult)
           );
 
-          wx.reLaunch({
-            url: "/" + this.page + "?ifBack=0&" + util.parseParams(this.options)
-          });
+          if (tokenResult && tokenResult.data && tokenResult.data.token) {
+            console.log("login页面登录,333");
+            wx.setStorageSync("token", tokenResult.data.token);
+            wx.setStorageSync(
+              "register_code",
+              tokenResult.data.user.register_code
+            );
+
+            wx.reLaunch({
+              url:
+                "/" + this.page + "?ifBack=0&" + util.parseParams(this.options),
+              success: function() {
+                wx.removeStorageSync("ifDirectToLogin");
+              }
+            });
+          }
         }
+      } else {
+        wx.reLaunch({
+          url: "/" + this.page + "?ifBack=0&" + util.parseParams(this.options),
+          success: function() {
+            wx.removeStorageSync("ifDirectToLogin");
+          }
+        });
       }
     }
   },
@@ -68,9 +83,10 @@ export default {
     // var { id, income, detail } = this.$root.$mp.query;
 
     var pages = getCurrentPages();
+    console.log("getCurrentPages==" + JSON.stringify(pages));
     this.page = pages[pages.length - 2].route;
     this.options = pages[pages.length - 2].options;
-    console.log(this.options);
+    console.log("首页options" + JSON.stringify(this.options));
   }
 };
 </script>

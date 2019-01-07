@@ -220,13 +220,14 @@
                 v-for="(goods, goodsindex) in item"
                 :data-index="goodsindex"
                 :key="goods.id"
-                :data-id="goods.id"
+                :data-is_id="goods.is_id"
               >
                 <image
                   class="_2edb85c"
                   :src="goods.img"
                 />
-                <div class="goods-title _2edb85c">{{goods.title}}</div>
+                <div class="goods-title _2edb85c"><rich-text class="" :nodes="goods.title"></rich-text></div>
+                <!-- <rich-text class="goods-title _2edb85c" :nodes="goods.title"></rich-text> -->
                 <!-- <div class="goods-price _2edb85c">
                   {{goods.coin}}
                 </div> -->
