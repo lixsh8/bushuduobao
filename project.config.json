@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 15,
+			"current": 6,
 			"list": [
 				{
 					"id": 0,
@@ -57,10 +57,10 @@
 					"query": ""
 				},
 				{
-					"id": -1,
+					"id": 4,
 					"name": "首页",
 					"pathName": "pages/index/main",
-					"query": "id=1"
+					"query": "id=1&register_code=111"
 				},
 				{
 					"id": 5,
@@ -72,7 +72,7 @@
 					"id": 6,
 					"name": "商品詳情",
 					"pathName": "pages/goods_detail/main",
-					"query": "id=61"
+					"query": "id=21"
 				},
 				{
 					"id": 7,

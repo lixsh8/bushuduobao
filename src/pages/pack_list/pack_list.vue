@@ -40,7 +40,7 @@
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
   </div>

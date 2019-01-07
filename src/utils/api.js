@@ -1,6 +1,13 @@
 import request from "./request";
+var ApiRootUrl;
+if (process.env.NODE_ENV === 'development') {
+  // dev
+  ApiRootUrl = "https://devapi.xiaotaotao123.cn/";
+} else {
+  ApiRootUrl = "https://api.xiaotaotao123.cn/";
+  // build
+}
 
-const ApiRootUrl = "https://devapi.xiaotaotao123.cn/";
 
 const api = {
   // 首页
@@ -13,7 +20,7 @@ const api = {
   IndexPackPrize: ApiRootUrl + "?act=index&op=getIndexInfo",
   // 发送消息模板
   sendMessage: r =>
-    request.get("?act=friend&op=sendMsg", r, {
+    request.get("?act=friend&op=signSendMsg", r, {
       baseURL: ApiRootUrl
     }),
   // 看广告得红包 
@@ -77,6 +84,11 @@ const api = {
   // 使用util的request方法，字符串变量即可
   // 微信登录静默登录
   Login: ApiRootUrl + "?act=little&op=getToken",
+
+  login: r =>
+    request.get("?act=little&op=getToken", r, {
+      baseURL: ApiRootUrl
+    }),
   // 微信登录 授权获取用户信息登录
   AuthLoginByWeixin: ApiRootUrl + "?act=little&op=updateUserInfo",
   // 获取微信统一下单prepay_id

@@ -21,7 +21,7 @@
         </div>
         <!-- 总共多少金币 -->
         <div
-          @click="goStepDetail"
+          @click="goPakcDetail"
           class="powerCoin"
         >
           <text class="agentCoinInteger">{{hb_amount}}</text>
@@ -357,7 +357,7 @@
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
     <!-- 授权弹窗 -->
@@ -389,7 +389,7 @@ export default {
       isNet: true,
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
-      ifShowSign: !0,
+      ifShowSign: !1,
       days: 0,
       hb_amount: 0,
       packAmount: 0,
@@ -423,6 +423,7 @@ export default {
       hasMore: !0,
       showNoMore: !1,
       duobao: null,
+      requestNum: 0,
       requestTimer: {}
     };
   },
@@ -441,25 +442,35 @@ export default {
     pagingFooter
   },
   methods: {
+    // 跳转到红包明细
+    goPakcDetail() {
+      wx.navigateTo({
+        url: "/pages/pack_list/main"
+      });
+    },
     // 关闭签到按钮
     clsSignModal(ev) {
       this.ifShowSign = false;
     },
-    // 预订提醒按钮
+    // 预订提醒按钮 发送消息
     subBtnClick(ev) {
       var _this = this;
-      console.log(ev);
+      console.log("form_id=" + ev);
       // this.ifShowSign = false
       api.sendMessage("form_id=" + ev).then(function(res) {
-        console.log(res);
-        if (res.code === 1) {
-          _this.ifShowSign = false
+        console.log("提交发送消息1：" + JSON.stringify(res));
+        if (res.code === 0) {
+          _this.ifShowSign = false;
         }
       });
     },
-    // 获取气泡红包
+    // 获取气泡红包和红包数据，需登录
     getPacks() {
       var _this = this;
+
+      if (_this.requestNum > 20 && _this.requestTimer.getPacks) {
+        clearInterval(_this.requestTimer.getPacks);
+      }
 
       api.getPacks().then(function(res) {
         if (res.code === 0) {
@@ -487,14 +498,14 @@ export default {
             var index = bubble.findIndex(
               (value, index, arr) => value.type === type
             );
-            _this.bubble = bubble.splice(index, 1);
+            _this.bubble.splice(index, 1);
             _this.hb_amount = res.data.hb_amount;
 
             // 签到气泡点击弹窗
             if (type === "attendanceReward") {
               _this.ifShowSign = true;
               _this.packAmount = res.data.hb;
-              _this.days = res.data.continueSign
+              _this.days = res.data.continueSign;
             } else if (type === "newReward") {
               // 新用户
             } else {
@@ -711,6 +722,8 @@ export default {
     this.getNewZone();
     this.getLatestAward();
     this.getDuobaoList();
+    this.getPacks();
+    this.getWeRunData();
     wx.stopPullDownRefresh();
   },
 
@@ -761,11 +774,14 @@ export default {
 
   // 页面加载
   async onLoad(options) {
-    const { id } = options;
-    var _this = this;
-    _this.globalData.id = id;
+    this.checkAuth();
+  },
 
-    _this.checkAuth();
+  async onShow(options) {
+    var _this = this;
+    // const { id } = options;
+    // _this.globalData.id = id;
+
     // 获取首页数据
     request.get(api.Index, null).then(res => {
       _this.menuList = res.data.menuList;
@@ -773,8 +789,9 @@ export default {
     });
     // 获取步数
     _this.getWeRunData();
-    // 获取红包等数据需要登录的
+    // 获取红包等数据 需要登录的
     _this.requestTimer.getPacks = setInterval(function() {
+      _this.requestNum = _this.requestNum + 1;
       _this.getPacks();
     }, 1000);
     // 获取新手专区数据 act=duobao&op=newbornZone

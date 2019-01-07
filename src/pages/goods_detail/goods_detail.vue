@@ -171,7 +171,7 @@
               class="duobao-item"
               v-for="item in historyList"
               :key="item.id"
-             >
+            >
               <div class="duobao-hd">
                 <div class="user-t">中奖者：</div>
                 <img
@@ -210,6 +210,7 @@
       :showBuyModal="showBuyModal"
       :totalNum="totalNum"
       :leftNum="leftNum"
+      :useTime="useTime || 0"
       :buyNum="buyNum"
       :totalPrice="totalPrice"
       @closeBuyModal="closeBuyModal"
@@ -220,7 +221,7 @@
     <back-top :showBackTop="showBackTop&&currentTab==1" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
     <!-- 底部按钮 -->
@@ -289,6 +290,7 @@ export default {
       scrollTimer: null,
       showBuyModal: !1,
       buyNum: 1,
+      useTime: 0,
       leftNum: 0,
       totalNum: 0,
       price: 0,
@@ -325,6 +327,45 @@ export default {
   },
 
   methods: {
+    async getData(id) {
+      // 夺宝详情
+      const res = await util.request(api.DuobaoDetail, { id: id }, "GET", this);
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+        let info = res.data.goodsInfo;
+
+        this.duobaoData = res.data;
+        this.title = res.data.title;
+        this.is_id = info.is_id;
+        this.dgoods_id = info.dgoods_id;
+        this.article = info.dgoods_body;
+        this.totalNum = info.is_totalnum;
+        this.leftNum = info.is_oddnum;
+        console.log("usetime" + res.data.useTime);
+
+        this.useTime = res.data.useTime - 1;
+        this.price = info.db_hbAmount;
+        this.totalPrice = info.db_hbAmount;
+      } else {
+      }
+
+      // 往期回顾
+      const resDuobaoHistory = await util.request(
+        api.DuobaoHistory,
+        { page: 1, dgoods_id: this.dgoods_id },
+        "GET",
+        this
+      );
+      if (resDuobaoHistory.data && resDuobaoHistory.code === 0) {
+        // this.totalData = resDuobaoHistory.data;
+        console.log(resDuobaoHistory.data);
+
+        this.historyList = resDuobaoHistory.data.list;
+        this.hasMore = resDuobaoHistory.data.hasMore;
+      } else {
+      }
+    },
     changeTab(idx) {
       this.currentTab = idx;
     },
@@ -341,6 +382,11 @@ export default {
     },
     // 购买
     async makeBuy() {
+      if (this.duobaoData.useTime <= 0) {
+        this.showDialog = true;
+        return;
+      }
+
       const res = await util.request(
         api.JoinDuobao,
         { buy_times: this.buyNum, is_id: this.is_id },
@@ -348,8 +394,15 @@ export default {
         this
       );
       if (res.data && res.code === 0) {
+        // 购买成功
+        this.buyNum = 1;
+        this.showBuyModal = false;
         wx.navigateTo({
-          url: "/pages/result/main?id=" + this.is_id + "&orderId=" + res.data.order_id
+          url:
+            "/pages/result/main?id=" +
+            this.is_id +
+            "&orderId=" +
+            res.data.order_id
         });
       } else if (res.code === 402) {
         this.showDialog = !0;
@@ -369,6 +422,7 @@ export default {
     changeNum(e) {
       var num = e || 0;
       this.buyNum = num;
+      this.useTime = this.duobaoData.useTime - num;
       this.totalPrice = num * this.price;
       console.log(this.buyNum);
     },
@@ -418,7 +472,11 @@ export default {
       path: this.totalData.share.link
     };
   },
-
+  // 下拉刷新
+  onPullDownRefresh() {
+    console.log("刷新");
+    this.getData(this.is_id);
+  },
   // 滚动加载更多
   async onReachBottom() {
     if (this.hasMore && this.currentTab === 1 && this.canScroll) {
@@ -466,45 +524,12 @@ export default {
     }
   },
   // 页面加载
-  async onLoad() {
+  async onShow() {
     var id = this.$root.$mp.query.id;
     console.log(id);
 
     // var id = e.id;
-    // 夺宝详情
-    const res = await util.request(api.DuobaoDetail, { id: id }, "GET", this);
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-      let info = res.data.goodsInfo;
-
-      this.duobaoData = res.data;
-      this.title = res.data.title;
-      this.is_id = info.is_id;
-      this.dgoods_id = info.dgoods_id;
-      this.article = info.dgoods_body;
-      this.totalNum = info.is_totalnum;
-      this.leftNum = info.is_oddnum;
-      this.price = info.db_hbAmount;
-      this.totalPrice = info.dgoods_hb;
-    } else {
-    }
-
-    // 往期回顾
-    const resDuobaoHistory = await util.request(
-      api.DuobaoHistory,
-      { page: 1, dgoods_id: this.dgoods_id },
-      "GET",
-      this
-    );
-    if (resDuobaoHistory.data && resDuobaoHistory.code === 0) {
-      // this.totalData = resDuobaoHistory.data;
-      console.log(resDuobaoHistory.data);
-
-      this.historyList = resDuobaoHistory.data.list;
-      this.hasMore = resDuobaoHistory.data.hasMore;
-    } else {
-    }
+    this.getData(id);
   }
 };
 </script>

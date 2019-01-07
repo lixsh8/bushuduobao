@@ -5,10 +5,11 @@
     :class="{show:showBuyModal}"
     @click="close"
   >
+  <form @submit="subBtnClick" report-submit="true">
     <div
       class="buy-cnt"
       @click.stop="stopPropagation"
-    >
+     >
       <div class="buy-hd">
         <div class="buy-title">满{{totalNum}}份开奖，差<text>{{leftNum}}</text>份</div>
         <div
@@ -37,7 +38,7 @@
             ></div>
           </div>
         </div>
-        <div class="buy-chance">今日剩余<text>1</text>份参与机会<button
+        <div class="buy-chance">今日剩余<text>{{useTime>=0?useTime:0}}</text>份参与机会<button
             class="add-chance"
             @click="okBtnHandler"
             open-type="share"
@@ -55,6 +56,7 @@
       </div>
 
     </div>
+  </form>
   </div>
 </template>
 
@@ -76,6 +78,10 @@ export default {
       type: Number,
       default: 0
     },
+    useTime: {
+      type: Number,
+      default: 0
+    },
     totalPrice: {
       type: Number,
       default: 0
@@ -94,6 +100,9 @@ export default {
       this.$emit("changeNum", e.target.value);
     },
     plus() {
+      if (this.useTime === 0) {
+        return;
+      }
       this.$emit("changeNum", this.buyNum * 1 + 1);
     },
     minus() {

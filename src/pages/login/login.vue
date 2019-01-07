@@ -6,14 +6,18 @@
       class="btn"
       @click="refresh"
     >
-    <img src="/static/images/net_err.png" mode="widthFix" alt="">
-    唔，网络不给力，轻触屏幕重试</div>
+      <img
+        src="/static/images/net_err.png"
+        mode="widthFix"
+        alt=""
+      >
+      唔，网络不给力，轻触屏幕重试</div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import util from "@/utils/util";
-// import api from "@/utils/api";
+import api from "@/utils/api";
 // import request from "@/utils/request";
 
 export default {
@@ -30,10 +34,33 @@ export default {
 
   methods: {
     // 购买
-    refresh() {
-      wx.reLaunch({
-        url: "/" + this.page + "?ifBack=0&" + util.parseParams(this.options)
-      });
+    async refresh() {
+      console.log("login页面登录,即将登陆");
+      
+      let loginResult = await util.login();
+      console.log('loginResult');
+      if (loginResult && loginResult.code) {
+        console.log("login页面登录,222");
+        wx.setStorageSync("code", loginResult.code);
+        let tokenResult = await util.request(api.Login, {
+          code: loginResult.code,
+          register_code: ''
+        });
+        console.log("login页面登录tokenResult=" + JSON.stringify(tokenResult));
+
+        if (tokenResult && tokenResult.data && tokenResult.data.token) {
+          console.log("login页面登录,333");
+          wx.setStorageSync("token", tokenResult.data.token);
+          wx.setStorageSync(
+            "register_code",
+            tokenResult.data.user.register_code
+          );
+
+          wx.reLaunch({
+            url: "/" + this.page + "?ifBack=0&" + util.parseParams(this.options)
+          });
+        }
+      }
     }
   },
   // 页面加载
@@ -51,7 +78,7 @@ export default {
 <style lang='scss' scoped>
 @import "../../common/style/variable";
 
-.login{
+.login {
   display: flex;
   width: 100%;
   height: 100%;
@@ -67,7 +94,7 @@ export default {
   font-size: 14px;
   color: #999;
 
-  img{
+  img {
     display: block;
     margin: 0 auto;
     width: 130px;

@@ -13,8 +13,27 @@
     <!-- 正文 -->
     <!-- 头部导航 -->
     <div
+      class="notice-wrap"
+      v-if="notice"
+    >
+      <div
+        class="notice"
+        :style="{top: headBarHeight + 'px'}"
+      >
+        <div
+          class="notice-txt"
+          :class="{'txt-scroll':isScroll}"
+          :style="{'animation-duration': scrollSec+'s'}"
+        >{{notice}}</div>
+      </div>
+      <div
+        class="notice-cover"
+        style="height:34px;"
+      ></div>
+    </div>
+    <div
       class="tab"
-      :style="{top: headBarHeight + 'px'}"
+      :style="{top: tabTop + 'px'}"
     >
       <div
         class="tab-item"
@@ -38,7 +57,7 @@
         v-for="(item, index) in list"
         :key="index"
         @click="goDetail(item.order_id)"
-       >
+      >
         <div class="item-hd">
           <div class="order-no">订单号:1075355839266603030</div>
           <div class="order-status">{{item.join_state}}</div>
@@ -83,7 +102,7 @@
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
     <!-- 快速导航 -->
@@ -111,6 +130,7 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       headerHeight: 46,
+      notice: "",
       navs: [
         { id: 0, name: "全部" },
         { id: 1, name: "待开奖" },
@@ -138,12 +158,31 @@ export default {
   computed: {
     headBarHeight() {
       return this.globalData.statusBarHeight + this.headerHeight;
+    },
+    tabTop() {
+      if (this.notice) {
+        return this.globalData.statusBarHeight + this.headerHeight + 34;
+      } else {
+        return this.globalData.statusBarHeight + this.headerHeight;
+      }
+    },
+    isScroll() {
+      if (this.notice.length > 375 / 14 - 2) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    scrollSec() {
+      return 8 * this.notice.length / (375 / 14 - 2);
     }
   },
 
   methods: {
     // 参与列表
     async getList(idx) {
+      console.log('订单页面的getList');
+      
       if (!this.canRequest) {
         return;
       }
@@ -164,6 +203,7 @@ export default {
         console.log(res.data);
 
         this.list = res.data.list;
+        this.notice = res.data.tips;
         this.hasMore = res.data.hasMore;
       } else {
       }
@@ -237,7 +277,10 @@ export default {
   },
   // 页面加载
   onLoad(e) {
+    
     var type = e.type || 0;
+    this.canRequest = true;
+    console.log('order页面的onload  type==' + type); 
     this.getList(type);
   },
   onShow(e) {
@@ -252,6 +295,39 @@ export default {
 
 page {
   background: #f2f2f2;
+}
+.notice {
+  width: 100%;
+  position: fixed;
+  background: #feefec;
+  color: #ff5454;
+  font-size: 14px;
+  height: 34px;
+  line-height: 34px;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .notice-txt {
+    position: absolute;
+    left: 15px;
+    top: 0;
+    white-space: nowrap;
+  }
+  .txt-scroll {
+    animation-name: txtscroll;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-delay: 1s;
+  }
+}
+
+@keyframes txtscroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
 }
 .tab {
   position: fixed;

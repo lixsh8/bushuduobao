@@ -10,7 +10,11 @@ export default {
     // console.log(opts);
   },
   async onShow(opts) {
-    console.log("onShow" + JSON.stringify(opts));
+    console.log("apponShow" + JSON.stringify(opts));
+    var register_code = opts.query.register_code
+    console.log('上一个人的register_code=' + register_code);
+    
+    wx.setStorageSync("register_code", register_code);
     
     const checkSession = await util.checkSession();
     
@@ -20,12 +24,13 @@ export default {
         wx.setStorageSync("code", loginResult.code);
         let tokenResult = await request.get(
           api.Login,
-          { code: loginResult.code }
+          { code: loginResult.code, register_code: register_code }
         );
         console.log('app全局登录');
         
         if (tokenResult && tokenResult.data && tokenResult.data.token) {
           wx.setStorageSync("token", tokenResult.data.token);
+          wx.setStorageSync("register_code", tokenResult.data.user.register_code);
         }
       }
     }

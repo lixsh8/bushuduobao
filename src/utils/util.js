@@ -61,6 +61,9 @@ function request(url, data = {}, method = "GET") {
           
           if (res.data.code === 401) {
             // 需要登录后才可以操作
+            wx.removeStorageSync("code");
+            wx.removeStorageSync("token");
+            wx.removeStorageSync("register_code");
             console.log("即将调用login函数");
             wx.navigateTo({
               url: "/pages/login/main"

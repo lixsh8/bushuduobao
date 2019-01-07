@@ -31,6 +31,7 @@ module.exports = {
     'padded-blocks': 0,
     'no-multiple-empty-lines': 0,
     'no-undef': 0,
+    'camelcase': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   },

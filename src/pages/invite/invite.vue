@@ -163,7 +163,7 @@
     /> -->
     <!-- 没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
   </div>
@@ -236,13 +236,13 @@ export default {
       return {
         title: this.totalData.share.title,
         imageUrl: this.totalData.share.img,
-        path: this.totalData.share.link
+        path: "/pages/index/main?register_code=" + wx.getStorageSync("register_code")
       };
     }
     return {
       title: this.totalData.share.title,
       imageUrl: this.totalData.share.img,
-      path: this.totalData.share.link
+      path: "/pages/index/main?register_code=" + wx.getStorageSync("register_code")
     };
   },
   // 滚动加载

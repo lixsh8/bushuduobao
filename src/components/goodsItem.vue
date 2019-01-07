@@ -1,6 +1,6 @@
 <!-- 商品列表组件 -->
 <template>
-  <div class="goods-item">
+  <div class="goods-item"  @click="btnClickHandler(goodsItem.is_id)">
     <div class="avatar-box">
       <img
         class="avatar"
@@ -19,7 +19,7 @@
     </div>
     <div class="cnt">
       <div class="goods-title">{{goodsItem.dgoods_name}}</div>
-      <div class="join-btn" @click="btnClickHandler(goodsItem.is_id)">{{goodsItem.dgoods_hb}}元红包参与</div>
+      <div class="join-btn">{{goodsItem.dgoods_hb}}元红包参与</div>
     </div>
   </div>
 </template>
