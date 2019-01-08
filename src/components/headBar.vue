@@ -60,9 +60,7 @@
 <script>
 export default {
   data() {
-    return {
-      ifBack: true
-    };
+    return {};
   },
   props: {
     title: {
@@ -85,6 +83,14 @@ export default {
       type: Boolean,
       default: !1
     },
+    ifBack: {
+      type: Boolean,
+      default: !0
+    },
+    ifCustomBack: {
+      type: Boolean,
+      default: !1
+    },
     customBarStyle: {
       type: String,
       default: "black"
@@ -97,15 +103,20 @@ export default {
   },
   methods: {
     navBack() {
-      console.log("back");
-      wx.navigateBack({
-        delta: 1,
-        fail: function() {
-          console.log("backFailed");
+      if (this.ifCustomBack) {
+        console.log("CustomBack");
+        this.$emit("back");
+      } else {
+        console.log("nativeback");
+        wx.navigateBack({
+          delta: 1,
+          fail: function() {
+            console.log("backFailed");
 
-          wx.switchTab({ url: "/pages/index/main" });
-        }
-      });
+            wx.switchTab({ url: "/pages/index/main" });
+          }
+        });
+      }
     },
     navIndex() {
       wx.switchTab({
@@ -114,12 +125,11 @@ export default {
     }
   },
   onLoad() {
-    var ifBack = this.$root.$mp.query.ifBack;
-    console.log(ifBack);
-    
-    if (ifBack === 0) {
-      this.ifBack = false;
-    }
+    // var ifBack = this.$root.$mp.query.ifBack;
+    // console.log('head里面的ifback=' + ifBack);
+    // if (ifBack === 0) {
+    //   this.ifBack = false;
+    // }
   }
 };
 </script>

@@ -77,6 +77,7 @@ import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 
 export default {
   data() {
@@ -99,6 +100,7 @@ export default {
     headBar,
     backTop,
     pagingFooter,
+    noData,
     quickNavigate
   },
 

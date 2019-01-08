@@ -1,4 +1,4 @@
-<!-- 广告福利 -->
+<!-- 参与明细 -->
 <template>
   <div style="height:100%;">
     <head-bar
@@ -32,6 +32,7 @@
           v-for="(item,index) in list"
           data-index="index"
           :key="index"
+          @click="goDetail(item.is_id, item.member_id)"
         >
           <img
             :src="item.avatarUrl"
@@ -40,7 +41,7 @@
           >
           <div class="username">{{item.nickName}}</div>
           <div class="info">
-            <div class="number">号码：{{item.number}}</div>
+            <div class="number">份数：{{item.number}}</div>
             <div class="time">{{item.date}}</div>
           </div>
         </div>
@@ -67,7 +68,6 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import wxParse from "mpvue-wxparse";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
@@ -103,8 +103,7 @@ export default {
     pagingFooter,
     noData,
     quickNavigate,
-    buyModal,
-    wxParse
+    buyModal
   },
 
   computed: {
@@ -113,9 +112,17 @@ export default {
     }
   },
 
-  mounted(ev) {},
-
   methods: {
+    // 跳转到号码详情
+    goDetail(is_id, member_id) {
+      wx.navigateTo({
+        url:
+          "/pages/join_list_detail/main?is_id=" +
+          is_id +
+          "&member_id=" +
+          member_id
+      });
+    },
     async getList() {
       // 参与列表
       if (!this.canRequest) {
@@ -150,10 +157,10 @@ export default {
       var isshowmine = this.isshowmine;
       if (!this.canRequest) {
         wx.showToast({
-          title: '你点击的太快了',
-          icon: 'warn'
+          title: "你点击的太快了",
+          icon: "warn"
         });
-        
+
         return;
       }
       this.page = 1;
@@ -267,6 +274,8 @@ export default {
     line-height: 1;
     overflow: hidden;
     border-bottom: 1px solid #e9e9e9;
+    background: url(#{$img_url}icon_arr_gray.png) no-repeat 97% center;
+    background-size: 15px;
 
     .avatar {
       display: block;
@@ -285,7 +294,7 @@ export default {
     }
     .info {
       flex: 1;
-      padding-right: 15px;
+      padding-right: 30px;
       text-align: right;
 
       .number {

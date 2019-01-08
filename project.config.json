@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 6,
+			"current": 16,
 			"list": [
 				{
 					"id": 0,
@@ -60,7 +60,7 @@
 					"id": 4,
 					"name": "首页",
 					"pathName": "pages/index/main",
-					"query": "id=1&register_code=111"
+					"query": "id=1&register_code=111&assistance=222222"
 				},
 				{
 					"id": 5,
@@ -72,7 +72,7 @@
 					"id": 6,
 					"name": "商品詳情",
 					"pathName": "pages/goods_detail/main",
-					"query": "id=21"
+					"query": "id=21&ifBack=01"
 				},
 				{
 					"id": 7,
@@ -87,10 +87,10 @@
 					"query": "id=48&income=12.3"
 				},
 				{
-					"id": -1,
+					"id": 9,
 					"name": "参与明细",
 					"pathName": "pages/join_list/main",
-					"query": "id=48"
+					"query": "id=84"
 				},
 				{
 					"id": 10,
@@ -127,6 +127,12 @@
 					"name": "赚红包",
 					"pathName": "pages/welfare_ad/main",
 					"query": "aaa=11111&b=222&ifBack=0"
+				},
+				{
+					"id": -1,
+					"name": "兑换攻略",
+					"pathName": "pages/strategy/main",
+					"query": "id=1&register_code=111&assistance=222222"
 				}
 			]
 		}

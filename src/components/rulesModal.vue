@@ -5,10 +5,11 @@
       <div class="dialog-hd">活动规则</div>
       <div class="dialog-bd">
         <scroll-view scroll-y scroll-with-animation>
-          <!-- <wx-parse
+          <rich-text
             v-if="rules"
-            :content="rules"
-          /> -->
+            :nodes="rules"
+          >
+          </rich-text>
 
           
         </scroll-view>
@@ -19,14 +20,12 @@
 </template>
 
 <script type="text/ecmascript-6">
-import wxParse from "mpvue-wxparse";
 
 export default {
   data() {
     return {};
   },
   components: {
-    wxParse
   },
 
   props: {

@@ -27,7 +27,7 @@
             <div class="title">{{item.change_type}}</div>
             <div class="time">{{item.add_time}}</div>
           </div>
-          <div class="r"><div class="num">{{item.change_hb_amount}}</div>币</div>
+          <div class="r"><div class="num">{{item.change_hb_amount}}</div></div>
         </div>
 
       </div>
@@ -50,11 +50,11 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import wxParse from "mpvue-wxparse";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 
 export default {
@@ -83,9 +83,9 @@ export default {
     headBar,
     backTop,
     pagingFooter,
+    noData,
     quickNavigate,
-    buyModal,
-    wxParse
+    buyModal
   },
 
   computed: {

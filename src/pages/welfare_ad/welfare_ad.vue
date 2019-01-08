@@ -66,6 +66,7 @@ import api from "@/utils/api";
 // import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
+import noData from "@/components/noData";
 
 export default {
   data() {
@@ -87,6 +88,7 @@ export default {
 
   components: {
     headBar,
+    noData,
     quickNavigate
   },
 

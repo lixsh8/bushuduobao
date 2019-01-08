@@ -226,7 +226,12 @@
                   class="_2edb85c"
                   :src="goods.img"
                 />
-                <div class="goods-title _2edb85c"><rich-text class="" :nodes="goods.title"></rich-text></div>
+                <div class="goods-title _2edb85c">
+                  <rich-text
+                    class=""
+                    :nodes="goods.title"
+                  ></rich-text>
+                </div>
                 <!-- <rich-text class="goods-title _2edb85c" :nodes="goods.title"></rich-text> -->
                 <!-- <div class="goods-price _2edb85c">
                   {{goods.coin}}
@@ -394,6 +399,7 @@ export default {
       days: 0,
       hb_amount: 0,
       packAmount: 0,
+      share: {},
       // 金币列表
       bubble: null,
       // 步数
@@ -478,6 +484,7 @@ export default {
           console.log(11);
           _this.hb_amount = res.data.hb_amount;
           _this.bubble = res.data.bubble;
+          _this.share = res.data.share;
 
           if (_this.requestTimer.getPacks) {
             clearInterval(_this.requestTimer.getPacks);
@@ -728,6 +735,25 @@ export default {
     wx.stopPullDownRefresh();
   },
 
+  // 分享
+  onShareAppMessage(res) {
+    if (res.from === "button") {
+      // 来自页面内转发按钮
+      console.log(res);
+      return util.getCommonShareData(
+        this.share.title,
+        this.share.image,
+        this.share.link
+      );
+    }
+    // 公用的分享转发数据
+    return util.getCommonShareData(
+      this.share.title,
+      this.share.image,
+      this.share.link
+    );
+  },
+
   // 滚动加载
   async onReachBottom() {
     console.log("showAuthModal:" + this.authModalShow);
@@ -775,7 +801,9 @@ export default {
 
   // 页面加载
   async onLoad(options) {
-    this.checkAuth();
+    if (wx.getStorageSync("is_update") != 1) {
+      this.checkAuth();
+    }
   },
 
   async onShow(options) {
@@ -791,6 +819,7 @@ export default {
     // 获取步数
     _this.getWeRunData();
     // 获取红包等数据 需要登录的
+    _this.requestNum = 0;
     _this.requestTimer.getPacks = setInterval(function() {
       _this.requestNum = _this.requestNum + 1;
       _this.getPacks();
@@ -1402,7 +1431,7 @@ button::after {
 }
 
 .prize-common {
-  width: 114rpx;
+  width: 132rpx;
   animation: prize-ani 2s infinite;
   z-index: 15;
 }
@@ -1489,14 +1518,14 @@ button::after {
 .friendsduobaoReward {
   position: absolute;
   top: 20rpx;
-  right: 80rpx;
+  right: 60rpx;
   z-index: 89;
 }
 /* 兑换商品收益 */
 .duobaoReward {
   position: absolute;
   top: 140rpx;
-  right: 80rpx;
+  right: 60rpx;
   z-index: 89;
 }
 

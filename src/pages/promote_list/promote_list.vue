@@ -50,17 +50,17 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import wxParse from "mpvue-wxparse";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 
 export default {
   data() {
     return {
-      title: "红包记录",
+      title: "加成明细",
       headerBackground: "#fff",
       titleColor: "black",
       showCustomBar: !0,
@@ -83,9 +83,9 @@ export default {
     headBar,
     backTop,
     pagingFooter,
+    noData,
     quickNavigate,
-    buyModal,
-    wxParse
+    buyModal
   },
 
   computed: {

@@ -7,6 +7,7 @@
       :titleColor="titleColor"
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
+      :ifBack="ifBack"
     />
 
     <!-- 正文 -->
@@ -52,7 +53,7 @@
           :src="icon_pack_sm"
           alt=""
         />
-        <div class="sale-price">￥{{duobaoData.goodsInfo.dgoods_hb}}</div>
+        <div class="sale-price">￥{{duobaoData.goodsInfo.db_hbAmount}}</div>
         <div class="source-price-t">市场价<div class="source-price">￥{{duobaoData.goodsInfo.dgoods_market_price}}</div>
         </div>
       </div>
@@ -96,19 +97,22 @@
       <div class="my-join-wrapper">
         <div class="my-join">
           <div class="my-join-hd">我的号码</div>
-          <div class="my-join-bd">{{duobaoData.buyNumbers||"0"}}</div>
+          <div
+            class="my-join-bd"
+            @click="goIncomeDetail"
+          >{{duobaoData.buyNumbers||"0"}}个</div>
         </div>
         <div class="my-money">
           <div class="my-money-hd">当前收益</div>
           <div
-            v-if="duobaoData.hb_amount==0"
+            v-if="duobaoData.hb_amount>=0"
             class="my-money-bd"
-            @click="goIncome()"
+            @click="goIncome"
           >¥{{duobaoData.hb_amount||"0"}}</div>
           <div
             class="my-money-bd-emy"
             v-else
-            @click="goIncome()"
+            @click="goIncome"
           >
             参与后获得
             <img
@@ -150,11 +154,9 @@
           class="content-item"
           :class="{active: currentTab == 0}"
         >
-          <wx-parse
+          <rich-text
             v-if="article"
-            :content="article"
-            @preview="preview"
-            @navigate="navigate"
+            :nodes="article"
           />
         </div>
 
@@ -230,22 +232,23 @@
     <div
       class="fixed-btn"
       @click="goNext"
-      v-if="is_end&&nextId"
+      v-if="is_end==1&&nextId"
     >
       <div class="btn-t">继续夺宝</div>
       <div class="btn-sub-t">第{{nextId}}期正在进行中</div>
     </div>
     <div
-      v-else-if="is_end"
+      v-else-if="is_end==1"
       class="fixed-btn"
     >已结束</div>
-    
+
     <div
       v-else-if="duobaoData&&duobaoData.useTime<=0"
       class="fixed-btn"
       @click="showInviteModal"
     >参与机会不足，邀请好友赞助</div>
     <div
+      v-else
       class="fixed-btn"
       @click="gotobuy"
     >立即参与</div>
@@ -267,12 +270,12 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import wxParse from "mpvue-wxparse";
 import { setTimeout, clearTimeout } from "timers";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 import lsDialog from "@/components/lsDialog";
 
@@ -284,6 +287,7 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
+      ifBack: 1,
       // 轮播图配置
       config: {
         current: 0,
@@ -331,10 +335,10 @@ export default {
     headBar,
     backTop,
     pagingFooter,
+    noData,
     quickNavigate,
     buyModal,
-    lsDialog,
-    wxParse
+    lsDialog
   },
 
   computed: {
@@ -360,9 +364,11 @@ export default {
         let info = res.data.goodsInfo;
 
         this.duobaoData = res.data;
+        this.member_id = res.data.member_id;
         this.title = res.data.title;
         this.nextId = res.data.next_is_id;
         this.useTime = res.data.useTime - 1;
+        this.is_end = res.data.is_end;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
         this.article = info.dgoods_body;
@@ -481,7 +487,7 @@ export default {
           success: res => {
             if (res) {
               wx.redirectTo({
-                url: '/pages/welfare_ad/main'
+                url: "/pages/welfare_ad/main"
               });
             }
           }
@@ -500,7 +506,8 @@ export default {
       }
     },
     changeNum(e) {
-      var num = e || 0;
+      var num = parseInt(e) || 1;
+      num = num > this.leftNum ? this.leftNum : num;
       this.buyNum = num;
       this.useTime = this.duobaoData.useTime - num;
       this.totalPrice = num * this.price;
@@ -526,6 +533,16 @@ export default {
           this.duobaoData.hb_amount
       });
     },
+    // 跳转到我的号码
+    goIncomeDetail() {
+      wx.navigateTo({
+        url:
+          "/pages/join_list_detail/main?is_id=" +
+          this.is_id +
+          "&member_id=" +
+          this.member_id
+      });
+    },
     // 跳转到参与明细
     goJoinList() {
       console.log("goJoinList");
@@ -541,17 +558,17 @@ export default {
     if (res.from === "button") {
       // 来自页面内转发按钮
       console.log(res);
-      return {
-        title: this.totalData.share.title,
-        imageUrl: this.totalData.share.img,
-        path: this.totalData.share.link
-      };
+      return util.getCommonShareData(
+        this.duobaoData.share.title,
+        this.duobaoData.share.image,
+        this.duobaoData.share.link
+      );
     }
-    return {
-      title: this.totalData.share.title,
-      imageUrl: this.totalData.share.img,
-      path: this.totalData.share.link
-    };
+    return util.getCommonShareData(
+      this.duobaoData.share.title,
+      this.duobaoData.share.image,
+      this.duobaoData.share.link
+    );
   },
   // 下拉刷新
   onPullDownRefresh() {
@@ -607,7 +624,15 @@ export default {
   // 页面加载
   async onLoad() {
     var id = this.$root.$mp.query.id;
-    console.log(id);
+    var ifBack = this.$root.$mp.query.ifBack;
+    console.log("ifback=", ifBack);
+    if (ifBack == 0) {
+      this.ifBack = false;
+    } else {
+      this.ifBack = true;
+    }
+
+    console.log("id, this.ifback", id, this.ifBack);
 
     // 重置tab
     this.currentTab = 0;
@@ -952,12 +977,12 @@ page {
     rgba(255, 58, 57, 1) 100%
   );
 
-  .btn-t{
+  .btn-t {
     padding-top: 10px;
     font-size: 16px;
     line-height: 1;
   }
-  .btn-sub-t{
+  .btn-sub-t {
     padding-top: 4px;
     font-size: 10px;
     line-height: 1;

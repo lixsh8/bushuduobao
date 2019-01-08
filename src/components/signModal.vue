@@ -40,14 +40,12 @@
 </template>
 
 <script type="text/ecmascript-6">
-import wxParse from "mpvue-wxparse";
 
 export default {
   data() {
     return {};
   },
   components: {
-    wxParse
   },
 
   props: {

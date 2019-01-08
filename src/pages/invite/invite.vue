@@ -27,18 +27,24 @@
           >活动规则</div>
 
           <div class="topBg">
-            <div class="gotReward" @click="goPromoteList">
+            <div
+              class="gotReward"
+              @click="goPromoteList"
+            >
               {{totalData.plusNum}}
               <!-- <text>币</text> -->
             </div>
-            <div class="tips" @click="goPromoteList">
+            <div
+              class="tips"
+              @click="goPromoteList"
+            >
               <!-- 累计奖励{{totalData.accumulateReward}}红包 -->
               加成倍数越高，到手红包越大
-              <text bindtap="goDetailPage">查看明细</text>
+              <!-- <text bindtap="goDetailPage">查看明细</text> -->
             </div>
             <button
               class="inviteBtn"
-              data-type="0"
+              data-type="3"
               openType="share"
             >邀请新用户得{{totalData.inviteTotalReward}}加成</button>
             <!-- <div class="bottomTips">邀请成功立得</div> -->
@@ -46,7 +52,7 @@
 
           <div class="centerBg voidHeight">
             <!-- 无邀请列表 -->
-            <block v-if="friendList.length==0">
+            <!-- <block v-if="friendList.length==0">
               <div class="totalCoin">每邀请1位好友，可获得{{totalData.inviteTotalReward}}币</div>
               <div class="inviteCoin">邀请成功立得{{totalData.inviteReward}}币，连续5天唤醒好友领剩余{{totalData.inviteTotalReward-totalData.inviteReward}}币</div>
               <div class="award1">
@@ -59,9 +65,9 @@
                 </div>
               </div>
               <div class="award2"></div>
-            </block>
+            </block> -->
             <!-- 有邀请列表 -->
-            <block v-else>
+            <block v-if="friendList">
               <div class="importantInfo">
                 <div class="inviteTotalUserNum">{{f_title}}</div>
                 <div
@@ -77,40 +83,48 @@
               </div>
               <!-- 用户列表 -->
               <div class="list-page">
-                <div
-                  class="userItem"
-                  v-for="(item, index) in friendList"
-                  :key="index"
-                >
-                  <image
-                    class="portrait"
-                    :src="item.avatarUrl"
-                  />
-                  <div class="nameInfo">
-                    <div class="nickName">{{item.nickName}}</div>
-                    <div
-                      class="tips"
-                      v-if="item.hb_amount>0"
-                    >好友今日已兑换{{item.StepNumber}}步</div>
-                    <div
-                      class="tips"
-                      v-else
-                    >好友今日未兑换步数</div>
-                  </div>
+                <block v-if="friendList&&friendList.length>0">
                   <div
-                    class="coinInfo2 gray2"
-                    v-if="item.hb_amount>0"
+                    class="userItem"
+                    v-for="(item, index) in friendList"
+                    :key="index"
                   >
-                    已获得红包<text class="info-m">￥{{item.hb_amount}}</text>
+                    <image
+                      class="portrait"
+                      :src="item.avatarUrl"
+                    />
+                    <div class="nameInfo">
+                      <div class="nickName">{{item.nickName}}</div>
+                      <div
+                        class="tips"
+                        v-if="item.hb_amount>0"
+                      >好友今日已兑换{{item.StepNumber}}步</div>
+                      <div
+                        class="tips"
+                        v-else
+                      >好友今日未兑换步数</div>
+                    </div>
+                    <div
+                      class="coinInfo2 gray2"
+                      v-if="item.hb_amount>0"
+                    >
+                      已获得红包<text class="info-m">￥{{item.hb_amount}}</text>
+                    </div>
+                    <button
+                      class="coinInfo2"
+                      openType="share"
+                      data-type="6"
+                      v-else
+                    >召唤好友兑换</button>
                   </div>
-                  <button
-                    class="coinInfo2"
-                    openType="share"
-                    v-else
-                  >召唤好友兑换</button>
-                </div>
+                </block>
+                <div
+                  v-else
+                  class="no-data"
+                >还没有邀请任何好友~</div>
               </div>
             </block>
+
           </div>
         </div>
       </div>
@@ -118,36 +132,16 @@
 
     <!-- 规则 -->
     <div
-      bindtap="$RuleDialog$onModal"
-      catchtouchmove="$RuleDialog$touchmoveHandler"
       class="launchScreen _6a61420"
-      data-ele="modal"
-      style="top:px;"
       v-if="ruleDialogShow"
     >
       <div class="launcher _6a61420">
-        <div class="bg _6a61420"></div>
-        <div class="totalCoin _6a61420">每邀请1位好友，可获得{{$RuleDialog$totalCoin}}币</div>
-        <div class="inviteCoin _6a61420">邀请成功立得{{$RuleDialog$inviteReward}}币</div>
-        <div class="award1 _6a61420">
-          <div class="eachCoin _6a61420">
-            <div
-              class="eachItem _6a61420"
-              v-for="(item,index) in eachCoin"
-              :key="index"
-            >{{item}}</div>
-          </div>
-        </div>
         <div class="title _6a61420">活动细则</div>
         <scroll-div
           class="content _6a61420"
           scrollY="true"
         >
-          <div class="_6a61420">1、邀请好友奖励：每邀请1位好友，好友注册后的5天里，每天将自己运动的步数兑换成转币，您即可拿到当天对应的奖励，第一天奖励5币，第二天奖励2币，第三天奖励5币，第四天奖励2币，第五天奖励6币；</div>
-          <div class="_6a61420">2、好友加成：邀请的好友每日红包加成，好友每日兑换步数，你就可以获得1个红包奖励，好友数越多，每日奖励币数越多；</div>
-          <div class="_6a61420">3、加成时间：好友注册30天内，每天兑换红包，你都可以获得1红包奖励，好友注册超过30天则无法收到奖励；</div>
-          <div class="_6a61420">4、账号异常：如果你与邀请好友的账号是同一个人，则无法获得邀请奖励和好友加成。同一个手机号、设备号、银行卡、收货地址均视为同一个账号；</div>
-          <div class="_6a61420">5、奖励领取：每日获得邀请好友和好友加成的奖励，需要你点击步数换首页奖励气泡进行领取；</div>
+          <rich-text :nodes="totalData&&totalData.rules"></rich-text>
         </scroll-div>
         <div
           @click="ruleDialogClose"
@@ -191,8 +185,7 @@ export default {
       page: 1,
       hasMore: !0,
       showNoMore: !1,
-      eachCoin: ["5", "2", "5", "2", "6"],
-      ifLimited: !1,
+      ifLimited: !1, 
       ruleDialogShow: 0
     };
   },
@@ -206,8 +199,8 @@ export default {
     // 跳转到加成明细
     goPromoteList() {
       wx.navigateTo({
-        url: '/pages/promote_list/main'
-      })
+        url: "/pages/promote_list/main"
+      });
     },
     showRule() {
       this.ruleDialogShow = !0;
@@ -231,20 +224,31 @@ export default {
   created() {},
   // 分享
   onShareAppMessage(res) {
-    if (res.from === "button") {
+    console.log(res);
+    if (res.from === "button" && res.target.dataset.type == 3) {
+      console.log("加成按钮");
+
       // 来自页面内转发按钮
-      console.log(res);
-      return {
-        title: this.totalData.share.title,
-        imageUrl: this.totalData.share.img,
-        path: "/pages/index/main?register_code=" + wx.getStorageSync("register_code")
-      };
+      return util.getCommonShareData(
+        this.totalData.share.title,
+        this.totalData.share.image,
+        this.totalData.share.link
+      );
+    } else if (res.from === "button" && res.target.dataset.type == 6) {
+      console.log("召唤按钮");
+      // 来自页面内转发按钮
+      return util.getCommonShareData(
+        this.totalData.shareFriend.title,
+        this.totalData.shareFriend.image,
+        this.totalData.shareFriend.link
+      );
     }
-    return {
-      title: this.totalData.share.title,
-      imageUrl: this.totalData.share.img,
-      path: "/pages/index/main?register_code=" + wx.getStorageSync("register_code")
-    };
+    // 公用的分享转发数据
+    return util.getCommonShareData(
+      this.totalData.share.title,
+      this.totalData.share.image,
+      this.totalData.share.link
+    );
   },
   // 滚动加载
   async onReachBottom(e) {
@@ -430,19 +434,19 @@ page {
   font-size: 40rpx;
   color: #333333;
   position: absolute;
-  top: 312rpx;
+  top: 30rpx;
   left: 194rpx;
 }
 
 .launchScreen .launcher .content._6a61420 {
   width: 468rpx;
-  height: 276rpx;
+  height: 270px;
   overflow: scroll;
   font-size: 28rpx;
   color: #2e3135;
   line-height: 48rpx;
   position: absolute;
-  top: 384rpx;
+  top: 50px;
   left: 40rpx;
 }
 
@@ -452,8 +456,7 @@ page {
   left: 238rpx;
   width: 72rpx;
   height: 72rpx;
-  background: url(#{$img_url}dialog_close.png)
-    no-repeat;
+  background: url(#{$img_url}dialog_close.png) no-repeat;
   background-size: 100% 100%;
 }
 
@@ -746,15 +749,14 @@ page {
 .topBg {
   width: 750rpx;
   height: 511rpx;
-  background: url(#{$img_url}invite_bg.png)
-    no-repeat;
+  background: url(#{$img_url}invite_bg.png) no-repeat;
   background-size: 100% 100%;
 }
 
 .topBg .gotReward {
   font-family: PingFangSC-Semibold;
   font-size: 60px;
-  color: #FF6742;
+  color: #ff6742;
   text-align: center;
   padding-top: 100rpx;
 }
@@ -765,7 +767,7 @@ page {
 
 .topBg .tips {
   font-size: 24rpx;
-  color: #FF6742;
+  color: #ff6742;
   text-align: center;
   margin-top: 16rpx;
 }
@@ -1012,5 +1014,11 @@ page {
 .centerBg .list-page .userItem .btnStyle {
   color: #c55a00;
   background: #ffd66b;
+}
+.no-data {
+  padding-top: 30px;
+  text-align: center;
+  font-size: 14px;
+  color: #999;
 }
 </style>

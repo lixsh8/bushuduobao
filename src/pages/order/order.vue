@@ -119,6 +119,7 @@ import api from "@/utils/api";
 import headBar from "@/components/headBar";
 import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
+import noData from "@/components/noData";
 import quickNavigate from "@/components/quickNavigate";
 
 export default {
@@ -152,6 +153,7 @@ export default {
     headBar,
     backTop,
     pagingFooter,
+    noData,
     quickNavigate
   },
 
@@ -210,7 +212,7 @@ export default {
       if (this.requestTimer) clearTimeout(this.requestTimer);
       this.requestTimer = setTimeout(() => {
         this.canRequest = !0;
-      }, 2000);
+      }, 1000);
     },
     // 切换tab
     changeTab(idx) {

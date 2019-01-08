@@ -29,7 +29,7 @@
 export default {
   data() {
     return {
-      authModalContent: "小程序需要您的授权，才能免费换商品哦~",
+      authModalContent: "小程序需要您的授权，才能换商品哦~",
       contentScrollable: "auto",
       AuthModalButtons: [{ text: "去授权", openType: "getUserInfo" }]
     };

@@ -30,8 +30,6 @@ export default {
 
   components: {},
 
-  computed: {},
-
   methods: {
     // 购买
     async refresh() {
@@ -45,7 +43,8 @@ export default {
           wx.setStorageSync("code", loginResult.code);
           let tokenResult = await util.request(api.Login, {
             code: loginResult.code,
-            register_code: ""
+            register_code: "",
+            assistance: wx.getStorageSync("assistance")
           });
           console.log(
             "login页面登录tokenResult=" + JSON.stringify(tokenResult)
@@ -58,6 +57,7 @@ export default {
               "register_code",
               tokenResult.data.user.register_code
             );
+            wx.setStorageSync("is_update", tokenResult.data.user.is_update);
 
             wx.reLaunch({
               url:

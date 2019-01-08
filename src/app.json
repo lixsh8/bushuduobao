@@ -11,11 +11,14 @@
     "pages/order_detail/main",
     "pages/goods_detail/main",
     "pages/join_list/main",
+    "pages/join_list_detail/main",
     "pages/pack_list/main",
     "pages/income_rules/main",
     "pages/result/main",
     "pages/logistics/main",
     "pages/mine/main",
+    "pages/strategy/main",
+    "pages/detail_rules/main",
     "pages/login/main"
   ],
   "window": {

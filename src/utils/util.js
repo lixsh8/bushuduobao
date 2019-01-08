@@ -58,7 +58,7 @@ function request(url, data = {}, method = "GET") {
         // console.log("请求参数，data:", JSON.stringify(res));
         if (res.statusCode === 200) {
           console.log(res.data);
-          
+
           if (res.data.code === 401) {
             // 需要登录后才可以操作
             wx.removeStorageSync("code");
@@ -349,6 +349,20 @@ function wxRequest(obj, cb, page, type) {
   return type ? cachFn : cachFn();
 }
 
+/**
+ * 
+ * @param {String} title 分享标题
+ * @param {String} image 分享图片
+ * @param {String} link  分享跳转链接
+ */
+function getCommonShareData(title, image, link) {
+  return {
+    title: title,
+    imageUrl: image,
+    path: link
+  };
+}
+
 const util = {
   formatTime,
   request,
@@ -358,6 +372,7 @@ const util = {
   checkSession,
   login,
   parseParams,
+  getCommonShareData,
   getUserInfo
 };
 

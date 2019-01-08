@@ -7,6 +7,8 @@
       :titleColor="titleColor"
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
+      ifCustomBack="true"
+      @back="back"
     />
 
     <!-- 正文 -->
@@ -102,7 +104,9 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       banner: null,
+      id: '',
       orderId: "",
+      shareData: {},
       list: null
     };
   },
@@ -134,6 +138,13 @@ export default {
   },
 
   methods: {
+    // 返回上一页
+    back() {
+      console.log('back func');
+      wx.redirectTo({
+        url: "/pages/goods_detail/main?id=" + this.id + "&ifBack=0"
+      });
+    },
     // 点击购买按钮
     btnClickHandler(ev) {
       console.log(ev);
@@ -144,18 +155,39 @@ export default {
     // 点击查看订单详情
     goOrderDetail() {
       wx.navigateTo({
-        url: "/pages/order_detail/main?orderId=" + this.orderId
+        url: "/pages/order_detail/main?id=" + this.orderId
       });
     },
     // 保存图片
     savePic() {
+      wx.showToast({
+        title: "正在保存图片...",
+        icon: "loading",
+        duration: 20000,
+        mask: true,
+        success: res => {}
+      });
+
       wx.getImageInfo({
         src: "https://resourcecdn.xiaotaotao123.cn/wxapp_img/result_banner.png",
         success: function(sres) {
           wx.saveImageToPhotosAlbum({
             filePath: sres.path,
-            success: function(fres) {
-              console.log(fres);
+            success: function(res) {
+              console.log(res);
+              if (res.errMsg === "saveImageToPhotosAlbum:ok") {
+                wx.showModal({
+                  title: "提示",
+                  content: "图片已经保存到相册，可以到微信去分享了",
+                  showCancel: false,
+                  confirmText: "确定",
+                  confirmColor: "#3CC51F",
+                  success: res => {}
+                });
+              }
+            },
+            complete: function() {
+              wx.hideToast();
             }
           });
         }
@@ -163,10 +195,29 @@ export default {
     }
   },
 
+  // 分享
+  onShareAppMessage(res) {
+    if (res.from === "button") {
+      // 来自页面内转发按钮
+      console.log(res);
+      return util.getCommonShareData(
+        this.shareData.title,
+        this.shareData.image,
+        this.shareData.link
+      );
+    }
+    return util.getCommonShareData(
+      this.shareData.title,
+      this.shareData.image,
+      this.shareData.link
+    );
+  },
+
   // 页面加载
   async onLoad(e) {
     this.orderId = this.$root.$mp.query.orderId;
-    console.log('this.orderId=' + this.orderId);
+    this.id = this.$root.$mp.query.id;
+    console.log("this.orderId=" + this.orderId);
     // 列表
     const res = await util.request(api.IndexNewZone, "GET", this);
     if (res.data && res.code === 0) {
@@ -174,6 +225,7 @@ export default {
       console.log(res.data);
 
       this.list = res.data.list;
+      this.shareData = res.data.shareData;
       this.banner = res.data.banner;
       this.hasMore = res.data.hasMore;
     } else {

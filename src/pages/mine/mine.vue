@@ -331,6 +331,7 @@ page {
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+  text-align: left;
 }
 
 .mine-head-portrait {

@@ -18,11 +18,9 @@
       收益规则
     </div>
     <div class="rules">
-      <wx-parse
+      <rich-text
         v-if="article"
         :content="article"
-        @preview="preview"
-        @navigate="navigate"
       />
     </div>
     <!-- 底部按钮 -->
@@ -39,7 +37,6 @@ import headBar from "@/components/headBar";
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import wxParse from "mpvue-wxparse";
 
 export default {
   data() {
@@ -57,8 +54,7 @@ export default {
   },
 
   components: {
-    headBar,
-    wxParse
+    headBar
   },
 
   computed: {},

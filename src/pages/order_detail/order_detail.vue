@@ -126,7 +126,7 @@
       </div>
       <!-- 产品信息 -->
       <div class="goods-panel">
-        <div class="goods-info">
+        <div class="goods-info" @click="goDetail(data.is_id)">
           <img
             class="goods-avatar"
             :src="data.dgoods_image"
@@ -137,7 +137,7 @@
         <div class="price-info">
           <div class="price-item">
             <div class="price-t">参与总额</div>
-            <div class="price-cnt">参￥{{data.dgoods_hb}}</div>
+            <div class="price-cnt">￥{{data.dgoods_hb}}</div>
           </div>
           <div
             class="price-item"
@@ -213,17 +213,16 @@
     </div>
 
     <!-- 底部按钮客服 -->
-    <div
+    <button open-type="contact"
       class="btn-kf"
-      @click="makePhoneCall"
     >
       <img
         :src="kfIcon"
         alt=""
         class="kf-icon"
       >
-      <div class="kf-txt">电话客服</div>
-    </div>
+      <div open-type="contact" class="kf-txt">联系客服</div>
+    </button>
     <div class="btn-kf-cover"></div>
 
     <!-- 快速导航 -->
@@ -268,6 +267,12 @@ export default {
   },
 
   methods: {
+    // 跳转到商品详情
+    goDetail(is_id) {
+      wx.navigateTo({
+        url: "/pages/goods_detail/main?id=" + is_id
+      })
+    },
     // 跳转到收益规则
     goIncome() {
       wx.navigateTo({
@@ -629,6 +634,7 @@ page {
   font-size: 0;
   text-align: center;
   background: #fff;
+  border-radius: none;
 
   .kf-icon {
     display: inline-block;
@@ -647,5 +653,8 @@ page {
 .btn-kf-cover {
   height: 50px;
   padding-top: 12px;
+}
+button::after {
+  border-radius: 0;
 }
 </style>
