@@ -56,7 +56,7 @@
     />
 
     <!-- 快速导航 -->
-    <quick-navigate />
+    <!-- <quick-navigate /> -->
   </div>
 </template>
 
@@ -69,6 +69,8 @@ import goodsItem from "@/components/goodsItem";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import rulesModal from "@/components/rulesModal";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -117,6 +119,8 @@ export default {
 
   // 页面加载
   async onLoad(e) {
+    // mta统计
+    mta.Page.init();
     // 列表
     const res = await util.request(api.IndexNewZone, "GET", this);
     if (res.data && res.code === 0) {

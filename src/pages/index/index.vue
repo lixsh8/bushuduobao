@@ -242,56 +242,41 @@
         </div>
       </div>
 
-      <!-- banner -->
-      <div class="banner">
-        <div
-          class="box _3142106 indexBanner"
-          v-if="banners.length>0"
-        >
+      <!-- 中间广告advertList -->
+      <div
+        class="banner"
+        v-if="advertList&&advertList.length>0"
+      >
+        <div class="box _3142106 indexBanner advBanner">
           <swiper
             :autoplay="config.autoplay"
             :circular="config.circular"
+            :current="config.current"
             :duration="config.duration"
             :indicatorActiveColor="config.indicatorActiveColor"
             :indicatorColor="config.indicatorColor"
             :indicatorDots="config.indicatorDots"
             :interval="config.interval"
-            v-if="banners.length>1"
           >
             <swiper-item
-              catchtap="onBanner"
+              @click="jump"
               class="banner-wrap _3142106"
-              data-wpyonbanner-a="index"
-              v-for="banner in banners"
-              :key="banner.id"
+              v-for="(advert,index) in advertList"
+              :data-index="index"
+              :data-id="advert.id"
+              :data-link="advert.link"
+              :data-appid="advert.appid"
+              :key="advert.id"
             >
               <img
                 class="pic _3142106"
-                :src="banner.pic"
+                :src="advert.img"
               />
               <div class="banner-tip _3142106">
-                <div class="banner-tip-title _3142106">{{banner.title}}</div>
+                <div class="banner-tip-title _3142106">{{advert.title}}</div>
               </div>
             </swiper-item>
           </swiper>
-          <div
-            class="banners single _3142106"
-            v-if="banners.length==1"
-          >
-            <div
-              catchtap="onBanner"
-              class="banner-wrap _3142106"
-              data-wpyonbanner-a="0"
-            >
-              <img
-                class="pic _3142106"
-                :src="banners[0].pic"
-              />
-              <div class="banner-tip _3142106">
-                <div class="banner-tip-title _3142106">{{banners[0].title}}</div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -349,6 +334,13 @@
       </div>
 
     </div>
+    <!-- 底部没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore"
+      noMoreTips="没有更多数据了"
+    />
+
+    <!-- 腾讯广告 -->
 
     <!-- 签到弹窗 -->
     <signModal
@@ -361,11 +353,6 @@
 
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
-    <!-- 底部没有更多 -->
-    <paging-footer
-      :showNoMore="showNoMore&&page!=1"
-      noMoreTips="没有更多数据了"
-    />
     <!-- 授权弹窗 -->
     <auth-modal
       @getUserInfos="getUserInfos"
@@ -385,6 +372,8 @@ import util from "@/utils/util";
 import api from "@/utils/api";
 import request from "@/utils/request";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -392,7 +381,6 @@ export default {
       headerBackground: "#FF696C",
       titleColor: "#fff",
       showBackTop: true,
-      isNet: true,
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
       ifShowSign: !1,
@@ -423,8 +411,8 @@ export default {
       },
       // 最新开奖
       latestAward: null,
-      // banner
-      banners: [],
+      // advertList
+      advertList: [],
       // 推荐商品 列表
       page: 1,
       hasMore: !0,
@@ -533,22 +521,9 @@ export default {
     },
     // 统一跳转
     jump(e) {
-      var url = e.currentTarget.dataset.url;
-      if (
-        url.indexOf("/index") > 0 ||
-        url.indexOf("/duobao") > 0 ||
-        url.indexOf("/invite") > 0 ||
-        url.indexOf("/mine") > 0
-      ) {
-        wx.switchTab({
-          url: url
-        });
-      } else {
-        wx.navigateTo({
-          url: url
-        });
-      }
+      util.jump(e);
     },
+    // 跳转到最新夺宝
     goDuobaoHistory() {
       wx.navigateTo({
         url: "/pages/duobao_history/main"
@@ -580,6 +555,7 @@ export default {
         url: "/pages/welfare_ad/main"
       });
     },
+    // 更新用户信息
     getUserInfos(e) {
       var _this = this;
       console.log("外面调用" + this.authModalShow);
@@ -592,6 +568,9 @@ export default {
         .then(function(res) {
           if (res.code === 0) {
             _this.authModalShow = false;
+            if (res.data) {
+              wx.setStorageSync("is_update", res.data.is_update || 0);
+            }
             console.log(
               "更新用户信息后：this.authModalShow=" + _this.authModalShow
             );
@@ -677,6 +656,14 @@ export default {
         }
       });
     },
+    async getIndexData() {
+      var _this = this;
+      request.get(api.Index, null).then(res => {
+        _this.menuList = res.data.menuList;
+        _this.banner = res.data.banner;
+        _this.advertList = res.data.advertList;
+      });
+    },
     // 获取新人专区列表
     async getNewZone() {
       const resNewZone = await util.request(
@@ -710,7 +697,7 @@ export default {
     async getDuobaoList() {
       const Duobao = await util.request(
         api.IndexDuobao,
-        { page: 1 },
+        { page: 1, hasTitle: 1 },
         "GET",
         this
       );
@@ -727,6 +714,7 @@ export default {
   // 下拉刷新
   onPullDownRefresh() {
     console.log("刷新");
+    this.getIndexData();
     this.getNewZone();
     this.getLatestAward();
     this.getDuobaoList();
@@ -756,7 +744,9 @@ export default {
 
   // 滚动加载
   async onReachBottom() {
-    console.log("showAuthModal:" + this.authModalShow);
+    console.log(
+      "srcoll onReachBottom========showAuthModal:" + this.authModalShow
+    );
 
     if (this.hasMore) {
       let list = this.duobao.list;
@@ -801,6 +791,8 @@ export default {
 
   // 页面加载
   async onLoad(options) {
+    // mta统计
+    mta.Page.init();
     if (wx.getStorageSync("is_update") != 1) {
       this.checkAuth();
     }
@@ -808,22 +800,59 @@ export default {
 
   async onShow(options) {
     var _this = this;
+
+    // socket
+    wx.onSocketMessage(function(res) {
+      console.log('首页');
+      console.log(res);
+    });
+
+    // 登录
+    const checkSession = await util.checkSession();
+
+    console.log("checkSession");
+
+    if (!checkSession || !wx.getStorageSync("token")) {
+      let loginResult = await util.login();
+      if (loginResult && loginResult.code) {
+        wx.setStorageSync("code", loginResult.code);
+        let tokenResult = await request.get(api.Login, {
+          code: loginResult.code,
+          register_code: wx.getStorageSync("register_code"),
+          assistance: wx.getStorageSync("assistance")
+        });
+        console.log("app全局登录");
+
+        if (tokenResult && tokenResult.data && tokenResult.data.token) {
+          wx.setStorageSync("token", tokenResult.data.token);
+          wx.setStorageSync(
+            "register_code",
+            tokenResult.data.user.register_code
+          );
+          wx.setStorageSync("is_update", tokenResult.data.user.is_update);
+
+          // 获取红包等数据 需要登录的
+          _this.getPacks();
+          // _this.requestNum = 0;
+          // _this.requestTimer.getPacks = setInterval(function() {
+          //   _this.requestNum = _this.requestNum + 1;
+          //   _this.getPacks();
+          // }, 1000);
+        }
+      }
+    } else {
+      // 获取红包等数据 需要登录的
+      _this.getPacks();
+    }
+
     // const { id } = options;
     // _this.globalData.id = id;
 
     // 获取首页数据
-    request.get(api.Index, null).then(res => {
-      _this.menuList = res.data.menuList;
-      _this.banner = res.data.banner;
-    });
+    _this.getIndexData();
     // 获取步数
     _this.getWeRunData();
-    // 获取红包等数据 需要登录的
-    _this.requestNum = 0;
-    _this.requestTimer.getPacks = setInterval(function() {
-      _this.requestNum = _this.requestNum + 1;
-      _this.getPacks();
-    }, 1000);
+
     // 获取新手专区数据 act=duobao&op=newbornZone
     _this.getNewZone();
 
@@ -2376,5 +2405,37 @@ ad {
   text-align: center;
   color: #9b9b9b;
   font-size: 28rpx;
+}
+.advBanner {
+  height: 150px !important;
+
+  swiper {
+    width: 100%;
+    height: 100%;
+
+    swiper-item {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .pic {
+    height: 114px !important;
+  }
+
+  .banner-tip {
+    width: 100%;
+    height: 80rpx;
+    padding: 0 27rpx;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .banner-tip-title {
+    font-size: 28rpx;
+    color: #2e3135;
+    line-height: 40rpx;
+  }
 }
 </style>

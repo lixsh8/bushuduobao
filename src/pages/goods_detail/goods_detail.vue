@@ -105,10 +105,10 @@
         <div class="my-money">
           <div class="my-money-hd">当前收益</div>
           <div
-            v-if="duobaoData.hb_amount>=0"
+            v-if="duobaoData.fuli_amount>0"
             class="my-money-bd"
             @click="goIncome"
-          >¥{{duobaoData.hb_amount||"0"}}</div>
+          >¥{{duobaoData.fuli_amount||"0"}}</div>
           <div
             class="my-money-bd-emy"
             v-else
@@ -154,10 +154,12 @@
           class="content-item"
           :class="{active: currentTab == 0}"
         >
-          <rich-text
-            v-if="article"
-            :nodes="article"
-          />
+          <div class="rich-text">
+            <rich-text
+              v-if="article"
+              :nodes="article"
+            />
+          </div>
         </div>
 
         <div
@@ -230,17 +232,22 @@
     />
     <!-- 底部按钮 -->
     <div
+      v-if="duobaoData&&duobaoData.hb_amount<1"
+      class="fixed-btn"
+      @click="goEarnPack"
+    >红包不足，立即赚红包</div>
+    <div
       class="fixed-btn"
       @click="goNext"
-      v-if="is_end==1&&nextId"
+      v-else-if="is_end==1&&nextId"
     >
       <div class="btn-t">继续夺宝</div>
       <div class="btn-sub-t">第{{nextId}}期正在进行中</div>
     </div>
     <div
-      v-else-if="is_end==1"
+      v-else-if="is_soldout==1"
       class="fixed-btn"
-    >已结束</div>
+    >已抢光</div>
 
     <div
       v-else-if="duobaoData&&duobaoData.useTime<=0"
@@ -278,6 +285,8 @@ import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 import lsDialog from "@/components/lsDialog";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -371,7 +380,10 @@ export default {
         this.is_end = res.data.is_end;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
-        this.article = info.dgoods_body;
+        this.article = info.dgoods_body.replace(
+          /<img/gi,
+          '<img style="max-width:100%;height:auto" '
+        );
         this.totalNum = info.is_totalnum;
         this.leftNum = info.is_oddnum;
         console.log("usetime" + res.data.useTime);
@@ -400,12 +412,6 @@ export default {
     changeTab(idx) {
       this.currentTab = idx;
     },
-    preview(src, e) {
-      // do something
-    },
-    navigate(href, e) {
-      // do something
-    },
     // 去下一期购买
     goNext() {
       if (this.nextId) {
@@ -422,6 +428,12 @@ export default {
         url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
       });
     },
+    // 跳转到去赚红包
+    goEarnPack() {
+      wx.redirectTo({
+        url: "/pages/welfare_ad/main"
+      });
+    },
     // 弹窗邀请好友
     showInviteModal() {
       this.showDialog = true;
@@ -433,6 +445,8 @@ export default {
     },
     // 购买
     async makeBuy() {
+      // 购买统计
+      mta.Event.stat("buy_btn", {});
       // 购买次数不够
       if (this.duobaoData.useTime <= 0) {
         this.showDialog = true;
@@ -516,6 +530,9 @@ export default {
     },
     // 关闭购买弹窗
     closeBuyModal() {
+      this.buyNum = 1;
+      this.useTime = this.duobaoData.useTime - 1;
+      this.totalPrice = this.price;
       this.showBuyModal = !1;
     },
     // 关闭dialog
@@ -530,7 +547,7 @@ export default {
           "/pages/income_rules/main?id=" +
           this.is_id +
           "&income=" +
-          this.duobaoData.hb_amount
+          this.duobaoData.fuli_amount
       });
     },
     // 跳转到我的号码
@@ -623,6 +640,8 @@ export default {
   },
   // 页面加载
   async onLoad() {
+    // mta统计
+    mta.Page.init();
     var id = this.$root.$mp.query.id;
     var ifBack = this.$root.$mp.query.ifBack;
     console.log("ifback=", ifBack);
@@ -957,6 +976,16 @@ page {
           }
         }
       }
+    }
+  }
+  .rich-text {
+    padding: 15px;
+    word-break: break-all;
+    word-wrap: break-word;
+
+    rich-text {
+      word-break: break-all;
+      word-wrap: break-word;
     }
   }
 }

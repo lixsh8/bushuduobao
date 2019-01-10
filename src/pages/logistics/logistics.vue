@@ -11,68 +11,62 @@
     />
 
     <!-- 正文 -->
-    <!-- 头部导航 -->
-    <div
-      class="tab"
-      :style="{top: headBarHeight + 'px'}"
-    >
-      <div
-        class="tab-item"
-        :class="{active: currentTab===index}"
-        :style="{width: (100/navs.length) + '%'}"
-        v-for="(item, index) in navs"
-        :key="index"
-        @click="changeTab(index)"
-      >
-        <div class="tab-cnt">{{item.name}}</div>
-      </div>
-    </div>
-    <div class="tab-cover"></div>
-
-    <!-- 列表 -->
-    <div class="order-list">
-
-      <div
-        class="item"
-        v-for="(item, index) in list"
-        :key="index"
-      >
-        <div class="item-hd">
-          <div class="order-no">订单号:1075355839266603030</div>
-          <div class="order-status">恭喜中奖，已发货</div>
+    <div class="deliver-detail">
+      <div class="deliver-detail-info">
+        <div class="deliver-detail-info-left">
+          <image
+            class="deliver-detail-info-left-pic"
+            :src="logisticsInfo.companyPic"
+          ></image>
         </div>
-        <div class="item-bd">
-          <img
-            src="https://resource.xiaotaotao123.cn/wxapp_img/avatar.png"
-            class="avatar"
-          />
-          <div class="info">
-            <div class="title">【秒杀即将结束】亚克力小夜灯(商 品材质： 亚克力+PP+电子元件...</div>
-            <div class="count-wrapper">号码份数：<div class="count">5</div>
-            </div>
+        <div class="deliver-detail-info-right">
+          <div class="deliver-detail-info-right-list deliver-detail-info-right-status">物流状态：<div class="deliver-detail-info-right-list-state">{{logisticsInfo.state}}</div>
+          </div>
+          <div class="deliver-detail-info-right-list deliver-detail-info-right-campany">承运公司：{{logisticsInfo.companyType==1?'--':logisticsInfo.companyName}}</div>
+          <div class="deliver-detail-info-right-list deliver-detail-info-right-id">运单编号：{{logisticsInfo.logisticsNumber==1?'--':logisticsInfo.logisticsNumber}}</div>
+          <div
+            class="deliver-detail-info-right-list deliver-detail-info-right-tel"
+            v-if="logisticsInfo.companyType!=1"
+          >官方电话：<div class="deliver-detail-info-right-list-tel">{{logisticsInfo.servicePhoneNum}}</div>
           </div>
         </div>
-        <div class="item-ft">
-          <div
-            class="btn-logistics"
-            @click="goLogistics(item)"
-          >查看物流</div>
-        </div>
       </div>
 
+      <div
+        class="deliver-detail-list"
+        v-for="(logisticsItem,index1) in logisticsDetail"
+        :key="index1"
+      >
+        <div
+          class="deliver-detail-list-item"
+          v-for="(item,index2) in logisticsItem.data"
+          :key="index2"
+        >
+          <div class="deliver-detail-list-item-context">
+            <div class="deliver-detail-list-item-context-point deliver-detail-list-item-context-point-index"></div>
+            {{item.content}}
+          </div>
+          <div class="deliver-detail-list-item-bottom">
+            <div class="deliver-detail-list-item-bottom-subContext">
+              {{item.subContent}}
+            </div>
+            <div class="deliver-detail-list-item-bottom-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="deliver-detail-tip">
+        物流信息来自：
+        <div class="deliver-detail-tip-color">{{logisticsInfo.jumpTitle}}</div>
+      </div>
     </div>
-
-    <!-- 快速导航 -->
-    <!-- <quick-navigate /> -->
-    <back-top />
 
   </div>
 </template>
 
 <script type="text/ecmascript-6">
 import headBar from "@/components/headBar";
-import backTop from "@/components/backTop";
-import quickNavigate from "@/components/quickNavigate";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -83,22 +77,142 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       headerHeight: 46,
-      navs: [
-        { id: 1, name: "全部" },
-        { id: 2, name: "已开奖" },
-        { id: 3, name: "已开奖" },
-        { id: 4, name: "已开奖" },
-        { id: 5, name: "已开奖" }
-      ],
-      currentTab: 0,
-      list: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11, 12, 13, 14, 15]
+      logisticsInfo: {
+        servicePhoneNum: "95311",
+        companyType: "0",
+        companyName: "中通速递",
+        bottomText:
+          "<font color='#333333'>部分物流信息由</font><font color='#ff472e'>菜鸟裹裹</font><font color='#333333'>提供</font>",
+        canModifyDeliver: "0",
+        companyPic:
+          "http://img.58cdn.com.cn/zhuanzhuanftp/images/kuaidi/pic-zhongtong@3x.png",
+        bottomJumpUrl:
+          "http://newconnection.cainiao.com/act/check-download.html?source=10014022",
+        jumpTitle: "菜鸟裹裹",
+        state: "已签收",
+        logisticsNumber: "75118420085789",
+        logisticsDetail: [
+          {
+            sortId: 10,
+            icon:
+              "http://img.58cdn.com.cn/zhuanzhuan/zz/kuaidi/normal_logistics_icon.png",
+            title: "物流动态",
+            data: [
+              {
+                content:
+                  "【深圳市】 快件已在 【深圳桃源】 签收, 签收人: 菜鸟, 如有疑问请电联:13149908822 / 0755-36550506, 您的快递已经妥投, 如果您对我们的服务感到满意, 请给个五星好评, 鼓励一下我们【请在评价快递员处帮忙点亮五颗星星哦~】",
+                subContent: "2018-12-23 14:13:06",
+                time: "1545545586000"
+              },
+              {
+                content: "【深圳市】 快件到达 【深圳桃源】",
+                subContent: "2018-12-23 08:44:03",
+                time: "1545525843000"
+              },
+              {
+                content: "【深圳市】 快件离开 【深圳中心】 发往 【深圳桃源】",
+                subContent: "2018-12-22 14:39:24",
+                time: "1545460764000"
+              },
+              {
+                content: "【深圳市】 快件到达 【深圳中心】",
+                subContent: "2018-12-22 14:37:08",
+                time: "1545460628000"
+              },
+              {
+                content: "在转转录入快递单号操作发货",
+                subContent:
+                  "承运公司:中通速递 运单编号:75118420085789\n2018-12-21 22:22:29",
+                time: "1545402149221"
+              },
+              {
+                content: "【金华市】 快件离开 【义乌中转部】 发往 【深圳中心】",
+                subContent: "2018-12-21 19:32:50",
+                time: "1545391970000"
+              },
+              {
+                content: "【金华市】 快件到达 【义乌中转部】",
+                subContent: "2018-12-21 19:31:05",
+                time: "1545391865000"
+              },
+              {
+                content: "【金华市】 快件离开 【义乌童店】 发往 【深圳中心】",
+                subContent: "2018-12-21 16:45:06",
+                time: "1545381906000"
+              },
+              {
+                content:
+                  "【金华市】 【义乌童店】（0579-85877276） 的 郑葆帅 （15924266431） 已揽收",
+                subContent: "2018-12-21 16:35:20",
+                time: "1545381320000"
+              }
+            ]
+          }
+        ]
+      },
+      logisticsDetail: [
+        {
+          sortId: 10,
+          icon:
+            "http://img.58cdn.com.cn/zhuanzhuan/zz/kuaidi/normal_logistics_icon.png",
+          title: "物流动态",
+          data: [
+            {
+              content:
+                "【深圳市】 快件已在 【深圳桃源】 签收, 签收人: 菜鸟, 如有疑问请电联:13149908822 / 0755-36550506, 您的快递已经妥投, 如果您对我们的服务感到满意, 请给个五星好评, 鼓励一下我们【请在评价快递员处帮忙点亮五颗星星哦~】",
+              subContent: "2018-12-23 14:13:06",
+              time: "1545545586000"
+            },
+            {
+              content: "【深圳市】 快件到达 【深圳桃源】",
+              subContent: "2018-12-23 08:44:03",
+              time: "1545525843000"
+            },
+            {
+              content: "【深圳市】 快件离开 【深圳中心】 发往 【深圳桃源】",
+              subContent: "2018-12-22 14:39:24",
+              time: "1545460764000"
+            },
+            {
+              content: "【深圳市】 快件到达 【深圳中心】",
+              subContent: "2018-12-22 14:37:08",
+              time: "1545460628000"
+            },
+            {
+              content: "在转转录入快递单号操作发货",
+              subContent:
+                "承运公司:中通速递 运单编号:75118420085789\n2018-12-21 22:22:29",
+              time: "1545402149221"
+            },
+            {
+              content: "【金华市】 快件离开 【义乌中转部】 发往 【深圳中心】",
+              subContent: "2018-12-21 19:32:50",
+              time: "1545391970000"
+            },
+            {
+              content: "【金华市】 快件到达 【义乌中转部】",
+              subContent: "2018-12-21 19:31:05",
+              time: "1545391865000"
+            },
+            {
+              content: "【金华市】 快件离开 【义乌童店】 发往 【深圳中心】",
+              subContent: "2018-12-21 16:45:06",
+              time: "1545381906000"
+            },
+            {
+              content:
+                "【金华市】 【义乌童店】（0579-85877276） 的 郑葆帅 （15924266431） 已揽收",
+              subContent: "2018-12-21 16:35:20",
+              time: "1545381320000"
+            }
+          ]
+        }
+      ]
     };
   },
 
   components: {
-    headBar,
-    backTop,
-    quickNavigate
+    headBar
   },
 
   computed: {
@@ -107,141 +221,135 @@ export default {
     }
   },
 
+  methods: {},
   onShow(ev) {
     // console.log(this.globalData.statusBarHeight);
   },
-
-  methods: {
-    changeTab(idx) {
-      this.currentTab = idx;
-    },
-    goLogistics(oid) {
-      wx.navigateTo({ url: "/pages/logistics/main?orderId=" + oid });
-    }
+  onLoad() {
+    // mta统计
+    mta.Page.init();
   }
 };
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 @import "../../common/style/mixin";
+@import "../../common/style/curtain";
 
-page {
-  background: #f2f2f2;
+.deliver-detail-info {
+  height: 220rpx;
+  background: #ffffff;
+  color: #43474c;
 }
-.tab {
+
+.deliver-detail-info-left {
+  margin-left: 30rpx;
+  margin-top: 30rpx;
+  float: left;
+}
+
+.deliver-detail-info-left-pic {
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.deliver-detail-info-right {
+  margin-left: 30rpx;
+  margin-top: 30rpx;
+  float: left;
+}
+
+.deliver-detail-info-right-list {
+  font-size: 30rpx;
+}
+
+.deliver-detail-info-right-list-state {
+  color: #ff5647;
+  display: inline;
+}
+
+.deliver-detail-info-right-list-tel {
+  color: #6da5ff;
+  display: inline;
+}
+
+.deliver-detail-list {
+  background: #ffffff;
+  margin-top: 30rpx;
+  padding-top: 30rpx;
+  padding-bottom: 30rpx;
+}
+
+.deliver-detail-list-item {
+  font-size: 26rpx;
+}
+
+.deliver-detail-list-item-context {
+  color: #43474c;
+  margin-left: 60rpx;
+  position: relative;
+}
+
+.deliver-detail-list-item-context-point {
+  position: absolute;
+  left: -30rpx;
+  background-image: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/main/deliver/point-gray.png");
+  background-size: cover;
+  width: 20rpx;
+  height: 26rpx;
+  display: inline-block;
+  margin-right: 10rpx;
+}
+
+.deliver-detail-list-item-context-point-0 {
+  background-image: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/main/deliver/point-red.png");
+}
+
+.deliver-detail-list-item-bottom {
+  margin-left: 40rpx;
+  border-left: 1px solid #e8ebf0;
+  padding-bottom: 30rpx;
+}
+
+.deliver-detail-list-item-bottom-subContext {
+  color: #b2b8c2;
+  margin-left: 25rpx;
+  width: 550rpx;
+}
+
+.deliver-detail-list-item-bottom-line {
+  width: 650rpx;
+  height: 1px;
+  background: #e8ebf0;
+  margin-left: 25rpx;
+  position: relative;
+  top: 15rpx;
+}
+
+.deliver-detail-tip {
+  color: #43474c;
+  font-size: 28rpx;
+  margin-left: 30rpx;
+  margin-top: 30rpx;
+  margin-bottom: 128rpx;
+}
+
+.deliver-detail-tip-color {
+  display: inline;
+  color: #ff5a21;
+}
+
+.deliver-detail-modify {
   position: fixed;
+  bottom: 0;
+  background: #ff5647;
   width: 100%;
+  height: 98rpx;
+  line-height: 98rpx;
   text-align: center;
-  background: #fff;
-
-  .tab-item {
-    display: inline-block;
-  }
-  .tab-cnt {
-    display: inline-block;
-    padding: 10px 2px;
-    font-size: 15px;
-    color: #707376;
-    box-sizing: border-box;
-  }
-  .active .tab-cnt {
-    color: #ff5454;
-    font-size: 16px;
-    border-bottom: 3px solid #ff5454;
-  }
-}
-.tab-cover {
-  height: 50px;
-}
-
-.order-list {
-  padding: 12px 15px;
-
-  .item {
-    margin-bottom: 12px;
-    padding: 10px;
-    background: #fff;
-    border-radius: 5px;
-
-    .item-hd {
-      display: flex;
-      flex-direction: row;
-      padding: 8px 0;
-      line-height: 1;
-
-      .order-no {
-        width: 60%;
-        font-size: 12px;
-        color: #2d3134;
-        flex-shrink: 0;
-      }
-      .order-status {
-        width: 40%;
-        text-align: right;
-        font-size: 14px;
-        color: #9b9b9b;
-
-        &.red {
-          color: #ff5454;
-        }
-      }
-    }
-
-    .item-bd {
-      display: flex;
-      flex-direction: row;
-      padding: 14px 0;
-
-      .avatar {
-        display: block;
-        width: 90px;
-        height: 90px;
-        border-radius: 5px;
-        flex-shrink: 0;
-      }
-
-      .info {
-        flex: 1;
-        margin-left: 12px;
-
-        .title {
-          width: 100%;
-          padding-top: 3px;
-          font-size: 14px;
-          color: #2d3134;
-          line-height: 17px;
-          @include mult_line_ellipsis_2;
-        }
-        .count-wrapper {
-          padding-top: 35px;
-          font-size: 14px;
-          color: #6c6f72;
-          line-height: 1;
-
-          .count {
-            display: inline-block;
-            color: #ff5454;
-          }
-        }
-      }
-    }
-
-    .item-ft {
-      text-align: right;
-      padding-top: 10px;
-
-      .btn-logistics {
-        display: inline-block;
-        width: 80px;
-        height: 24px;
-        line-height: 24px;
-        text-align: center;
-        font-size: 14px;
-        color: #070707;
-        border-radius: 3px;
-        border: 1px solid #6c6f72;
-      }
-    }
-  }
+  font-family: PingFangHK-Regular;
+  font-size: 36rpx;
+  color: #ffffff;
+  letter-spacing: 0;
 }
 </style>

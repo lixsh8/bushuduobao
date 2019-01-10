@@ -5,8 +5,6 @@
       :title="title"
       :headerBackground="headerBackground"
       :titleColor="titleColor"
-      :showCustomBar="showCustomBar"
-      :customBarStyle="customBarStyle"
     />
 
     <!-- 正文 -->
@@ -20,7 +18,10 @@
     </div>
 
     <!-- 滚动消息 -->
-    <div class="scroll-message-wrapper" v-if="messages && messages.length>0">
+    <div
+      class="scroll-message-wrapper"
+      v-if="messages && messages.length>0"
+    >
       <div class="message-icon"></div>
       <div class="scroll-message">
         <scroll-message
@@ -46,17 +47,21 @@
         />
       </block>
     </div>
+    <!-- 底部没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore&&page==1"
+      noMoreTips="没有更多数据了"
+    />
+    <!-- 腾讯广告 -->
+    <div class="ad">
+      <!-- <ad unitId="adunit-b195e9267cb30a9e"></ad> -->
+    </div>
 
     <!-- 无数据 -->
     <no-data :showNoData="!list||list.length<=0" />
 
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
-    <!-- 底部没有更多 -->
-    <paging-footer
-      :showNoMore="showNoMore&&page!=1"
-      noMoreTips="没有更多数据了"
-    />
 
     <!-- 快速导航 -->
     <!-- <quick-navigate /> -->
@@ -74,6 +79,9 @@ import backTop from "@/components/backTop";
 import scrollMessage from "@/components/scrollMessage";
 import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
+import { setTimeout, clearTimeout } from "timers";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -81,14 +89,14 @@ export default {
       title: "兑商品",
       headerBackground: "#ff5b5c",
       titleColor: "white",
-      showCustomBar: !0,
-      customBarStyle: "white",
+      // showCustomBar: !0,
+      // customBarStyle: "white",
       banner: null,
       page: 1,
       hasMore: !0,
       showNoMore: !1,
       canScroll: !0,
-      aa: "",
+      timer: null,
       scrollTimer: null,
       autoplay: !0,
       messages: [],
@@ -113,6 +121,19 @@ export default {
   },
 
   methods: {
+    // 获取列表
+    async getList() {
+      const res = await util.request(api.IndexDuobao, "GET", this);
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+
+        this.list = res.data.list;
+        this.banner = res.data.banner;
+        this.hasMore = res.data.hasMore;
+      } else {
+      }
+    },
     // 规则弹窗
     showRules() {
       this.ifShowRules = !0;
@@ -121,7 +142,15 @@ export default {
       this.ifShowRules = !1;
     },
     // 请求消息数据
-    getMessage() {
+    async getMessage() {
+      const res = await util.request(api.DuobaoMessage, "GET", this);
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+
+        this.messages = res.data.rollingMessage;
+      } else {
+      }
       console.log("getMessage");
     },
     // 消息滚动事件
@@ -137,7 +166,25 @@ export default {
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + ev
       });
+    },
+    // 通过id来更新数据
+    updateData(newData) {
+      for (var i = 0, len = newData.length; i < len; i++) {
+        for (var j = 0, len2 = this.list.length; j < len2; j++) {
+          if (newData[i].is_id == this.list[j].is_id) {
+            this.list[j].is_oddnum = newData[i].is_oddnum;
+            this.list[j].is_rate = newData[i].is_rate;
+          }
+        }
+      }
     }
+  },
+
+  // 下拉刷新
+  onPullDownRefresh() {
+    console.log("刷新");
+    this.getList();
+    wx.stopPullDownRefresh();
   },
 
   // 滚动加载更多
@@ -188,28 +235,62 @@ export default {
   },
 
   onShow() {
+    var _this = this;
     this.autoplay = true;
-    console.log("onShow" + this.autoplay);
+    // this.timer = setInterval(this.getList, 3000);
+    wx.connectSocket({
+      url: "ws://ws.chaojitao.cn",
+      // url: "ws://devws.xiaotaotao123.cn",
+      header: {
+        // Authorization: "cjt eadd53444b70c87361ebc6026a2850de"
+        "X-TOKEN": "854f671efa14b949e75a91616d878e20",
+        "X-M": "qq_9339c4b5e8a00a73c25667ae07f67624"
+      },
+      success(res) {
+        console.log("连接成功");
+      }
+    });
 
+    wx.onSocketOpen(function(res) {
+      console.log("WebSocket连接已打开！");
+
+      // wx.sendSocketMessage({
+      //   data: "Hello,World:" + Math.round(Math.random() * 0xffffff).toString()
+      // });
+
+      // wx.closeSocket()
+    });
+
+    wx.onSocketMessage(function(res) {
+      // 接收到消息
+      var num = Math.floor(Math.random() * 1050);
+      var rate = Math.floor(Math.random() * 100) + "%";
+      _this.updateData([
+        { is_id: 101, is_oddnum: num, is_rate: rate },
+        { is_id: 97, is_oddnum: num, is_rate: rate },
+        { is_id: 98, is_oddnum: num, is_rate: rate }
+      ]);
+      console.log(res);
+    });
+
+    wx.onSocketClose(function(res) {
+      console.log("WebSocket连接已关闭！");
+      console.log(res.code);
+      
+    });
   },
   onHide() {
     this.autoplay = false;
-    console.log("onHide" + this.autoplay);
+    console.log("onHide");
+    wx.closeSocket()
   },
   // 页面加载
-  async onLoad(e) {
+  onLoad(e) {
+    // mta统计
+    mta.Page.init();
     // 列表
-    const res = await util.request(api.IndexDuobao, "GET", this);
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-
-      this.list = res.data.list;
-      this.banner = res.data.banner;
-      this.hasMore = res.data.hasMore;
-      this.messages = res.data.rollingMessage;
-    } else {
-    }
+    this.getList();
+    this.getMessage();
   }
 };
 </script>

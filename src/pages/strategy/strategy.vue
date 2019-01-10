@@ -49,6 +49,8 @@ import headBar from "@/components/headBar";
 // import api from "@/utils/api";
 // import request from "@/utils/request";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -90,6 +92,8 @@ export default {
 
   // 页面加载
   async onLoad() {
+    // mta统计
+    mta.Page.init();
     // var { id, income, detail } = this.$root.$mp.query;
   }
 };

@@ -20,7 +20,7 @@
     <div class="rules">
       <rich-text
         v-if="article"
-        :content="article"
+        :nodes="article"
       />
     </div>
     <!-- 底部按钮 -->
@@ -38,6 +38,8 @@ import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -48,8 +50,7 @@ export default {
       customBarStyle: "black",
       income: "-",
       detail: "",
-      article:
-        "<div style='background:#eee;'><div style='color:#fff;padding:10px;'>12121212</div></div>"
+      article: ""
     };
   },
 
@@ -76,18 +77,20 @@ export default {
 
   // 页面加载
   async onLoad() {
+    // mta统计
+    mta.Page.init();
     var { id, income, detail } = this.$root.$mp.query;
 
     this.id = id;
     this.income = income;
     this.detail = detail;
-    
+
     const res = await util.request(api.IncomeRule, { id: id }, "GET", this);
     if (res.data && res.code === 0) {
       // this.totalData = res.data;
       console.log(res.data);
 
-      this.article = res.data.content;
+      this.article = res.data.rules;
     } else {
     }
   }

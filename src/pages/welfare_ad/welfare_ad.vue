@@ -68,6 +68,8 @@ import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import noData from "@/components/noData";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -116,7 +118,7 @@ export default {
         extraData: {
           foo: "bar"
         },
-        envVersion: "develop",
+        envVersion: api.mienvVersion,
         success(res) {
           console.log("跳转成功");
           if (gotStatus) return;
@@ -173,6 +175,8 @@ export default {
   },
 
   async onLoad(e) {
+    // mta统计
+    mta.Page.init();
     // 列表
     const res = await util.request(api.WelfareAd, "GET", this);
     if (res.data && res.code === 0) {

@@ -8,6 +8,8 @@
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
       :headerHeight="headerHeight"
+      :ifCustomBack="ifCustomBack"
+      @back="back"
     />
 
     <!-- 正文 -->
@@ -59,8 +61,8 @@
         @click="goDetail(item.order_id)"
       >
         <div class="item-hd">
-          <div class="order-no">订单号:1075355839266603030</div>
-          <div class="order-status">{{item.join_state}}</div>
+          <div class="order-no">订单号:{{item.order_id}}</div>
+          <div class="order-status" :class="{red:item.join_state!='未中奖'}">{{item.join_state}}</div>
         </div>
         <div class="item-bd">
           <img
@@ -122,6 +124,8 @@ import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
 import quickNavigate from "@/components/quickNavigate";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -130,6 +134,7 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
+      ifCustomBack: false,
       headerHeight: 46,
       notice: "",
       navs: [
@@ -181,6 +186,13 @@ export default {
   },
 
   methods: {
+    // 返回上一页
+    back() {
+      console.log('back func');
+      wx.switchTab({
+        url: "/pages/mine/main"
+      });
+    },
     // 参与列表
     async getList(idx) {
       console.log('订单页面的getList');
@@ -279,11 +291,25 @@ export default {
   },
   // 页面加载
   onLoad(e) {
+    // mta统计
+    mta.Page.init();
+
+    var ifBack = this.$root.$mp.query.ifBack;
+    console.log("ifback=", ifBack);
+    if (ifBack == 0) {
+      this.ifBack = false;
+      this.ifCustomBack = true;
+    } else {
+      this.ifBack = true;
+      this.ifCustomBack = false;
+    }
+    console.log("id, this.ifback", this.ifBack);
     
     var type = e.type || 0;
     this.canRequest = true;
     console.log('order页面的onload  type==' + type); 
     this.getList(type);
+    
   },
   onShow(e) {
     // var type = e.type || 0;

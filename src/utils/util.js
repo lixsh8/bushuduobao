@@ -1,5 +1,5 @@
 // import wx from 'wx';
-// import api from "@/utils/api";
+import api from "@/utils/api";
 
 function formatTime(date) {
   var year = date.getFullYear();
@@ -350,7 +350,7 @@ function wxRequest(obj, cb, page, type) {
 }
 
 /**
- * 
+ *
  * @param {String} title 分享标题
  * @param {String} image 分享图片
  * @param {String} link  分享跳转链接
@@ -363,6 +363,60 @@ function getCommonShareData(title, image, link) {
   };
 }
 
+/**
+ * 跳转
+ * @param {event} e
+ */
+function jump(e) {
+  var url = e.currentTarget.dataset.link || e.currentTarget.dataset.url;
+  var appid = e.currentTarget.dataset.appid;
+  var id = e.currentTarget.dataset.id;
+  var type = e.currentTarget.dataset.type;
+  if (type === "address") {
+    console.log("address");
+    wx.chooseAddress({
+      success(res) {},
+      fail() {
+        wx.openSetting({
+          success(res) {
+            console.log(res.authSetting);
+          }
+        });
+      }
+    });
+  } else if (appid) {
+    console.log("跳转小程序");
+
+    // 跳转小程序
+    wx.navigateToMiniProgram({
+      appId: appid,
+      path: url,
+      extraData: {
+        id: id
+      },
+      envVersion: api.mienvVersion,
+      success(res) {
+        console.log("跳转成功");
+      }
+    });
+  } else if (
+    url.indexOf("/index") > 0 ||
+    url.indexOf("/duobao") > 0 ||
+    url.indexOf("/invite") > 0 ||
+    url.indexOf("/mine") > 0
+  ) {
+    // tab页面跳转
+    wx.switchTab({
+      url: url
+    });
+  } else {
+    // 其他页面跳转
+    wx.navigateTo({
+      url: url
+    });
+  }
+}
+
 const util = {
   formatTime,
   request,
@@ -373,6 +427,7 @@ const util = {
   login,
   parseParams,
   getCommonShareData,
+  jump,
   getUserInfo
 };
 

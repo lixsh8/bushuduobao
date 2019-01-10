@@ -95,6 +95,8 @@ import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import rulesModal from "@/components/rulesModal";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -155,7 +157,7 @@ export default {
     // 点击查看订单详情
     goOrderDetail() {
       wx.navigateTo({
-        url: "/pages/order_detail/main?id=" + this.orderId
+        url: "/pages/order_detail/main?orderId=" + this.orderId
       });
     },
     // 保存图片
@@ -215,6 +217,8 @@ export default {
 
   // 页面加载
   async onLoad(e) {
+    // mta统计
+    mta.Page.init();
     this.orderId = this.$root.$mp.query.orderId;
     this.id = this.$root.$mp.query.id;
     console.log("this.orderId=" + this.orderId);

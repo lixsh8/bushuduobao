@@ -1,15 +1,19 @@
 import request from "./request";
-var ApiRootUrl;
+var ApiRootUrl, mienvVersion;
 if (process.env.NODE_ENV === 'development') {
   // dev
   ApiRootUrl = "https://devapi.xiaotaotao123.cn/";
+  // 小程序环境。开发和正式
+  mienvVersion = "develop";
 } else {
   ApiRootUrl = "https://api.xiaotaotao123.cn/";
+  mienvVersion = "release"
   // build
 }
 
 
 const api = {
+  mienvVersion: mienvVersion,
   // 首页
   Index: ApiRootUrl + "?act=index&op=index",
   IndexExchangeStep: ApiRootUrl + "?act=index&op=exchangeSteps",
@@ -48,6 +52,7 @@ const api = {
 
   // 夺宝详情页
   DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
+  DuobaoMessage: ApiRootUrl + "?act=duobao&op=duobaoInfo",
   // 最新开奖
   DuobaoHistory: ApiRootUrl + "?act=duobao&op=latestAwardList",
   JoinDuobao: ApiRootUrl + "?act=duobao&op=join",
@@ -60,6 +65,7 @@ const api = {
   OderDetail: ApiRootUrl + "?act=duobao_order&op=orderDetail",
   AddressSave: ApiRootUrl + "?act=address&op=saveAddress",
   IncomeRule: ApiRootUrl + "?act=duobao&op=revenuRule",
+  OrderReceive: ApiRootUrl + "?act=duobao_order&op=receiveOrder",
 
   // 我的
   MineIndex: ApiRootUrl + "?act=home&op=index",

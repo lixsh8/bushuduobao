@@ -1,42 +1,56 @@
 <script>
-import api from "@/utils/api";
-import util from "@/utils/util";
-import request from "@/utils/request";
+// import api from "@/utils/api";
+// import util from "@/utils/util";
+// import request from "@/utils/request";
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   created() {},
 
   onLaunch(opts) {
+    mta.App.init({
+      appID: "500666011",
+      eventID: "500666018",
+      statPullDownFresh: true,
+      statShareApp: true,
+      statReachBottom: true
+    });
     // console.log(opts);
   },
   async onShow(opts) {
     console.log("apponShow" + JSON.stringify(opts));
-    var register_code = opts.query.register_code
-    var assistance = opts.query.assistance
-    console.log('上一个人的register_code=' + register_code);
-    
+    var register_code = opts.query.register_code;
+    var assistance = opts.query.assistance;
+    console.log("上一个人的register_code=" + register_code);
+
     wx.setStorageSync("register_code", register_code);
     wx.setStorageSync("assistance", assistance);
-    
-    const checkSession = await util.checkSession();
-    
-    if (!checkSession || !wx.getStorageSync("token")) {
-      let loginResult = await util.login();
-      if (loginResult && loginResult.code) {
-        wx.setStorageSync("code", loginResult.code);
-        let tokenResult = await request.get(
-          api.Login,
-          { code: loginResult.code, register_code: register_code, assistance: assistance }
-        );
-        console.log('app全局登录');
-        
-        if (tokenResult && tokenResult.data && tokenResult.data.token) {
-          wx.setStorageSync("token", tokenResult.data.token);
-          wx.setStorageSync("register_code", tokenResult.data.user.register_code);
-          wx.setStorageSync("is_update", tokenResult.data.user.is_update);
-        }
-      }
-    }
+
+    // const checkSession = await util.checkSession();
+
+    console.log('checkSession');
+
+    // if (!checkSession || !wx.getStorageSync("token")) {
+    //   let loginResult = await util.login();
+    //   if (loginResult && loginResult.code) {
+    //     wx.setStorageSync("code", loginResult.code);
+    //     let tokenResult = await request.get(api.Login, {
+    //       code: loginResult.code,
+    //       register_code: register_code,
+    //       assistance: assistance
+    //     });
+    //     console.log("app全局登录");
+
+    //     if (tokenResult && tokenResult.data && tokenResult.data.token) {
+    //       wx.setStorageSync("token", tokenResult.data.token);
+    //       wx.setStorageSync(
+    //         "register_code",
+    //         tokenResult.data.user.register_code
+    //       );
+    //       wx.setStorageSync("is_update", tokenResult.data.user.is_update);
+    //     }
+    //   }
+    // }
   }
 };
 </script>

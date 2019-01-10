@@ -1,4 +1,5 @@
 {
+  "navigationBarTextStyle": "black",
   "enablePullDownRefresh": true,
   "backgroundColor": "#ffffff"
 }

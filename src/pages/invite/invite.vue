@@ -24,7 +24,7 @@
           <div
             @click="showRule"
             class="activityRule"
-          >活动规则</div>
+          >加成规则</div>
 
           <div class="topBg">
             <div
@@ -136,7 +136,7 @@
       v-if="ruleDialogShow"
     >
       <div class="launcher _6a61420">
-        <div class="title _6a61420">活动细则</div>
+        <div class="title _6a61420">加成规则</div>
         <scroll-div
           class="content _6a61420"
           scrollY="true"
@@ -168,6 +168,8 @@ import headBar from "@/components/headBar";
 import pagingFooter from "@/components/pagingFooter";
 import util from "@/utils/util";
 import api from "@/utils/api";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -287,6 +289,8 @@ export default {
 
   // 页面加载
   async onLoad() {
+    // mta统计
+    mta.Page.init();
     // wx.hideShareMenu()
     const res = await util.request(api.Friend, null, "GET", this);
     if (res.data && res.code === 0) {

@@ -71,7 +71,7 @@
                 class="operationItem"
                 :openType="item.open_type"
                 v-if="item.open_type && item.open_type!='address'"
-              >
+               >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -84,9 +84,9 @@
                 v-else
                 @click="jump"
                 :data-type="item.open_type"
-                :data-url="item.link"
+                :data-link="item.link"
                 class="operationItem"
-              >
+               >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -99,23 +99,48 @@
 
           </div>
 
-          <image
-            bindtap="gotoAd"
-            class="adv"
-            mode="aspectFit"
-            src="https://pic3.zhuanstatic.com/zhuanzh/n_v24a4648bd88534e93835fd54c8454d864.jpg"
-            v-if="showGoldAd==1"
-          />
+          <!-- banner1 -->
+          <div
+            class="box _3142106 indexBanner bannerImg"
+            v-if="banners.length>0"
+            >
+            <swiper
+              class="banners multiple _3142106"
+              :autoplay="config.autoplay"
+              :circular="config.circular"
+              :current="config.current"
+              :duration="config.duration"
+              :indicatorActiveColor="config.indicatorActiveColor"
+              :indicatorColor="config.indicatorColor"
+              :indicatorDots="config.indicatorDots"
+              :interval="config.interval"
+             >
+              <swiper-item
+                @click="jump"
+                class="banner-wrap _3142106"
+                v-for="(banner,index) in banners"
+                :data-url="banner.link"
+                :key="index"
+              >
+                <image
+                  class="pic _3142106"
+                  :src="banner.img"
+                />
+              </swiper-item>
+            </swiper>
+          </div>
 
           <!-- 推荐 -->
           <div
             class="mine-recommends"
             v-if="data&&data.recommendList&&data.recommendList.length>0"
-          >
+           >
             <div class="header">精品推荐</div>
             <div class="recommends">
               <div
-                bindtap="onRecommend"
+                @click="jump"
+                :data-appid="recommend.appid"
+                :data-url="recommend.url"
                 class="recommend"
                 v-for="(recommend,index) in data.recommendList"
                 :key="index"
@@ -129,63 +154,48 @@
             </div>
           </div>
 
+          <!-- banner2 -->
           <div
             class="box _3142106 indexBanner"
-            v-if="banners.length>0"
-          >
-            <swiper
-              autoplay="config.autoplay"
-              bindchange="bannerChange"
-              circular="config.circular"
-              class="banners multiple _3142106"
-              current="config.current"
-              duration="config.duration"
-              indicatorActiveColor="config.indicatorActiveColor"
-              indicatorColor="config.indicatorColor"
-              indicatorDots="config.indicatorDots"
-              interval="config.interval"
-              vertical="config.vertical"
-              v-if="banners.length>1"
+            v-if="advertList.length>0"
             >
+            <swiper
+              class="banners multiple _3142106"
+              :autoplay="config.autoplay"
+              :circular="config.circular"
+              :current="config.current"
+              :duration="config.duration"
+              :indicatorActiveColor="config.indicatorActiveColor"
+              :indicatorColor="config.indicatorColor"
+              :indicatorDots="config.indicatorDots"
+              :interval="config.interval"
+             >
               <swiper-item
-                catchtap="onBanner"
+                @click="jump"
                 class="banner-wrap _3142106"
-                data-wpyonbanner-a="index"
-                v-for="(banner,index) in banners"
-                :key="index"
-              >
+                v-for="(advert,index) in advertList"
+                :data-index="index"
+                :data-id="advert.id"
+                :data-link="advert.link"
+                :data-appid="advert.appid"
+                :key="advert.id"
+               >
                 <image
                   class="pic _3142106"
-                  :src="banner.pic"
+                  :src="advert.img"
                 />
                 <div class="banner-tip _3142106">
-                  <div class="banner-tip-title _3142106">{{banner.title}}</div>
+                  <div class="banner-tip-title _3142106">{{advert.title}}</div>
                 </div>
               </swiper-item>
             </swiper>
-
-            <div
-              class="banners single _3142106"
-              v-if="banners.length==1"
-            >
-              <div
-                catchtap="onBanner"
-                class="banner-wrap _3142106"
-                data-wpyonbanner-a="0"
-              >
-                <image
-                  class="pic _3142106"
-                  :src="banners[0].pic"
-                />
-                <div class="banner-tip _3142106">
-                  <div class="banner-tip-title _3142106">{{banners[0].title}}</div>
-                </div>
-              </div>
-            </div>
-
-            <ad unitId="adunit-b195e9267cb30a9e"></ad>
-
           </div>
+
+          <!-- 腾讯广告 -->
+          <div class="ad">
+            <ad unitId="adunit-b195e9267cb30a9e"></ad>
+          </div>
+          
         </div>
       </div>
     </div>
@@ -197,6 +207,8 @@ import headBar from "@/components/headBar";
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -221,7 +233,19 @@ export default {
           title: "未中奖"
         }
       ],
+      // 轮播图配置
+      config: {
+        current: 0,
+        indicatorDots: !0,
+        indicatorColor: "#ccc",
+        indicatorActiveColor: "#808080",
+        autoplay: !1,
+        interval: 5000,
+        duration: 500,
+        circular: !0
+      },
       banners: [],
+      advertList: [],
       data: null
     };
   },
@@ -241,28 +265,37 @@ export default {
         url: "/pages/order/main?type=" + e
       });
     },
+    // 跳转
     jump(e) {
-      var data = e.currentTarget.dataset;
-      if (data.type === "address") {
-        wx.chooseAddress({
-          success(res) {}
-        });
+      util.jump(e);
+    },
+    // 获取数据
+    async getData() {
+      const res = await util.request(api.MineIndex, "GET", this);
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+        this.data = res.data;
+        this.banners = res.data.banners || [];
+        this.advertList = res.data.advertList || [];
       } else {
-        wx.navigateTo({
-          url: data.url
-        });
       }
     }
   },
 
-  async onLoad() {
-    const res = await util.request(api.MineIndex, "GET", this);
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-      this.data = res.data;
-    } else {
-    }
+  // 下拉刷新
+  onPullDownRefresh() {
+    console.log("刷新");
+    this.getData();
+    wx.stopPullDownRefresh();
+  },
+
+  onLoad() {
+    // mta统计
+    mta.Page.init();
+  },
+  onShow() {
+    this.getData();
   }
 };
 </script>
@@ -320,7 +353,6 @@ page {
 .mine {
   background: #f8f8f8;
   color: #2e3135;
-  margin-bottom: 100rpx;
 }
 
 .mine-head {
@@ -634,5 +666,12 @@ page {
   margin: 24rpx auto;
   border-radius: 10rpx;
   display: block;
+}
+.bannerImg{
+  height: 80px!important;
+
+  .pic{
+    height: 80px!important;
+  }
 }
 </style>

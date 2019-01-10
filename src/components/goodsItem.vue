@@ -8,6 +8,7 @@
         alt=""
         mode="widthFix"
       />
+      <div class="soldout" v-if="goodsItem.is_soldout"></div>
       <div class="top-tips" v-if="showTips">{{goodsItem.is_totalnum}}份即开奖</div>
       <div class="process">
         <div
@@ -31,6 +32,12 @@ export default {
   },
 
   props: ["goodsItem", "showTips"],
+
+  computed: {
+    soldoutIcon() {
+      return this.globalData.img_url + 'icon_soldout.png'
+    }
+  },
 
   methods: {
     btnClickHandler(ev) {
@@ -68,6 +75,17 @@ export default {
       display: block;
       width: 100%;
       height: 100%;
+    }
+
+    .soldout{
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3) url(#{$img_url}icon_soldout.png) no-repeat center;
+      background-size: 99px 77px;
+      z-index: 6;
     }
 
     .top-tips {

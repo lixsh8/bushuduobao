@@ -20,6 +20,8 @@ import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -58,6 +60,7 @@ export default {
               tokenResult.data.user.register_code
             );
             wx.setStorageSync("is_update", tokenResult.data.user.is_update);
+            console.log("has no token==" + JSON.stringify(this.options));
 
             wx.reLaunch({
               url:
@@ -69,6 +72,8 @@ export default {
           }
         }
       } else {
+        console.log("has token==" + util.parseParams(this.options));
+
         wx.reLaunch({
           url: "/" + this.page + "?ifBack=0&" + util.parseParams(this.options),
           success: function() {
@@ -80,12 +85,14 @@ export default {
   },
   // 页面加载
   onLoad() {
+    // mta统计
+    mta.Page.init();
     // var { id, income, detail } = this.$root.$mp.query;
 
     var pages = getCurrentPages();
     console.log("getCurrentPages==" + JSON.stringify(pages));
-    this.page = pages[pages.length - 2].route;
-    this.options = pages[pages.length - 2].options;
+    this.page = pages[pages.length - 2].route || "pages/index/main";
+    this.options = pages[pages.length - 2].options || "";
     console.log("首页options" + JSON.stringify(this.options));
   }
 };

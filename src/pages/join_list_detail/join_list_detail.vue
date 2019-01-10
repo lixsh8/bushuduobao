@@ -68,6 +68,8 @@ import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 
+var mta = require("@/utils/mta_analysis.js");
+
 export default {
   data() {
     return {
@@ -121,6 +123,8 @@ export default {
 
   // 页面加载
   async onLoad(e) {
+    // mta统计
+    mta.Page.init();
     this.is_id = this.$root.$mp.query.is_id;
     this.member_id = this.$root.$mp.query.member_id;
 

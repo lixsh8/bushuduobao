@@ -7,6 +7,8 @@
       :titleColor="titleColor"
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
+      ifCustomBack="true"
+      @back="back"
     />
 
     <!-- 正文 -->
@@ -83,7 +85,7 @@
       <!-- 物流信息 -->
       <div
         class="logistics"
-        v-if="data.deliveryState==1"
+        v-if="data&&data.deliveryState==1"
         @click="gotologistics"
       >
         <img
@@ -92,8 +94,8 @@
           alt=""
         />
         <div class="logistics-info">
-          <div class="logistics-node">{{data.deliveryInfo.title}}</div>
-          <div class="logistics-time">{{data.deliveryInfo.time}}</div>
+          <div class="logistics-node">{{data&&data.deliveryInfo.title}}</div>
+          <div class="logistics-time">{{data&&data.deliveryInfo.time}}</div>
         </div>
         <img
           class="arr-r"
@@ -126,7 +128,10 @@
       </div>
       <!-- 产品信息 -->
       <div class="goods-panel">
-        <div class="goods-info" @click="goDetail(data.is_id)">
+        <div
+          class="goods-info"
+          @click="goDetail(data.is_id)"
+        >
           <img
             class="goods-avatar"
             :src="data.dgoods_image"
@@ -213,20 +218,46 @@
     </div>
 
     <!-- 底部按钮客服 -->
-    <button open-type="contact"
+    <div
+      class="btns"
+      v-if="data&&data.join_state==10"
+    >
+      <button
+        open-type="contact"
+        class="btn-kf"
+      >
+        <img
+          :src="kfIcon"
+          alt=""
+          class="kf-icon"
+        />
+        <div class="kf-txt">联系客服</div>
+      </button>
+
+      <div
+        class="receipt"
+        @click.stop="confirmReceipt"
+      >
+        确认收货
+      </div>
+    </div>
+    <button
+      open-type="contact"
       class="btn-kf"
+      v-else
     >
       <img
         :src="kfIcon"
         alt=""
         class="kf-icon"
       >
-      <div open-type="contact" class="kf-txt">联系客服</div>
+      <div class="kf-txt">联系客服</div>
     </button>
+
     <div class="btn-kf-cover"></div>
 
     <!-- 快速导航 -->
-    <quick-navigate />
+    <!-- <quick-navigate /> -->
   </div>
 </template>
 
@@ -236,6 +267,8 @@ import api from "@/utils/api";
 // import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
+
+var mta = require("@/utils/mta_analysis.js");
 
 export default {
   data() {
@@ -247,7 +280,7 @@ export default {
       customBarStyle: "black",
       orderId: "",
       receivingInfo: null,
-      receivingState: '',
+      receivingState: "",
       data: null
     };
   },
@@ -267,11 +300,18 @@ export default {
   },
 
   methods: {
+    // 返回上一页
+    back() {
+      console.log('back func');
+      wx.redirectTo({
+        url: "/pages/order/main?ifBack=0"
+      });
+    },
     // 跳转到商品详情
     goDetail(is_id) {
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + is_id
-      })
+      });
     },
     // 跳转到收益规则
     goIncome() {
@@ -291,7 +331,35 @@ export default {
     },
     // 查看物流
     gotologistics() {
+      wx.navigateTo({
+        url: "/pages/logistics/main?id=" + this.data.is_id
+      });
       console.log("查看物流");
+    },
+    // 确认收货
+    async confirmReceipt() {
+      var _this = this;
+      console.log("确认收货");
+      const res = await util.request(
+        api.OrderReceive,
+        {
+          order_id: this.orderId
+        },
+        "GET",
+        this
+      );
+      if (res.data && res.code === 0) {
+        wx.showModal({
+          title: "提示",
+          content: "确认收货成功"
+        });
+        _this.getData(_this.orderId);
+      } else {
+        wx.showModal({
+          title: "提示",
+          content: "确认收货失败"
+        });
+      }
     },
     // 选择地址
     gotoAddress() {
@@ -314,13 +382,16 @@ export default {
               console.log(res);
               if (res.code === 0) {
                 console.log(data);
-                
+
                 _this.receivingState = 1;
                 _this.receivingInfo = {};
                 _this.receivingInfo.deliveryName = data.telNumber;
                 _this.receivingInfo.deliveryPhone = data.userName;
                 _this.receivingInfo.deliveryAddress =
-                  data.provinceName + data.cityName + data.countyName + data.detailInfo;
+                  data.provinceName +
+                  data.cityName +
+                  data.countyName +
+                  data.detailInfo;
               }
             })
             .catch(err => {
@@ -347,32 +418,36 @@ export default {
           });
         }
       });
+    },
+    async getData(orderId) {
+      const res = await util.request(
+        api.OderDetail,
+        {
+          order_id: orderId
+        },
+        "GET",
+        this
+      );
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+
+        this.data = res.data;
+        this.receivingState = res.data.receivingState;
+        this.receivingInfo = res.data.receivingInfo;
+      } else {
+      }
     }
   },
-  async onLoad(e) {
-    
+  onLoad(e) {
+    // mta统计
+    mta.Page.init();
+
     var orderId = this.$root.$mp.query.orderId;
-    this.orderId = orderId
+    this.orderId = orderId;
     console.log(orderId);
 
-    const res = await util.request(
-      api.OderDetail,
-      {
-        order_id: orderId
-      },
-      "GET",
-      this
-    );
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
-
-      this.data = res.data;
-      this.receivingState = res.data.receivingState;
-      this.receivingInfo = res.data.receivingInfo;
-      
-    } else {
-    }
+    this.getData(orderId);
   }
 };
 </script>
@@ -656,5 +731,45 @@ page {
 }
 button::after {
   border-radius: 0;
+  box-shadow: none;
+  border: 0;
+}
+.btns {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 50px;
+  display: flex;
+  flex-direction: row;
+  background: #fff;
+  justify-content: space-around;
+  align-items: center;
+
+  .btn-kf {
+    display: inline-block;
+    position: relative;
+    width: 40%;
+    height: 36px;
+    line-height: 36px;
+    flex-shrink: 0;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ccc;
+  }
+
+  .receipt {
+    width: 40%;
+    display: inline-block;
+    height: 36px;
+    line-height: 36px;
+    text-align: center;
+    flex-shrink: 0;
+    font-size: 14px;
+    color: #fff;
+    background: #ff5454;
+    border: 1px solid #ff5454;
+    border-radius: 5px;
+  }
 }
 </style>
