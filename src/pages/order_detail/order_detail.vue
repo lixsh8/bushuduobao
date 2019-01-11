@@ -85,7 +85,7 @@
       <!-- 物流信息 -->
       <div
         class="logistics"
-        v-if="data&&data.deliveryState==1"
+        v-if="data&&data.deliveryState==1 &&data.deliveryInfo"
         @click="gotologistics"
       >
         <img
@@ -94,8 +94,8 @@
           alt=""
         />
         <div class="logistics-info">
-          <div class="logistics-node">{{data&&data.deliveryInfo.title}}</div>
-          <div class="logistics-time">{{data&&data.deliveryInfo.time}}</div>
+          <div class="logistics-node">{{data&&data.deliveryInfo&&data.deliveryInfo.title}}</div>
+          <div class="logistics-time">{{data&&data.deliveryInfo&&data.deliveryInfo.time}}</div>
         </div>
         <img
           class="arr-r"
@@ -332,7 +332,7 @@ export default {
     // 查看物流
     gotologistics() {
       wx.navigateTo({
-        url: "/pages/logistics/main?id=" + this.data.is_id
+        url: "/pages/logistics/main?id=" + this.data.delivery_id
       });
       console.log("查看物流");
     },

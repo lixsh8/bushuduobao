@@ -8,7 +8,6 @@
       :duration="duration"
       :circular="circular"
       vertical="true"
-      :current="currentTab"
       @change="changeTab"
     >
       <swiper-item  class="sg_line_ellipsis"
@@ -27,7 +26,6 @@
 export default {
   data() {
     return {
-      currentTab: 0
     };
   },
 
@@ -62,6 +60,8 @@ export default {
   methods: {
     changeTab(e) {
       let currentId = e.mp.detail.current;
+      // console.log(currentId);
+      
       this.$emit("change", currentId);
     }
   }

@@ -7,6 +7,8 @@
       :titleColor="titleColor"
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
+      ifCustomBack="true"
+      @back="back"
     />
 
     <!-- 正文 -->
@@ -72,7 +74,6 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import { setTimeout, clearTimeout } from "timers";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
@@ -107,6 +108,12 @@ export default {
   },
 
   methods: {
+    // 自定义返回
+    back() {
+      wx.switchTab({
+        url: '/pages/index/main'
+      })
+    },
     // 跳转详情
     goDetail(e) {
       console.log(e);
@@ -119,6 +126,8 @@ export default {
 
   // 滚动加载更多
   async onReachBottom() {
+    console.log(this.hasMore, this.canScroll);
+
     if (this.hasMore && this.canScroll) {
       let list = this.historyList;
       let page = this.page;
@@ -155,11 +164,14 @@ export default {
           this.showNoMore = !0;
         }
       }
-      if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      this.scrollTimer = setTimeout(() => {
+      // if (this.scrollTimer) clearTimeout(this.scrollTimer);
+      console.log(11);
+
+      setTimeout(() => {
+        console.log(22);
         this.canScroll = true;
-      }, 3000);
-    } else if (!this.hasMore && this.currentTab === 1) {
+      }, 1000);
+    } else if (!this.hasMore) {
       this.showNoMore = !0;
     }
   },
@@ -442,6 +454,7 @@ page {
           flex-shrink: 0;
           width: 15px;
           height: 15px;
+          margin-right: 6px;
           border-radius: 50%;
         }
         .user-name {

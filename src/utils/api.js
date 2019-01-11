@@ -53,6 +53,7 @@ const api = {
   // 夺宝详情页
   DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
   DuobaoMessage: ApiRootUrl + "?act=duobao&op=duobaoInfo",
+  DuobaoResult: ApiRootUrl + "?act=duobao&op=joinSuccess",
   // 最新开奖
   DuobaoHistory: ApiRootUrl + "?act=duobao&op=latestAwardList",
   JoinDuobao: ApiRootUrl + "?act=duobao&op=join",
@@ -66,6 +67,9 @@ const api = {
   AddressSave: ApiRootUrl + "?act=address&op=saveAddress",
   IncomeRule: ApiRootUrl + "?act=duobao&op=revenuRule",
   OrderReceive: ApiRootUrl + "?act=duobao_order&op=receiveOrder",
+  // 物流信息
+  Logistics: ApiRootUrl + "?act=duobao_order&op=deliveryInfo",
+
 
   // 我的
   MineIndex: ApiRootUrl + "?act=home&op=index",

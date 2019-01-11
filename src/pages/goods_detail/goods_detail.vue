@@ -8,6 +8,8 @@
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
       :ifBack="ifBack"
+      :ifCustomBack="ifCustomBack"
+      @back="back"
     />
 
     <!-- 正文 -->
@@ -139,11 +141,13 @@
     <div class="tab">
       <div class="tab-nav">
         <div
+          v-if="article"
           class="nav-item"
           :class="{active: currentTab == 0}"
           @click="changeTab(0)"
         >商品详情</div>
         <div
+          
           class="nav-item"
           :class="{active: currentTab == 1}"
           @click="changeTab(1)"
@@ -230,12 +234,13 @@
       :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
+
     <!-- 底部按钮 -->
+
     <div
-      v-if="duobaoData&&duobaoData.hb_amount<1"
+      v-if="is_soldout==1"
       class="fixed-btn"
-      @click="goEarnPack"
-    >红包不足，立即赚红包</div>
+    >已抢光</div>
     <div
       class="fixed-btn"
       @click="goNext"
@@ -244,10 +249,12 @@
       <div class="btn-t">继续夺宝</div>
       <div class="btn-sub-t">第{{nextId}}期正在进行中</div>
     </div>
+
     <div
-      v-else-if="is_soldout==1"
+      v-else-if="duobaoData&&duobaoData.hb_amount<price"
       class="fixed-btn"
-    >已抢光</div>
+      @click="goEarnPack"
+    >红包不足，立即赚红包</div>
 
     <div
       v-else-if="duobaoData&&duobaoData.useTime<=0"
@@ -277,7 +284,6 @@
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
-import { setTimeout, clearTimeout } from "timers";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
@@ -316,6 +322,7 @@ export default {
       is_id: "",
       // 下一期id
       nextId: "",
+      is_soldout: 0,
       // 商品id
       dgoods_id: "",
       duobaoData: null,
@@ -378,12 +385,21 @@ export default {
         this.nextId = res.data.next_is_id;
         this.useTime = res.data.useTime - 1;
         this.is_end = res.data.is_end;
+        this.is_soldout = res.data.is_soldout;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
         this.article = info.dgoods_body.replace(
           /<img/gi,
           '<img style="max-width:100%;height:auto" '
         );
+        console.log(
+          "详情：====" +
+            info.dgoods_body.replace(
+              /<img/gi,
+              '<img style="max-width:100%;height:auto" '
+            )
+        );
+
         this.totalNum = info.is_totalnum;
         this.leftNum = info.is_oddnum;
         console.log("usetime" + res.data.useTime);
@@ -409,7 +425,40 @@ export default {
       } else {
       }
     },
+    // 自定义返回按钮事件
+    back() {
+      var url = "/" + wx.getStorageSync("goodsDetailFrom");
+      
+      console.log('详情页返回按钮点击url===' + url);
+      if (
+        url.indexOf("/index/") > 0 ||
+        url.indexOf("/duobao/") > 0 ||
+        url.indexOf("/invite/") > 0 ||
+        url.indexOf("/mine/") > 0
+      ) {
+        // tab页面跳转
+        wx.switchTab({
+          url: url,
+          success() {
+            wx.removeStorageSync("goodsDetailFrom");
+          }
+        });
+      } else {
+        // 其他页面跳转
+        wx.redirectTo({
+          url: url,
+          success() {
+            wx.removeStorageSync("goodsDetailFrom");
+          }
+        });
+      }
+    },
+    // 切换tab
     changeTab(idx) {
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 0
+      })
       this.currentTab = idx;
     },
     // 去下一期购买
@@ -444,7 +493,7 @@ export default {
       this.showBuyModal = !0;
     },
     // 购买
-    async makeBuy() {
+    async makeBuy(formId) {
       // 购买统计
       mta.Event.stat("buy_btn", {});
       // 购买次数不够
@@ -470,7 +519,7 @@ export default {
 
       const res = await util.request(
         api.JoinDuobao,
-        { buy_times: this.buyNum, is_id: this.is_id },
+        { buy_times: this.buyNum, is_id: this.is_id, formId: formId },
         "POST",
         this
       );
@@ -483,7 +532,8 @@ export default {
             "/pages/result/main?id=" +
             this.is_id +
             "&orderId=" +
-            res.data.order_id
+            res.data.order_id +
+            "&dgoods_id=" + this.duobaoData.goodsInfo.dgoods_id
         });
       } else if (res.code === 402) {
         // 参与机会不足
@@ -506,6 +556,21 @@ export default {
             }
           }
         });
+      } else if (res.code === 405) {
+        // 剩余数量不足
+        this.buyNum = 1;
+        // this.showDialog = !0;
+        wx.showModal({
+          title: "提示",
+          content: res.msg || "购买失败，剩余数量不足",
+          showCancel: false,
+          cancelText: "取消",
+          cancelColor: "#000000",
+          confirmText: "确定",
+          confirmColor: "#3CC51F",
+          success: res => {}
+        });
+        this.getData(this.is_id);
       } else {
         wx.showModal({
           title: "提示",
@@ -587,11 +652,15 @@ export default {
       this.duobaoData.share.link
     );
   },
+
   // 下拉刷新
   onPullDownRefresh() {
     console.log("刷新");
     this.getData(this.is_id);
+
+    wx.stopPullDownRefresh();
   },
+
   // 滚动加载更多
   async onReachBottom() {
     if (this.hasMore && this.currentTab === 1 && this.canScroll) {
@@ -645,13 +714,28 @@ export default {
     var id = this.$root.$mp.query.id;
     var ifBack = this.$root.$mp.query.ifBack;
     console.log("ifback=", ifBack);
+    // 获取要不要有返回按钮
     if (ifBack == 0) {
-      this.ifBack = false;
+      this.ifCustomBack = true;
     } else {
-      this.ifBack = true;
+      this.ifCustomBack = false;
     }
 
-    console.log("id, this.ifback", id, this.ifBack);
+    console.log(
+      "id, ifCustomBack,this.ifback",
+      id,
+      this.ifCustomBack,
+      this.ifBack
+    );
+
+    // 存储页面哪里来的
+    if (!wx.getStorageSync("goodsDetailFrom")) {
+      var pages = getCurrentPages();
+      console.log("getCurrentPages==" + JSON.stringify(pages));
+      var fromPage = pages[pages.length - 2].route || "pages/index/main";
+      var fromOptions = pages[pages.length - 2].options || "";
+      wx.setStorageSync("goodsDetailFrom", fromPage + "?" + util.parseParams(fromOptions));
+    }
 
     // 重置tab
     this.currentTab = 0;

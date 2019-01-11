@@ -417,6 +417,72 @@ function jump(e) {
   }
 }
 
+/**
+ * 连接socket
+ */
+function connectSocket() {
+  wx.connectSocket({
+    // url: "ws://ws.chaojitao.cn",
+    // url: "ws://devws.xiaotaotao123.cn",
+    url: "ws://134.175.43.184:9501",
+    header: {
+      Authorization: "cjt " + wx.getStorageSync("token")
+      // "X-TOKEN": "854f671efa14b949e75a91616d878e20",
+      // "X-M": "qq_9339c4b5e8a00a73c25667ae07f67624"
+    },
+    success(res) {
+      console.log("连接成功");
+    }
+  });
+}
+/**
+ * 微信websocket
+ * @param {function} cb 回调函数
+ */
+var socketTimer = null;
+
+function socket(cb) {
+  connectSocket();
+
+  wx.onSocketOpen(function(res) {
+    console.log("WebSocket连接已打开！");
+
+    // wx.sendSocketMessage({
+    //   data: "Hello,World:" + Math.round(Math.random() * 1000)
+    // });
+
+    // wx.closeSocket()
+  });
+
+  wx.onSocketMessage(function(res) {
+    // 接收到消息
+    cb && cb(res);
+    console.log("正在接收数据...");
+  });
+
+  wx.onSocketClose(function(res) {
+    if (socketTimer) clearTimeout(socketTimer);
+    socketTimer = setTimeout(connectSocket, 3000);
+    console.log("WebSocket连接已关闭！");
+    console.log(res.code + "   socket关闭原因：" + res.reason);
+  });
+}
+
+/**
+ *
+ */
+function updataNumByid(arr1, arr2, cb) {
+  for (var i = 0, len = arr1.length; i < len; i++) {
+    for (var j = 0, len2 = arr2.length; j < len2; j++) {
+      if (arr1[i].id == arr2[j].is_id) {
+        cb && cb();
+        // arr2[j].is_oddnum = arr1[i].n;
+        // arr2[j].is_rate = arr1[i].r;
+      }
+    }
+  }
+}
+
 const util = {
   formatTime,
   request,
@@ -428,6 +494,8 @@ const util = {
   parseParams,
   getCommonShareData,
   jump,
+  socket,
+  updataNumByid,
   getUserInfo
 };
 

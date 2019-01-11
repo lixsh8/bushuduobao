@@ -293,6 +293,9 @@ export default {
   onLoad() {
     // mta统计
     mta.Page.init();
+
+    // 删除存储的商品详情的来源
+    wx.removeStorageSync("goodsDetailFrom");
   },
   onShow() {
     this.getData();

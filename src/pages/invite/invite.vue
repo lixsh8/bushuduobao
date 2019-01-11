@@ -291,6 +291,10 @@ export default {
   async onLoad() {
     // mta统计
     mta.Page.init();
+
+    // 删除存储的商品详情的来源
+    wx.removeStorageSync("goodsDetailFrom");
+    
     // wx.hideShareMenu()
     const res = await util.request(api.Friend, null, "GET", this);
     if (res.data && res.code === 0) {

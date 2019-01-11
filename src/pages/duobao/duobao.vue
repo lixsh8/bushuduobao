@@ -24,11 +24,7 @@
     >
       <div class="message-icon"></div>
       <div class="scroll-message">
-        <scroll-message
-          :messages="messages"
-          :autoplay="autoplay"
-          @change="change"
-        />
+        <scroll-message :messages="messages" />
       </div>
     </div>
 
@@ -98,7 +94,6 @@ export default {
       canScroll: !0,
       timer: null,
       scrollTimer: null,
-      autoplay: !0,
       messages: [],
       list: null
     };
@@ -153,13 +148,6 @@ export default {
       }
       console.log("getMessage");
     },
-    // 消息滚动事件
-    change(ev) {
-      // console.log(ev);
-      // if (ev === this.list.length - 1) {
-      //   this.getMessage();
-      // }
-    },
     // 点击购买按钮
     btnClickHandler(ev) {
       console.log(ev);
@@ -169,11 +157,23 @@ export default {
     },
     // 通过id来更新数据
     updateData(newData) {
+      // console.log(newData);
+
+      if (
+        !newData ||
+        newData.length <= 0 ||
+        !this.list ||
+        this.list.length <= 0
+      ) {
+        return;
+      }
       for (var i = 0, len = newData.length; i < len; i++) {
+        // console.log(newData[i]);
+
         for (var j = 0, len2 = this.list.length; j < len2; j++) {
-          if (newData[i].is_id == this.list[j].is_id) {
-            this.list[j].is_oddnum = newData[i].is_oddnum;
-            this.list[j].is_rate = newData[i].is_rate;
+          if (newData[i].id == this.list[j].is_id) {
+            this.list[j].is_oddnum = newData[i].n;
+            // this.list[j].is_rate = newData[i].r;
           }
         }
       }
@@ -236,53 +236,24 @@ export default {
 
   onShow() {
     var _this = this;
-    this.autoplay = true;
-    // this.timer = setInterval(this.getList, 3000);
-    wx.connectSocket({
-      url: "ws://ws.chaojitao.cn",
-      // url: "ws://devws.xiaotaotao123.cn",
-      header: {
-        // Authorization: "cjt eadd53444b70c87361ebc6026a2850de"
-        "X-TOKEN": "854f671efa14b949e75a91616d878e20",
-        "X-M": "qq_9339c4b5e8a00a73c25667ae07f67624"
-      },
-      success(res) {
-        console.log("连接成功");
+    // // this.autoplay = true;
+    util.socket(function(res) {
+      // console.log(res.data);
+
+      if (res && res.data) {
+        var data = JSON.parse(res.data);
+        // console.log(data.updateoddtimes);
+
+        if (data.updateoddtimes && data.updateoddtimes.length > 0) {
+          _this.updateData(data.updateoddtimes);
+        }
       }
-    });
-
-    wx.onSocketOpen(function(res) {
-      console.log("WebSocket连接已打开！");
-
-      // wx.sendSocketMessage({
-      //   data: "Hello,World:" + Math.round(Math.random() * 0xffffff).toString()
-      // });
-
-      // wx.closeSocket()
-    });
-
-    wx.onSocketMessage(function(res) {
-      // 接收到消息
-      var num = Math.floor(Math.random() * 1050);
-      var rate = Math.floor(Math.random() * 100) + "%";
-      _this.updateData([
-        { is_id: 101, is_oddnum: num, is_rate: rate },
-        { is_id: 97, is_oddnum: num, is_rate: rate },
-        { is_id: 98, is_oddnum: num, is_rate: rate }
-      ]);
-      console.log(res);
-    });
-
-    wx.onSocketClose(function(res) {
-      console.log("WebSocket连接已关闭！");
-      console.log(res.code);
-      
     });
   },
   onHide() {
-    this.autoplay = false;
+    // this.autoplay = false;
     console.log("onHide");
-    wx.closeSocket()
+    wx.closeSocket();
   },
   // 页面加载
   onLoad(e) {

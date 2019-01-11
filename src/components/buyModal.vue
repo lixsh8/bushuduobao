@@ -5,58 +5,61 @@
     :class="{show:showBuyModal}"
     @click="close"
   >
-  <form @submit="subBtnClick" report-submit="true">
-    <div
-      class="buy-cnt"
-      @click.stop="stopPropagation"
-     >
-      <div class="buy-hd">
-        <div class="buy-title">满{{totalNum}}份开奖，差<text>{{leftNum}}</text>份</div>
-        <div
-          class="cls-btn"
-          @click="close"
-        ></div>
-      </div>
+    <form
+      @submit="subBtnClick"
+      report-submit="true"
+    >
+      <div
+        class="buy-cnt"
+        @click.stop="stopPropagation"
+      >
+        <div class="buy-hd">
+          <div class="buy-title">满{{totalNum}}份开奖，差<text>{{leftNum}}</text>份</div>
+          <div
+            class="cls-btn"
+            @click="close"
+          ></div>
+        </div>
 
-      <div class="buy-bd">
-        <div class="num-box">
-          <div class="num-t">参与份数</div>
-          <div class="num-wrapper">
-            <div
-              class="num-btn-minus btn"
-              @click="minus"
-            ></div>
-            <input
-              class="num-input"
-              :value="buyNum"
-              type="number"
-              @blur="blur"
-            />
-            <div
-              class="num-btn-plus btn"
-              @click="plus"
-            ></div>
+        <div class="buy-bd">
+          <div class="num-box">
+            <div class="num-t">参与份数</div>
+            <div class="num-wrapper">
+              <div
+                class="num-btn-minus btn"
+                @click="minus"
+              ></div>
+              <input
+                class="num-input"
+                :value="buyNum"
+                type="number"
+                @blur="blur"
+              />
+              <div
+                class="num-btn-plus btn"
+                @click="plus"
+              ></div>
+            </div>
+          </div>
+          <div class="buy-chance">今日剩余<text>{{useTime>=0?useTime:0}}</text>份参与机会<button
+              class="add-chance"
+              @click="okBtnHandler"
+              open-type="share"
+            >提升</button>
           </div>
         </div>
-        <div class="buy-chance">今日剩余<text>{{useTime>=0?useTime:0}}</text>份参与机会<button
-            class="add-chance"
-            @click="okBtnHandler"
-            open-type="share"
-          >提升</button>
+
+        <div class="buy-ft">
+          <div class="total-t">合计：</div>
+          <div class="total">￥{{totalPrice}}</div>
+          <button
+            form-type="submit"
+            class="makeBuy"
+          >确认</button>
         </div>
-      </div>
 
-      <div class="buy-ft">
-        <div class="total-t">合计：</div>
-        <div class="total">￥{{totalPrice}}</div>
-        <div
-          class="makeBuy"
-          @click="makeBuy"
-        >确认</div>
       </div>
-
-    </div>
-  </form>
+    </form>
   </div>
 </template>
 
@@ -109,8 +112,10 @@ export default {
       if (this.buyNum <= 1) return;
       this.$emit("changeNum", this.buyNum * 1 - 1);
     },
-    makeBuy() {
-      this.$emit("makeBuy");
+    subBtnClick(ev) {
+      console.log("formId=" + ev.target.formId);
+
+      this.$emit("makeBuy", ev.target.formId);
     }
   }
 };
@@ -247,6 +252,7 @@ export default {
           padding: 0 !important;
           margin: 0 !important;
           border: none !important;
+          border-radius: 0;
         }
       }
     }
@@ -277,11 +283,19 @@ export default {
         text-align: center;
         font-size: 18px;
         color: #fff;
+        border-radius: 0!important;
         background: linear-gradient(
           135deg,
           rgba(255, 106, 107, 1) 0%,
           rgba(255, 58, 57, 1) 100%
         );
+      }
+
+      button::after {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        border-radius: 0!important;
       }
     }
   }

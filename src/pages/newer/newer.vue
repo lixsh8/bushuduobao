@@ -7,6 +7,8 @@
       :titleColor="titleColor"
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
+      ifCustomBack="true"
+      @back="back"
     />
 
     <!-- 正文 -->
@@ -101,6 +103,12 @@ export default {
   },
 
   methods: {
+    // 自定义返回
+    back() {
+      wx.switchTab({
+        url: '/pages/index/main'
+      })
+    },
     // 规则弹窗
     showRules() {
       this.ifShowRules = !0;

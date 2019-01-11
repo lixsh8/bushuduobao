@@ -8,7 +8,7 @@
       :showCustomBar="showCustomBar"
       :customBarStyle="customBarStyle"
       :headerHeight="headerHeight"
-      :ifCustomBack="ifCustomBack"
+      ifCustomBack="true"
       @back="back"
     />
 
@@ -81,7 +81,7 @@
         >
           <div
             class="btn-logistics"
-            @click.stop="goLogistics(item.order_id)"
+            @click.stop="goLogistics(item.delivery_id)"
           >查看物流</div>
         </div>
         <div
@@ -134,14 +134,13 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
-      ifCustomBack: false,
       headerHeight: 46,
       notice: "",
       navs: [
         { id: 0, name: "全部" },
         { id: 1, name: "待开奖" },
-        { id: 8, name: "未中奖" },
-        { id: 9, name: "已中奖" }
+        { id: 9, name: "已中奖" },
+        { id: 8, name: "未中奖" }
       ],
       canRequest: !0,
       canScroll: !0,
@@ -188,7 +187,7 @@ export default {
   methods: {
     // 返回上一页
     back() {
-      console.log('back func');
+      console.log('自定义back func');
       wx.switchTab({
         url: "/pages/mine/main"
       });
@@ -228,14 +227,30 @@ export default {
     },
     // 切换tab
     changeTab(idx) {
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 0
+      })
+      this.page = 1;
       this.getList(idx);
     },
+    // 跳转到物流信息
     goLogistics(oid) {
-      wx.navigateTo({ url: "/pages/logistics/main?orderId=" + oid });
+      wx.navigateTo({ url: "/pages/logistics/main?id=" + oid });
     },
+    // 跳转订单详情页
     goDetail(oid) {
       wx.navigateTo({ url: "/pages/order_detail/main?orderId=" + oid });
     }
+  },
+
+  // 下拉刷新
+  onPullDownRefresh() {
+    console.log("刷新");
+    this.page = 1;
+    this.getList(0);
+
+    wx.stopPullDownRefresh();
   },
 
   // 滚动加载更多
@@ -297,21 +312,23 @@ export default {
     var ifBack = this.$root.$mp.query.ifBack;
     console.log("ifback=", ifBack);
     if (ifBack == 0) {
-      this.ifBack = false;
-      this.ifCustomBack = true;
+      // this.ifBack = false;
+      // this.ifCustomBack = true;
     } else {
-      this.ifBack = true;
-      this.ifCustomBack = false;
+      // this.ifBack = true;
+      // this.ifCustomBack = false;
     }
     console.log("id, this.ifback", this.ifBack);
     
     var type = e.type || 0;
+    this.type = type;
     this.canRequest = true;
     console.log('order页面的onload  type==' + type); 
     this.getList(type);
     
   },
   onShow(e) {
+    this.page = 1;
     // var type = e.type || 0;
     // this.currentType = type;
   }

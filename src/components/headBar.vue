@@ -11,42 +11,56 @@
         {{title}}
 
         <block v-if="showCustomBar">
-          <view
+          <div
             class="_c71564c"
             v-if="customBarStyle==='white'"
           >
-            <image
+            <div
               v-if="ifBack"
               @click="navBack"
               class="back _c71564c"
-              mode="aspectFit"
-              src="/static/images/whiteBack.png"
-            />
-            <image
+            >
+              <img
+                mode="widthFix"
+                src="/static/images/whiteBack.png"
+              />
+            </div>
+
+            <div
               @click="navIndex"
               class="index _c71564c"
-              mode="aspectFit"
-              src="/static/images/whiteHome.png"
-            />
-          </view>
-          <view
+            >
+              <img
+                mode="widthFix"
+                src="/static/images/whiteHome.png"
+              />
+            </div>
+          </div>
+          <div
             class="_c71564c"
             v-else
           >
-            <image
+
+            <div
               v-if="ifBack"
               @click="navBack"
               class="back _c71564c"
-              mode="aspectFit"
-              src="/static/images/blackBack.png"
-            />
-            <image
+            >
+              <img
+                mode="widthFix"
+                src="/static/images/blackBack.png"
+              />
+            </div>
+            <div
               @click="navIndex"
               class="index _c71564c"
-              mode="aspectFit"
-              src="/static/images/blackHome.png"
-            />
-          </view>
+            >
+              <img
+                mode="widthFix"
+                src="/static/images/blackHome.png"
+              />
+            </div>
+          </div>
         </block>
       </div>
     </div>
@@ -104,10 +118,11 @@ export default {
   methods: {
     navBack() {
       if (this.ifCustomBack) {
-        console.log("CustomBack");
+        console.log("CustomBack======" + this.ifCustomBack);
         this.$emit("back");
       } else {
         console.log("nativeback");
+        wx.removeStorageSync("goodsDetailFrom");
         wx.navigateBack({
           delta: 1,
           fail: function() {
@@ -119,6 +134,7 @@ export default {
       }
     },
     navIndex() {
+      wx.removeStorageSync("goodsDetailFrom");
       wx.switchTab({
         url: "/pages/index/main"
       });
@@ -159,21 +175,39 @@ export default {
   }
 
   .back {
-    width: 24.5rpx;
-    height: 42rpx;
+    width: 44px;
+    height: 44px;
     position: absolute;
     bottom: 0;
-    left: 0;
-    padding: 20rpx 20rpx;
+    left: 0px;
+    text-align: center;
+    padding-top: 10px;
+    box-sizing: border-box;
+    line-height: 1;
+
+    img {
+      display: inline-block;
+      width: 14px;
+      height: 24px;
+    }
   }
 
   .index {
-    width: 44rpx;
-    height: 44rpx;
+    width: 44px;
+    height: 44px;
     position: absolute;
     bottom: 0;
-    left: 60rpx;
-    padding: 20rpx 10rpx;
+    left: 44px;
+    text-align: center;
+    padding-top: 10px;
+    box-sizing: border-box;
+    line-height: 1;
+
+    img {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+    }
   }
 }
 .cover {

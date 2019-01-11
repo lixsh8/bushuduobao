@@ -184,7 +184,7 @@
       <!-- 最新开奖 -->
       <div
         class="one-coin _2edb85c"
-        v-if="latestAward&&latestAward.list&&latestAward.list.length>0"
+        v-if="latestAward&&latestAwardList&&latestAwardList.length>0"
       >
         <div class="head _2edb85c">
           <div class="title _2edb85c">{{latestAward&&latestAward.title}}</div>
@@ -283,7 +283,7 @@
       <!-- 兑换商品夺宝  -->
       <div
         class="duobao"
-        v-if="duobao&&duobao.list&&duobao.list.length>0"
+        v-if="duobao&&duobaoList&&duobaoList.length>0"
       >
         <div class="Recommend">
           <div class="Recommend-title">
@@ -411,6 +411,7 @@ export default {
       },
       // 最新开奖
       latestAward: null,
+      latestAwardList: null,
       // advertList
       advertList: [],
       // 推荐商品 列表
@@ -418,6 +419,7 @@ export default {
       hasMore: !0,
       showNoMore: !1,
       duobao: null,
+      duobaoList: null,
       requestNum: 0,
       requestTimer: {}
     };
@@ -437,6 +439,49 @@ export default {
     pagingFooter
   },
   methods: {
+    // 通过id来更新数据
+    updateData(newData) {
+      var _this = this;
+      console.log(2222);
+      // 新手
+      if (
+        !newData ||
+        newData.length <= 0 ||
+        !this.newUserZoneInfo ||
+        !this.newUserZoneInfo.list ||
+        this.newUserZoneInfo.list.length <= 0
+      ) {
+        return;
+      }
+      for (var i = 0, len = newData.length; i < len; i++) {
+        console.log(newData[i]);
+
+        for (var j = 0, len2 = this.newUserZoneInfo.list.length; j < len2; j++) {
+          if (newData[i].id == this.newUserZoneInfo.list[j].is_id) {
+            this.newUserZoneInfo.list[j].is_oddnum = newData[i].n;
+            this.newUserZoneInfo.list[j].is_rate = newData[i].r;
+          }
+        }
+      }
+
+      // 夺宝
+      if (!newData || !this.duobaoList || this.duobaoList.length <= 0) {
+        return;
+      }
+      console.log(1111);
+      for (var iNew = 0, lenNew = newData.length; iNew < lenNew; iNew++) {
+        for (
+          var jNew = 0, len2New = _this.duobaoList.length;
+          jNew < len2New;
+          jNew++
+        ) {
+          if (newData[iNew].id == _this.duobaoList[jNew].is_id) {
+            _this.duobaoList[jNew].is_oddnum = newData[iNew].n;
+            _this.duobaoList[jNew].is_rate = newData[iNew].r;
+          }
+        }
+      }
+    },
     // 跳转到红包明细
     goPakcDetail() {
       wx.navigateTo({
@@ -691,6 +736,7 @@ export default {
         // this.totalData = res.data;
 
         this.latestAward = resLatestAward.data;
+        this.latestAwardList = resLatestAward.data.list;
       }
     },
     // 获取兑换列表
@@ -706,6 +752,7 @@ export default {
         // this.totalData = res.data;
 
         this.duobao = Duobao.data;
+        this.duobaoList = Duobao.data.list;
         this.hasMore = Duobao.data.hasMore;
       }
     }
@@ -789,6 +836,11 @@ export default {
     }
   },
 
+  // 页面隐藏
+  onHide() {
+    wx.closeSocket();
+  },
+
   // 页面加载
   async onLoad(options) {
     // mta统计
@@ -796,22 +848,18 @@ export default {
     if (wx.getStorageSync("is_update") != 1) {
       this.checkAuth();
     }
+
+    // 删除存储的商品详情的来源
+    wx.removeStorageSync("goodsDetailFrom");
   },
 
   async onShow(options) {
+    console.log("index");
     var _this = this;
-
-    // socket
-    wx.onSocketMessage(function(res) {
-      console.log('首页');
-      console.log(res);
-    });
 
     // 登录
     const checkSession = await util.checkSession();
-
     console.log("checkSession");
-
     if (!checkSession || !wx.getStorageSync("token")) {
       let loginResult = await util.login();
       if (loginResult && loginResult.code) {
@@ -833,11 +881,6 @@ export default {
 
           // 获取红包等数据 需要登录的
           _this.getPacks();
-          // _this.requestNum = 0;
-          // _this.requestTimer.getPacks = setInterval(function() {
-          //   _this.requestNum = _this.requestNum + 1;
-          //   _this.getPacks();
-          // }, 1000);
         }
       }
     } else {
@@ -861,6 +904,22 @@ export default {
 
     // 夺宝列表 IndexDuobao
     _this.getDuobaoList();
+
+    // socket
+    util.socket(function(res) {
+      if (res && res.data) {
+        var data = JSON.parse(res.data);
+        console.log(data.updateoddtimes);
+        console.log(data.newwin);
+
+        if (data.updateoddtimes && data.updateoddtimes.length > 0) {
+          _this.updateData(data.updateoddtimes);
+        }
+        if (data.newwin && data.newwin.length > 0) {
+          _this.latestAwardList = data.newwin;
+        }
+      }
+    });
   }
 };
 </script>

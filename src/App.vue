@@ -10,12 +10,13 @@ export default {
   onLaunch(opts) {
     mta.App.init({
       appID: "500666011",
+      lauchOpts: this.$root.$mp.appOptions,
       eventID: "500666018",
       statPullDownFresh: true,
       statShareApp: true,
       statReachBottom: true
     });
-    // console.log(opts);
+    console.log("appLaunch" + JSON.stringify(this.$root.$mp.appOptions));
   },
   async onShow(opts) {
     console.log("apponShow" + JSON.stringify(opts));
@@ -28,7 +29,7 @@ export default {
 
     // const checkSession = await util.checkSession();
 
-    console.log('checkSession');
+    // console.log('checkSession');
 
     // if (!checkSession || !wx.getStorageSync("token")) {
     //   let loginResult = await util.login();

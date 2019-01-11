@@ -42,7 +42,7 @@
           >
           <div class="btn-title">晒单给好友</div>
         </button>
-        <div
+        <!-- <div
           class="share-btn"
           @click="savePic"
         >
@@ -51,7 +51,7 @@
             alt=""
           >
           <div class="btn-title">保存海报</div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -106,8 +106,9 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       banner: null,
-      id: '',
+      id: "",
       orderId: "",
+      dgoods_id: "",
       shareData: {},
       list: null
     };
@@ -142,7 +143,7 @@ export default {
   methods: {
     // 返回上一页
     back() {
-      console.log('back func');
+      console.log("back func");
       wx.redirectTo({
         url: "/pages/goods_detail/main?id=" + this.id + "&ifBack=0"
       });
@@ -221,17 +222,23 @@ export default {
     mta.Page.init();
     this.orderId = this.$root.$mp.query.orderId;
     this.id = this.$root.$mp.query.id;
+    this.dgoods_id = this.$root.$mp.query.dgoods_id;
     console.log("this.orderId=" + this.orderId);
     // 列表
-    const res = await util.request(api.IndexNewZone, "GET", this);
+    const res = await util.request(
+      api.DuobaoResult,
+      {
+        dgoods_id: this.dgoods_id
+      },
+      "GET",
+      this
+    );
     if (res.data && res.code === 0) {
       // this.totalData = res.data;
       console.log(res.data);
 
       this.list = res.data.list;
-      this.shareData = res.data.shareData;
-      this.banner = res.data.banner;
-      this.hasMore = res.data.hasMore;
+      this.shareData = res.data.share;
     } else {
     }
   }
