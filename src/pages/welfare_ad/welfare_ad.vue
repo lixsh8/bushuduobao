@@ -141,7 +141,7 @@ export default {
             _this.list = res.data.list;
 
             wx.showModal({
-              title: "提示", // 提示的标题,
+              title: "领取成功", // 提示的标题,
               content: res.msg,
               showCancel: false,
               confirmText: "收下"

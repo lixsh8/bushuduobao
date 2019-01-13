@@ -302,9 +302,12 @@ export default {
   methods: {
     // 返回上一页
     back() {
-      console.log('back func');
+      console.log("back func");
+
       wx.redirectTo({
-        url: "/pages/order/main?ifBack=0"
+        url:
+          "/pages/order/main?ifBack=0&type=" +
+            wx.getStorageSync("currentType") || ""
       });
     },
     // 跳转到商品详情

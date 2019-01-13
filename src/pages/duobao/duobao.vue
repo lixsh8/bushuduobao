@@ -45,7 +45,7 @@
     </div>
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore&&page==1"
+      :showNoMore="showNoMore&&page!=1"
       noMoreTips="没有更多数据了"
     />
     <!-- 腾讯广告 -->
@@ -75,7 +75,6 @@ import backTop from "@/components/backTop";
 import scrollMessage from "@/components/scrollMessage";
 import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
-import { setTimeout, clearTimeout } from "timers";
 
 var mta = require("@/utils/mta_analysis.js");
 
@@ -125,7 +124,7 @@ export default {
 
         this.list = res.data.list;
         this.banner = res.data.banner;
-        this.hasMore = res.data.hasMore;
+        // this.hasMore = res.data.hasMore;
       } else {
       }
     },
@@ -183,17 +182,20 @@ export default {
   // 下拉刷新
   onPullDownRefresh() {
     console.log("刷新");
+    this.page = 1;
+    this.hasMore = true;
+    this.canScroll = true;
+    this.showNoMore = false;
     this.getList();
     wx.stopPullDownRefresh();
   },
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.canScroll) {
+    if (this.hasMore) {
       let list = this.list;
       let page = this.page;
       page++;
-      this.canScroll = false;
 
       wx.showToast({
         title: "数据加载中...", // 提示的内容,
@@ -208,34 +210,36 @@ export default {
         this
       );
 
-      if (
-        res.data &&
-        res.code === 0 &&
-        res.data.list &&
-        res.data.list.length > 0
-      ) {
+      if (res.data && res.code === 0 && res.data.list) {
         // this.totalData = res.data;
         var data = res.data;
-        this.list = list.concat(data.list);
+        if (res.data.list.length > 0) {
+          this.list = list.concat(data.list);
+          this.page = res.data.page;
+        }
+
         this.hasMore = res.data.hasMore;
-        this.page = res.data.page;
         if (res.data.hasMore) {
           this.showNoMore = !1;
         } else {
           this.showNoMore = !0;
         }
       }
-      if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      this.scrollTimer = setTimeout(() => {
-        this.canScroll = true;
-      }, 3000);
-    } else if (!this.hasMore && this.currentTab === 1) {
+    } else {
       this.showNoMore = !0;
     }
   },
 
   onShow() {
     var _this = this;
+    this.page = 1;
+    this.hasMore = true;
+    this.canScroll = true;
+    this.showNoMore = false;
+    // 列表
+    this.getList();
+    // 消息
+    this.getMessage();
     // // this.autoplay = true;
     util.socket(function(res) {
       // console.log(res.data);
@@ -259,9 +263,6 @@ export default {
   onLoad(e) {
     // mta统计
     mta.Page.init();
-    // 列表
-    this.getList();
-    this.getMessage();
   }
 };
 </script>

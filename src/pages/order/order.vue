@@ -62,7 +62,10 @@
       >
         <div class="item-hd">
           <div class="order-no">订单号:{{item.order_id}}</div>
-          <div class="order-status" :class="{red:item.join_state!='未中奖'}">{{item.join_state}}</div>
+          <div
+            class="order-status"
+            :class="{red:item.join_state_code!=8}"
+          >{{item.join_state}}</div>
         </div>
         <div class="item-bd">
           <img
@@ -90,7 +93,7 @@
         >
           <div
             class="btn-logistics"
-            @click.stop="setAddress()"
+            @click.stop="setAddress(item.order_id)"
           >收货地址</div>
         </div>
       </div>
@@ -104,7 +107,7 @@
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore&&page!=1"
+      :showNoMore="showNoMore"
       noMoreTips="没有更多数据了"
     />
     <!-- 快速导航 -->
@@ -142,11 +145,9 @@ export default {
         { id: 9, name: "已中奖" },
         { id: 8, name: "未中奖" }
       ],
-      canRequest: !0,
-      canScroll: !0,
-      requestTimer: null,
       page: 1,
       page_size: 10,
+      showNoMore: false,
       hasMore: !0,
       currentType: 0,
       list: []
@@ -187,19 +188,20 @@ export default {
   methods: {
     // 返回上一页
     back() {
-      console.log('自定义back func');
+      console.log("自定义back func");
       wx.switchTab({
         url: "/pages/mine/main"
       });
     },
     // 参与列表
-    async getList(idx) {
-      console.log('订单页面的getList');
-      
-      if (!this.canRequest) {
-        return;
+    async getList(idx, isFirst) {
+      console.log("订单页面的getList");
+
+      if (idx == this.currentType && !isFirst) {
+        return false;
       }
-      this.canRequest = !1;
+      this.currentType = idx;
+
       const res = await util.request(
         api.OderList,
         {
@@ -211,26 +213,21 @@ export default {
         this
       );
       if (res.data && res.code === 0) {
-        this.currentType = idx;
         // this.totalData = res.data;
         console.log(res.data);
 
         this.list = res.data.list;
         this.notice = res.data.tips;
-        this.hasMore = res.data.hasMore;
+        // this.hasMore = res.data.hasMore;
       } else {
       }
-      if (this.requestTimer) clearTimeout(this.requestTimer);
-      this.requestTimer = setTimeout(() => {
-        this.canRequest = !0;
-      }, 1000);
     },
     // 切换tab
     changeTab(idx) {
       wx.pageScrollTo({
         scrollTop: 0,
         duration: 0
-      })
+      });
       this.page = 1;
       this.getList(idx);
     },
@@ -240,7 +237,59 @@ export default {
     },
     // 跳转订单详情页
     goDetail(oid) {
+      wx.setStorageSync("currentType", this.currentType);
+
       wx.navigateTo({ url: "/pages/order_detail/main?orderId=" + oid });
+    },
+    // 设置地址
+    setAddress(orderId) {
+      console.log();
+      var _this = this;
+      wx.chooseAddress({
+        success: function(res) {
+          var data = res;
+          console.log(JSON.stringify(data));
+          util
+            .request(
+              api.AddressSave,
+              {
+                order_id: orderId,
+                address: JSON.stringify(res)
+              },
+              "POST",
+              _this
+            )
+            .then(res => {
+              console.log(res);
+              if (res.code === 0) {
+                console.log('保存地址成功');
+                _this.page = 1;
+                _this.getList(_this.currentType, 1);
+
+                wx.showModal({
+                  title: "提示",
+                  content: "保存成功",
+                  showCancel: false,
+                  confirmText: "确定",
+                  confirmColor: "#3CC51F",
+                  success: res => {}
+                });
+              } else {
+                wx.showModal({
+                  title: "提示",
+                  content: res.msg || "保存失败",
+                  showCancel: false,
+                  confirmText: "确定",
+                  confirmColor: "#3CC51F",
+                  success: res => {}
+                });
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        }
+      });
     }
   },
 
@@ -248,19 +297,19 @@ export default {
   onPullDownRefresh() {
     console.log("刷新");
     this.page = 1;
-    this.getList(0);
+    this.showNoMore = false;
+    this.getList(0, 1);
 
     wx.stopPullDownRefresh();
   },
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.canScroll) {
+    if (this.hasMore) {
       let list = this.list;
       let page = this.page; // eslint-disable-line
 
       page++;
-      this.canScroll = false;
 
       wx.showToast({
         title: "数据加载中...", // 提示的内容,
@@ -279,28 +328,23 @@ export default {
         this
       );
 
-      if (
-        res.data &&
-        res.code === 0 &&
-        res.data.list &&
-        res.data.list.length > 0
-      ) {
+      if (res.data && res.code === 0 && res.data.list) {
         // this.totalData = res.data;
         var data = res.data;
-        this.list = list.concat(data.list);
+
+        if (res.data.list.length > 0) {
+          this.list = list.concat(data.list);
+          this.page = data.page;
+        }
+
         this.hasMore = data.hasMore;
-        this.page = data.page;
         if (data.hasMore) {
           this.showNoMore = !1;
         } else {
           this.showNoMore = !0;
         }
       }
-      if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      this.scrollTimer = setTimeout(() => {
-        this.canScroll = true;
-      }, 1500);
-    } else if (!this.hasMore && this.currentTab === 1) {
+    } else {
       this.showNoMore = !0;
     }
   },
@@ -319,13 +363,12 @@ export default {
       // this.ifCustomBack = false;
     }
     console.log("id, this.ifback", this.ifBack);
-    
-    var type = e.type || 0;
-    this.type = type;
-    this.canRequest = true;
-    console.log('order页面的onload  type==' + type); 
-    this.getList(type);
-    
+
+    var type = this.$root.$mp.query.type || 0;
+    this.currentType = type;
+    console.log("order页面的onload  type==" + type);
+    this.getList(type, 1);
+    wx.removeStorageSync("currentType");
   },
   onShow(e) {
     this.page = 1;

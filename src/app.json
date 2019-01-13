@@ -26,7 +26,7 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "步数换",
     "enablePullDownRefresh": false,
-    "onReachBottomDistance": 150,
+    "onReachBottomDistance": 50,
     "navigationStyle": "custom"
   },
   "tabBar": {

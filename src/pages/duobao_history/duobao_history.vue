@@ -93,8 +93,6 @@ export default {
       page: 1,
       hasMore: !0,
       showNoMore: !1,
-      canScroll: !0,
-      scrollTimer: null,
       historyList: []
     };
   },
@@ -111,8 +109,8 @@ export default {
     // 自定义返回
     back() {
       wx.switchTab({
-        url: '/pages/index/main'
-      })
+        url: "/pages/index/main"
+      });
     },
     // 跳转详情
     goDetail(e) {
@@ -126,13 +124,12 @@ export default {
 
   // 滚动加载更多
   async onReachBottom() {
-    console.log(this.hasMore, this.canScroll);
+    console.log(this.hasMore);
 
-    if (this.hasMore && this.canScroll) {
+    if (this.hasMore) {
       let list = this.historyList;
       let page = this.page;
       page++;
-      this.canScroll = false;
 
       wx.showToast({
         title: "数据加载中...", // 提示的内容,
@@ -150,14 +147,16 @@ export default {
       if (
         DuobaoHistory.data &&
         DuobaoHistory.code === 0 &&
-        DuobaoHistory.data.list &&
-        DuobaoHistory.data.list.length > 0
+        DuobaoHistory.data.list
       ) {
         // this.totalData = res.data;
         var data = DuobaoHistory.data;
-        this.historyList = list.concat(data.list);
+        if (DuobaoHistory.data.list.length > 0) {
+          this.historyList = list.concat(data.list);
+          this.page = DuobaoHistory.data.page;
+        }
+
         this.hasMore = DuobaoHistory.data.hasMore;
-        this.page = DuobaoHistory.data.page;
         if (DuobaoHistory.data.hasMore) {
           this.showNoMore = !1;
         } else {
@@ -165,18 +164,14 @@ export default {
         }
       }
       // if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      console.log(11);
-
-      setTimeout(() => {
-        console.log(22);
-        this.canScroll = true;
-      }, 1000);
-    } else if (!this.hasMore) {
+    } else {
       this.showNoMore = !0;
     }
   },
   // 页面加载
   async onLoad(e) {
+    this.page = 1;
+    this.showNoMore = false;
     // mta统计
     mta.Page.init();
     // 往期回顾
@@ -191,7 +186,7 @@ export default {
       console.log(resDuobaoHistory.data);
 
       this.historyList = resDuobaoHistory.data.list;
-      this.hasMore = resDuobaoHistory.data.hasMore;
+      // this.hasMore = resDuobaoHistory.data.hasMore;
     } else {
     }
   }

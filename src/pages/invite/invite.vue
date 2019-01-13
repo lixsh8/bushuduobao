@@ -220,6 +220,27 @@ export default {
       for (var i = 0, len = this.reloadFn.length; i < len; i++) {
         this.reloadFn[i] && this.reloadFn[i]();
       }
+    },
+    async getData() {
+      const res = await util.request(api.Friend, null, "GET", this);
+      if (res.data && res.code === 0) {
+        this.totalData = res.data;
+      }
+
+      // 请求列表
+      const resFriendUserlist = await util.request(
+        api.FriendUserlist,
+        { page: 1 },
+        "GET",
+        this
+      );
+      if (resFriendUserlist.data && resFriendUserlist.code === 0) {
+        this.friendList = resFriendUserlist.data.list || [];
+        this.f_title = resFriendUserlist.data.title;
+        this.f_subtitle = resFriendUserlist.data.subtitle;
+        this.hasMore = resFriendUserlist.data.hasMore;
+        this.page = resFriendUserlist.data.page;
+      }
     }
   },
 
@@ -288,33 +309,17 @@ export default {
   },
 
   // 页面加载
-  async onLoad() {
+  onLoad() {
     // mta统计
     mta.Page.init();
 
+    this.page = 1;
+
     // 删除存储的商品详情的来源
     wx.removeStorageSync("goodsDetailFrom");
-    
-    // wx.hideShareMenu()
-    const res = await util.request(api.Friend, null, "GET", this);
-    if (res.data && res.code === 0) {
-      this.totalData = res.data;
-    }
-
-    // 请求列表
-    const resFriendUserlist = await util.request(
-      api.FriendUserlist,
-      { page: 1 },
-      "GET",
-      this
-    );
-    if (resFriendUserlist.data && resFriendUserlist.code === 0) {
-      this.friendList = resFriendUserlist.data.list || [];
-      this.f_title = resFriendUserlist.data.title;
-      this.f_subtitle = resFriendUserlist.data.subtitle;
-      this.hasMore = resFriendUserlist.data.hasMore;
-      this.page = resFriendUserlist.data.page;
-    }
+  },
+  onShow() {
+    this.getData();
   }
 };
 </script>

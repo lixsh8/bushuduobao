@@ -27,7 +27,9 @@
             <div class="title">{{item.title}}</div>
             <div class="time">{{item.date}}</div>
           </div>
-          <div class="r"><div class="num">{{item.addition}}</div></div>
+          <div class="r">
+            <div class="num">{{item.addition}}</div>
+          </div>
         </div>
 
       </div>
@@ -90,8 +92,7 @@ export default {
     buyModal
   },
 
-  computed: {
-  },
+  computed: {},
 
   methods: {
     async getList() {
@@ -110,7 +111,7 @@ export default {
         console.log(res.data);
 
         this.list = res.data.list;
-        this.hasMore = res.data.hasMore;
+        // this.hasMore = res.data.hasMore;
       } else {
       }
     }
@@ -141,17 +142,15 @@ export default {
         this
       );
 
-      if (
-        res.data &&
-        res.code === 0 &&
-        res.data.list &&
-        res.data.list.length > 0
-      ) {
+      if (res.data && res.code === 0 && res.data.list) {
         // this.totalData = res.data;
         var data = res.data;
-        this.list = list.concat(data.list);
+        if (res.data.list.length > 0) {
+          this.list = list.concat(data.list);
+          this.page = data.page;
+        }
+
         this.hasMore = data.hasMore;
-        this.page = data.page;
         if (data.hasMore) {
           this.showNoMore = !1;
         } else {
@@ -170,6 +169,8 @@ export default {
   async onLoad(e) {
     // mta统计
     mta.Page.init();
+
+    this.page = 1;
 
     this.getList();
   }
@@ -195,29 +196,29 @@ export default {
     border-bottom: 1px solid #e9e9e9;
     line-height: 1;
 
-    .l{
+    .l {
       width: 60%;
       flex-shrink: 0;
 
-      .title{
+      .title {
         font-size: 16px;
         color: #333;
         @include sg_line_ellipsis;
       }
-      .time{
+      .time {
         padding-top: 6px;
         font-size: 12px;
         color: #999;
       }
     }
-    .r{
+    .r {
       width: 40%;
       flex-shrink: 0;
       font-size: 16px;
       text-align: right;
 
-      .num{
-        color: #FF696C;
+      .num {
+        color: #ff696c;
         display: inline-block;
         vertical-align: middle;
       }

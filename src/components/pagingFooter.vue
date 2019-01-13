@@ -34,7 +34,7 @@ export default {
 
 <style lang='scss' scoped>
 .no-more{
-  padding: 20px;
+  padding: 20px 0 20px 0;
   text-align: center;
   font-size: 14px;
   color: #333;

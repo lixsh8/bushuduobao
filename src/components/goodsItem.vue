@@ -60,6 +60,7 @@ export default {
   background: #fff;
   border-radius: 5px;
   box-shadow: 0 0 10px #eee;
+  overflow: hidden;
 
   &:nth-child(2n){
     margin: 10px 15px 0 0;
@@ -85,6 +86,7 @@ export default {
       height: 100%;
       background: rgba(0,0,0,0.3) url(#{$img_url}icon_soldout.png) no-repeat center;
       background-size: 99px 77px;
+      border-radius: 5px 5px 0 0;
       z-index: 6;
     }
 
@@ -120,7 +122,16 @@ export default {
         height: 16px;
         background: url(#{$img_url}/process_bar.png) no-repeat left center;
         background-size: 165px 16px;
+        animation: grow 1s 1s;
       }
+      /* @keyframes grow{
+        0%{
+          width: 0%;
+        }
+        100%{
+          width: 100%;
+        }
+      } */
       .process-txt {
         position: absolute;
         bottom: 0;

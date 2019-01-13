@@ -79,7 +79,7 @@ export default {
   props: {
     title: {
       type: String,
-      default: "步数夺宝"
+      default: ""
     },
     headerHeight: {
       type: Number,

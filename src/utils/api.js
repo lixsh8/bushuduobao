@@ -4,7 +4,7 @@ if (process.env.NODE_ENV === 'development') {
   // dev
   ApiRootUrl = "https://devapi.xiaotaotao123.cn/";
   // 小程序环境。开发和正式
-  mienvVersion = "develop";
+  mienvVersion = "release";
 } else {
   ApiRootUrl = "https://api.xiaotaotao123.cn/";
   mienvVersion = "release"

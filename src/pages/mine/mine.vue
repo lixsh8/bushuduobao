@@ -102,17 +102,17 @@
           <!-- banner1 -->
           <div
             class="box _3142106 indexBanner bannerImg"
-            v-if="banners.length>0"
+            v-if="banners&&banners.length>0"
             >
             <swiper
               class="banners multiple _3142106"
-              :autoplay="config.autoplay"
+              :autoplay="banners.length>1"
               :circular="config.circular"
               :current="config.current"
               :duration="config.duration"
               :indicatorActiveColor="config.indicatorActiveColor"
               :indicatorColor="config.indicatorColor"
-              :indicatorDots="config.indicatorDots"
+              :indicatorDots="banners.length>1"
               :interval="config.interval"
              >
               <swiper-item
@@ -157,17 +157,17 @@
           <!-- banner2 -->
           <div
             class="box _3142106 indexBanner"
-            v-if="advertList.length>0"
+            v-if="advertList&&advertList.length>0"
             >
             <swiper
               class="banners multiple _3142106"
-              :autoplay="config.autoplay"
+              :autoplay="advertList.length>1"
               :circular="config.circular"
               :current="config.current"
               :duration="config.duration"
               :indicatorActiveColor="config.indicatorActiveColor"
               :indicatorColor="config.indicatorColor"
-              :indicatorDots="config.indicatorDots"
+              :indicatorDots="advertList.length>1"
               :interval="config.interval"
              >
               <swiper-item

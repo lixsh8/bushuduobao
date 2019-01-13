@@ -110,7 +110,10 @@
           邀请新人永久加成
         </button>
 
-        <div class="middleArea">
+        <div
+          class="middleArea"
+          v-if="menuList&&menuList.length>0"
+        >
           <!-- 导航 -->
           <div
             @click="jump"
@@ -137,6 +140,7 @@
           :data-url='banner.link'
           class="activity-challenge"
           v-if="banner"
+          :style="{margin: menuList&&menuList.length>0?'':'150rpx auto 32rpx'}"
         >
           <image
             mode="aspectFill"
@@ -200,12 +204,12 @@
         >
           <swiper
             class="swiper _2edb85c"
-            :autoplay="config.autoplay"
+            :autoplay="latestAwardList.length>1"
             :circular="config.circular"
             :duration="config.duration"
             :indicatorActiveColor="config.indicatorActiveColor"
             :indicatorColor="config.indicatorColor"
-            :indicatorDots="config.indicatorDots"
+            :indicatorDots="latestAwardList.length>1"
             :interval="config.interval"
           >
             <swiper-item
@@ -249,13 +253,13 @@
       >
         <div class="box _3142106 indexBanner advBanner">
           <swiper
-            :autoplay="config.autoplay"
+            :autoplay="advertList.length>1"
             :circular="config.circular"
             :current="config.current"
             :duration="config.duration"
             :indicatorActiveColor="config.indicatorActiveColor"
             :indicatorColor="config.indicatorColor"
-            :indicatorDots="config.indicatorDots"
+            :indicatorDots="advertList.length>1"
             :interval="config.interval"
           >
             <swiper-item
@@ -339,6 +343,7 @@
       :showNoMore="showNoMore"
       noMoreTips="没有更多数据了"
     />
+    <div class="blank" style="height:100px;" v-if="showBlank"></div>
 
     <!-- 腾讯广告 -->
 
@@ -417,6 +422,7 @@ export default {
       // 推荐商品 列表
       page: 1,
       hasMore: !0,
+      showBlank: false,
       showNoMore: !1,
       duobao: null,
       duobaoList: null,
@@ -456,7 +462,11 @@ export default {
       for (var i = 0, len = newData.length; i < len; i++) {
         console.log(newData[i]);
 
-        for (var j = 0, len2 = this.newUserZoneInfo.list.length; j < len2; j++) {
+        for (
+          var j = 0, len2 = this.newUserZoneInfo.list.length;
+          j < len2;
+          j++
+        ) {
           if (newData[i].id == this.newUserZoneInfo.list[j].is_id) {
             this.newUserZoneInfo.list[j].is_oddnum = newData[i].n;
             this.newUserZoneInfo.list[j].is_rate = newData[i].r;
@@ -753,7 +763,7 @@ export default {
 
         this.duobao = Duobao.data;
         this.duobaoList = Duobao.data.list;
-        this.hasMore = Duobao.data.hasMore;
+        // this.hasMore = Duobao.data.hasMore;
       }
     }
   },
@@ -761,6 +771,9 @@ export default {
   // 下拉刷新
   onPullDownRefresh() {
     console.log("刷新");
+    this.page = 1;
+    this.hasMore = true;
+    this.showNoMore = false;
     this.getIndexData();
     this.getNewZone();
     this.getLatestAward();
@@ -794,6 +807,7 @@ export default {
     console.log(
       "srcoll onReachBottom========showAuthModal:" + this.authModalShow
     );
+    this.showBlank = false;
 
     if (this.hasMore) {
       let list = this.duobao.list;
@@ -808,23 +822,23 @@ export default {
 
       const Duobao = await util.request(
         api.IndexDuobao,
-        { page: page },
+        { page: page, hasTitle: 1 },
         "GET",
         this
       );
       console.log(Duobao.data);
-      if (
-        Duobao.data &&
-        Duobao.code === 0 &&
-        Duobao.data.list &&
-        Duobao.data.list.length > 0
-      ) {
+      if (Duobao.data && Duobao.code === 0 && Duobao.data.list) {
         // this.totalData = res.data;
         var data = Duobao.data;
-        data.list = list.concat(data.list);
+        if (Duobao.data.list.length > 0) {
+          data.list = list.concat(data.list);
+          this.page = Duobao.data.page;
+        }
+
+        this.showBlank = true;
+
         this.duobao = data;
         this.hasMore = Duobao.data.hasMore;
-        this.page = Duobao.data.page;
         if (Duobao.data.hasMore) {
           this.showNoMore = !1;
         } else {
@@ -856,6 +870,13 @@ export default {
   async onShow(options) {
     console.log("index");
     var _this = this;
+    _this.page = 1;
+    _this.hasMore = true;
+    _this.showNoMore = false;
+
+    wx.pageScrollTo({
+      scrollTop: 0
+    });
 
     // 登录
     const checkSession = await util.checkSession();
@@ -1198,14 +1219,16 @@ button::after {
   height: 48rpx;
   z-index: 5;
   font-family: PingFang-SC-SemiBold;
-  width: 190rpx;
+  width: 100px;
   font-size: 28rpx;
-  padding-right: 8rpx;
+  padding-right: 8px;
   line-height: 48rpx;
-  background-color: rgba(0, 0, 0, 0.13);
   border-top-right-radius: 24rpx;
   border-bottom-right-radius: 24rpx;
   color: #fff;
+  background: rgba(0, 0, 0, 0.13) url(#{$img_url}icon_arr_r_white.png) no-repeat
+    right center;
+  background-size: 12px;
 }
 
 .topArea .powerCoin .agentCoinInteger {
@@ -1640,6 +1663,7 @@ button::after {
 .activity-challenge image {
   width: 100%;
   height: 100%;
+  border-radius: 6px;
 }
 
 .left-top {
@@ -2480,6 +2504,7 @@ ad {
 
   .pic {
     height: 114px !important;
+    border-radius: 6px;
   }
 
   .banner-tip {

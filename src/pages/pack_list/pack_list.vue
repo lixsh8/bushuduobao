@@ -27,13 +27,18 @@
             <div class="title">{{item.change_type}}</div>
             <div class="time">{{item.add_time}}</div>
           </div>
-          <div class="r"><div class="num">{{item.change_hb_amount}}</div></div>
+          <div class="r">
+            <div
+              class="num"
+              :class="{blue: !item.is_plus}"
+            >{{item.change_hb_amount}}</div>
+          </div>
         </div>
 
       </div>
 
       <!-- 无数据 -->
-    <no-data :showNoData="!list||list.length<=0" />
+      <no-data :showNoData="!list||list.length<=0" />
     </div>
 
     <!-- 返回頂部 -->
@@ -72,9 +77,6 @@ export default {
       page: 1,
       page_size: 20,
       hasMore: !0,
-      canRequest: !0,
-      requestTimer: null,
-      canScroll: !0,
       showNoMore: !1,
       scrollTimer: null,
       list: null
@@ -90,8 +92,7 @@ export default {
     buyModal
   },
 
-  computed: {
-  },
+  computed: {},
 
   methods: {
     async getList() {
@@ -112,7 +113,6 @@ export default {
         console.log(res.data);
 
         this.list = res.data.list;
-        this.hasMore = res.data.hasMore;
       } else {
       }
     }
@@ -120,12 +120,11 @@ export default {
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.canScroll) {
+    if (this.hasMore) {
       let list = this.list;
       let page = this.page;
 
       page++;
-      this.canScroll = false;
 
       wx.showToast({
         title: "数据加载中...", // 提示的内容,
@@ -145,28 +144,22 @@ export default {
         this
       );
 
-      if (
-        res.data &&
-        res.code === 0 &&
-        res.data.list &&
-        res.data.list.length > 0
-      ) {
+      if (res.data && res.code === 0 && res.data.list) {
         // this.totalData = res.data;
         var data = res.data;
-        this.list = list.concat(data.list);
+        if (res.data.list.length > 0) {
+          this.list = list.concat(data.list);
+          this.page = data.page;
+        }
+
         this.hasMore = data.hasMore;
-        this.page = data.page;
         if (data.hasMore) {
           this.showNoMore = !1;
         } else {
           this.showNoMore = !0;
         }
       }
-      if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      this.scrollTimer = setTimeout(() => {
-        this.canScroll = true;
-      }, 1000);
-    } else if (!this.hasMore) {
+    } else {
       this.showNoMore = !0;
     }
   },
@@ -175,6 +168,7 @@ export default {
     // mta统计
     mta.Page.init();
 
+    this.page = 1;
     this.getList();
   }
 };
@@ -199,31 +193,35 @@ export default {
     border-bottom: 1px solid #e9e9e9;
     line-height: 1;
 
-    .l{
+    .l {
       width: 60%;
       flex-shrink: 0;
 
-      .title{
+      .title {
         font-size: 16px;
         color: #333;
         @include sg_line_ellipsis;
       }
-      .time{
+      .time {
         padding-top: 6px;
         font-size: 12px;
         color: #999;
       }
     }
-    .r{
+    .r {
       width: 40%;
       flex-shrink: 0;
       font-size: 16px;
       text-align: right;
 
-      .num{
-        color: #FF696C;
+      .num {
+        color: #ff696c;
         display: inline-block;
         vertical-align: middle;
+      }
+
+      .blue {
+        color: #1f77ff;
       }
     }
   }

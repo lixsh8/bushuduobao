@@ -89,10 +89,6 @@ export default {
       isshowmine: 0,
       page: 1,
       page_size: 20,
-      hasMore: !0,
-      canRequest: !0,
-      requestTimer: null,
-      canScroll: !0,
       showNoMore: !1,
       scrollTimer: null,
       list: null
@@ -127,10 +123,6 @@ export default {
     },
     async getList() {
       // 参与列表
-      if (!this.canRequest) {
-        return;
-      }
-      this.canRequest = !1;
       const res = await util.request(
         api.JoinList,
         {
@@ -147,13 +139,9 @@ export default {
         console.log(res.data);
 
         this.list = res.data.list;
-        this.hasMore = res.data.hasMore;
+        // this.hasMore = res.data.hasMore;
       } else {
       }
-      if (this.requestTimer) clearTimeout(this.requestTimer);
-      this.requestTimer = setTimeout(() => {
-        this.canRequest = !0;
-      }, 2000);
     },
     showList() {
       var isshowmine = this.isshowmine;
@@ -177,12 +165,11 @@ export default {
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.canScroll) {
+    if (this.hasMore) {
       let list = this.list;
       let page = this.page;
 
       page++;
-      this.canScroll = false;
 
       wx.showToast({
         title: "数据加载中...", // 提示的内容,
@@ -202,17 +189,14 @@ export default {
         this
       );
 
-      if (
-        res.data &&
-        res.code === 0 &&
-        res.data.list &&
-        res.data.list.length > 0
-      ) {
+      if (res.data && res.code === 0 && res.data.list) {
         // this.totalData = res.data;
         var data = res.data;
-        this.list = list.concat(data.list);
+        if (res.data.list.length > 0) {
+          this.list = list.concat(data.list);
+          this.page = data.page;
+        }
         this.hasMore = data.hasMore;
-        this.page = data.page;
         if (data.hasMore) {
           this.showNoMore = !1;
         } else {
@@ -223,7 +207,7 @@ export default {
       this.scrollTimer = setTimeout(() => {
         this.canScroll = true;
       }, 3000);
-    } else if (!this.hasMore && this.currentTab === 1) {
+    } else {
       this.showNoMore = !0;
     }
   },
@@ -232,7 +216,7 @@ export default {
     // mta统计
     mta.Page.init();
     this.id = this.$root.$mp.query.id;
-
+    this.page = 1;
     this.getList();
   }
 };

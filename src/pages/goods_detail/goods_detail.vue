@@ -147,9 +147,8 @@
           @click="changeTab(0)"
         >商品详情</div>
         <div
-          
           class="nav-item"
-          :class="{active: currentTab == 1}"
+          :class="{active: currentTab == 1 || !article}"
           @click="changeTab(1)"
         >往期揭晓</div>
       </div>
@@ -168,7 +167,7 @@
 
         <div
           class="content-item"
-          :class="{active: currentTab == 1}"
+          :class="{active: currentTab == 1 || !article}"
         >
           <div
             class="duobao-list"
@@ -303,6 +302,7 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       ifBack: 1,
+      isBlack: 0,
       // 轮播图配置
       config: {
         current: 0,
@@ -330,8 +330,6 @@ export default {
       page: 1,
       hasMore: !0,
       showNoMore: !1,
-      canScroll: !0,
-      scrollTimer: null,
       showBuyModal: !1,
       buyNum: 1,
       useTime: 0,
@@ -380,6 +378,13 @@ export default {
         let info = res.data.goodsInfo;
 
         this.duobaoData = res.data;
+        this.isBlack = res.data.is_black;
+        if (this.isBlack == 1) {
+          wx.redirectTo({
+            url: "/pages/login/main"
+          });
+          return;
+        }
         this.member_id = res.data.member_id;
         this.title = res.data.title;
         this.nextId = res.data.next_is_id;
@@ -388,15 +393,19 @@ export default {
         this.is_soldout = res.data.is_soldout;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
-        this.article = info.dgoods_body.replace(
-          /<img/gi,
-          '<img style="max-width:100%;height:auto" '
-        );
+        if (!info.dgoods_body) {
+          this.currentTab = 1;
+        } else {
+          this.article = info.dgoods_body.replace(
+            /<img/gi,
+            '<img style="width:375px;height:auto;display:block;" '
+          );
+        }
         console.log(
           "详情：====" +
             info.dgoods_body.replace(
               /<img/gi,
-              '<img style="max-width:100%;height:auto" '
+              '<img style="width:375px;height:auto;display:block;" '
             )
         );
 
@@ -421,15 +430,25 @@ export default {
         console.log(resDuobaoHistory.data);
 
         this.historyList = resDuobaoHistory.data.list;
-        this.hasMore = resDuobaoHistory.data.hasMore;
+        // this.hasMore = resDuobaoHistory.data.hasMore;
       } else {
       }
     },
     // 自定义返回按钮事件
     back() {
       var url = "/" + wx.getStorageSync("goodsDetailFrom");
-      
-      console.log('详情页返回按钮点击url===' + url);
+
+      console.log("详情页返回按钮点击url===" + url);
+
+      if (url.indexOf("/goods_detail/") > 0) {
+        // tab页面跳转
+        wx.switchTab({
+          url: "/pages/index/main",
+          success() {
+            wx.removeStorageSync("goodsDetailFrom");
+          }
+        });
+      }
       if (
         url.indexOf("/index/") > 0 ||
         url.indexOf("/duobao/") > 0 ||
@@ -458,7 +477,7 @@ export default {
       wx.pageScrollTo({
         scrollTop: 0,
         duration: 0
-      })
+      });
       this.currentTab = idx;
     },
     // 去下一期购买
@@ -533,7 +552,8 @@ export default {
             this.is_id +
             "&orderId=" +
             res.data.order_id +
-            "&dgoods_id=" + this.duobaoData.goodsInfo.dgoods_id
+            "&dgoods_id=" +
+            this.duobaoData.goodsInfo.dgoods_id
         });
       } else if (res.code === 402) {
         // 参与机会不足
@@ -656,6 +676,9 @@ export default {
   // 下拉刷新
   onPullDownRefresh() {
     console.log("刷新");
+    this.page = 1;
+    this.showNoMore = false;
+
     this.getData(this.is_id);
 
     wx.stopPullDownRefresh();
@@ -663,11 +686,10 @@ export default {
 
   // 滚动加载更多
   async onReachBottom() {
-    if (this.hasMore && this.currentTab === 1 && this.canScroll) {
+    if (this.hasMore && this.currentTab === 1) {
       let list = this.historyList;
       let page = this.page;
       page++;
-      this.canScroll = false;
 
       wx.showToast({
         title: "数据加载中...", // 提示的内容,
@@ -685,27 +707,29 @@ export default {
       if (
         DuobaoHistory.data &&
         DuobaoHistory.code === 0 &&
-        DuobaoHistory.data.list &&
-        DuobaoHistory.data.list.length > 0
+        DuobaoHistory.data.list
       ) {
         // this.totalData = res.data;
         var data = DuobaoHistory.data;
-        this.historyList = list.concat(data.list);
+        if (DuobaoHistory.data.list.length > 0) {
+          this.historyList = list.concat(data.list);
+          this.page = DuobaoHistory.data.page;
+        }
+
         this.hasMore = DuobaoHistory.data.hasMore;
-        this.page = DuobaoHistory.data.page;
         if (DuobaoHistory.data.hasMore) {
           this.showNoMore = !1;
         } else {
           this.showNoMore = !0;
         }
       }
-      if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      this.scrollTimer = setTimeout(() => {
-        this.canScroll = true;
-      }, 3000);
     } else if (!this.hasMore && this.currentTab === 1) {
       this.showNoMore = !0;
     }
+  },
+
+  onUnload() {
+    this.article = "";
   },
   // 页面加载
   async onLoad() {
@@ -734,11 +758,15 @@ export default {
       console.log("getCurrentPages==" + JSON.stringify(pages));
       var fromPage = pages[pages.length - 2].route || "pages/index/main";
       var fromOptions = pages[pages.length - 2].options || "";
-      wx.setStorageSync("goodsDetailFrom", fromPage + "?" + util.parseParams(fromOptions));
+      wx.setStorageSync(
+        "goodsDetailFrom",
+        fromPage + "?" + util.parseParams(fromOptions)
+      );
     }
 
     // 重置tab
     this.currentTab = 0;
+    this.page = 1;
     // var id = e.id;
     this.getData(id);
   }
@@ -752,7 +780,7 @@ page {
 }
 
 .banner {
-  padding: 0 15px;
+  padding: 15px 15px 0 15px;
 
   swiper {
     display: block;
@@ -1061,6 +1089,9 @@ page {
         }
       }
     }
+  }
+  .no-data {
+    padding: 30px 0 !important;
   }
   .rich-text {
     padding: 15px;

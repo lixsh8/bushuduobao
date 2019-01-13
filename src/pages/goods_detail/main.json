@@ -1,4 +1,5 @@
 {
+  "onReachBottomDistance": 1000,
   "navigationBarTextStyle": "black",
   "enablePullDownRefresh": true,
   "backgroundColor": "#ffffff"
