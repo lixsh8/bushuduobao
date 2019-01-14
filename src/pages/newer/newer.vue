@@ -105,9 +105,15 @@ export default {
   methods: {
     // 自定义返回
     back() {
-      wx.switchTab({
-        url: '/pages/index/main'
-      })
+      if (wx.getStorageSync("tabPage") === "mine") {
+        wx.switchTab({
+          url: "/pages/mine/main"
+        });
+      } else {
+        wx.switchTab({
+          url: "/pages/index/main"
+        });
+      }
     },
     // 规则弹窗
     showRules() {

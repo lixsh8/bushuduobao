@@ -79,6 +79,18 @@
     <!-- 无数据 -->
     <no-data :showNoData="!list||list.length<=0" />
 
+    <!-- 弹窗 -->
+    <ls-dialog
+      @closeDialog="closeDialog"
+      @okBtnHandler="okBtnHandler"
+      :showDialog="showDialog"
+      :dialogTitle="dialogTitle"
+      :dialogContent="dialogContent"
+      :openType="openType"
+      :singleBtn="singleBtn"
+      :confirmText="confirmText"
+    />
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
 
@@ -94,6 +106,7 @@ import goodsItem from "@/components/goodsItem";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import rulesModal from "@/components/rulesModal";
+import lsDialog from "@/components/lsDialog";
 
 var mta = require("@/utils/mta_analysis.js");
 
@@ -105,6 +118,14 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
+      // 弹窗
+      showDialog: false,
+      dialogTitle: "",
+      dialogContent: "",
+      openType: "",
+      singleBtn: true,
+      confirmText: "",
+
       banner: null,
       id: "",
       orderId: "",
@@ -119,7 +140,8 @@ export default {
     goodsItem,
     backTop,
     quickNavigate,
-    rulesModal
+    rulesModal,
+    lsDialog
   },
 
   computed: {
@@ -141,6 +163,16 @@ export default {
   },
 
   methods: {
+    // 确定按钮关闭弹窗事件
+    okBtnHandler() {
+      this.showDialog = false;
+    },
+    // 关闭弹窗
+    closeDialog(ev) {
+      console.log("closeDialog");
+
+      this.showDialog = false;
+    },
     // 返回上一页
     back() {
       console.log("back func");
@@ -158,7 +190,7 @@ export default {
     // 点击查看订单详情
     goOrderDetail() {
       wx.navigateTo({
-        url: "/pages/order_detail/main?orderId=" + this.orderId
+        url: "/pages/order_detail/main?from=result&orderId=" + this.orderId
       });
     },
     // 保存图片
@@ -228,6 +260,7 @@ export default {
     const res = await util.request(
       api.DuobaoResult,
       {
+        id: this.orderId,
         dgoods_id: this.dgoods_id
       },
       "GET",
@@ -239,6 +272,12 @@ export default {
 
       this.list = res.data.list;
       this.shareData = res.data.share;
+
+      // 好友贡献弹窗
+      this.dialogTitle = "恭喜获得";
+      this.dialogContent = "参与兑商品收益" + res.data.fuli_amount + "元";
+      this.confirmText = "收下";
+      this.showDialog = true;
     } else {
     }
   }
@@ -253,6 +292,7 @@ export default {
   height: 146px;
   background: url(#{$img_url}result_top_banner.png) no-repeat center;
   background-size: 100%;
+  text-align: center;
 
   .suc-tips {
     width: 151px;
@@ -268,16 +308,19 @@ export default {
   }
 
   .btn-order {
-    width: 80px;
-    height: 24px;
+    display: inline-block;
+    width: 90px;
+    padding: 5px 12px 5px 8px;
     margin: 0 auto;
-    line-height: 24px;
     text-align: center;
     font-size: 14px;
+    line-height: 1;
     color: #fff;
     border-radius: 12px;
     border: 1px solid #fff;
     box-sizing: border-box;
+    background: url(#{$img_url}icon_arr_r_white.png) no-repeat 95% center;
+    background-size: 14px;
   }
 }
 

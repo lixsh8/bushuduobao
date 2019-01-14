@@ -367,23 +367,83 @@ function getCommonShareData(title, image, link) {
  * 跳转
  * @param {event} e
  */
-function jump(e) {
+function jump(e, _this) {
   var url = e.currentTarget.dataset.link || e.currentTarget.dataset.url;
   var appid = e.currentTarget.dataset.appid;
   var id = e.currentTarget.dataset.id;
   var type = e.currentTarget.dataset.type;
   if (type === "address") {
     console.log("address");
-    wx.chooseAddress({
-      success(res) {},
-      fail() {
-        wx.openSetting({
-          success(res) {
-            console.log(res.authSetting);
-          }
-        });
+
+    wx.getSetting({
+      success(res) {
+        if (!res.authSetting["scope.address"]) {
+          wx.authorize({
+            scope: "scope.address",
+            success() {
+              wx.chooseAddress({
+                success(res) {},
+                fail: function() {}
+              });
+            },
+            fail() {
+              console.log('系统自带的授权弹窗点了拒绝授权');
+              // 自定义地址授权按钮弹窗
+              _this.dialogTitle = "通讯地址授权失败，请重新授权";
+              _this.dialogContent = "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
+              _this.confirmText = "去授权";
+              _this.cancelText = "取消";
+              _this.singleBtn = false;
+              _this.openType = "openSetting";
+              _this.showDialog = true;
+            }
+          });
+        } else {
+          wx.chooseAddress({
+            success(res) {},
+            fail: function() {}
+          });
+        }
       }
     });
+
+    // wx.getSetting({
+    //   success(res) {
+    //     if (!res.authSetting["scope.address"]) {
+    //       wx.showModal({
+    //         title: "通讯地址授权失败，请重新授权",
+    //         content: "为了方便你管理收货地址，步数换商品申请获取你的通讯地址",
+    //         showCancel: true,
+    //         cancelText: "取消",
+    //         cancelColor: "#000000",
+    //         confirmText: "去授权",
+    //         confirmColor: "#3CC51F",
+    //         success: res => {
+    //           if (res.confirm) {
+    //             wx.authorize({
+    //               scope: "scope.address",
+    //               success() {
+    //                 wx.chooseAddress({
+    //                   success(res) {},
+    //                   fail: function() {}
+    //                 });
+    //               },
+    //               fail() {
+    //                 console.log('系统自带的授权弹窗点了拒绝授权');
+    //                 wx.openSetting({ success: res => {} });
+    //               }
+    //             });
+    //           }
+    //         }
+    //       });
+    //     } else {
+    //       wx.chooseAddress({
+    //         success(res) {},
+    //         fail: function() {}
+    //       });
+    //     }
+    //   }
+    // });
   } else if (appid) {
     console.log("跳转小程序");
 

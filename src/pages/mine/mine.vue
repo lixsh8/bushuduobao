@@ -24,7 +24,7 @@
             <div class="mine-head-myinfo">
               <div class="mine-head-myinfo-nickname">{{data&&data.nickName}}</div>
               <div class="mine-head-myinfo-coininfo">红包
-                <text>{{data&&data.hb_amount}}</text>
+                <text>￥{{data&&data.hb_amount}}</text>
                 <!-- <text>|</text>兑换 -->
                 <!-- <text>{{}}</text>件-->
               </div>
@@ -38,7 +38,7 @@
               <div
                 @click="navToOrder"
                 class="mine-orderList-title-tip2"
-              >查看我的全部订单</div>
+              >查看全部订单</div>
             </div>
             <div class="mine-orderList-orders">
               <div
@@ -71,7 +71,7 @@
                 class="operationItem"
                 :openType="item.open_type"
                 v-if="item.open_type && item.open_type!='address'"
-               >
+              >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -86,7 +86,7 @@
                 :data-type="item.open_type"
                 :data-link="item.link"
                 class="operationItem"
-               >
+              >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -103,7 +103,7 @@
           <div
             class="box _3142106 indexBanner bannerImg"
             v-if="banners&&banners.length>0"
-            >
+          >
             <swiper
               class="banners multiple _3142106"
               :autoplay="banners.length>1"
@@ -114,7 +114,7 @@
               :indicatorColor="config.indicatorColor"
               :indicatorDots="banners.length>1"
               :interval="config.interval"
-             >
+            >
               <swiper-item
                 @click="jump"
                 class="banner-wrap _3142106"
@@ -134,7 +134,7 @@
           <div
             class="mine-recommends"
             v-if="data&&data.recommendList&&data.recommendList.length>0"
-           >
+          >
             <div class="header">精品推荐</div>
             <div class="recommends">
               <div
@@ -158,7 +158,7 @@
           <div
             class="box _3142106 indexBanner"
             v-if="advertList&&advertList.length>0"
-            >
+          >
             <swiper
               class="banners multiple _3142106"
               :autoplay="advertList.length>1"
@@ -169,7 +169,7 @@
               :indicatorColor="config.indicatorColor"
               :indicatorDots="advertList.length>1"
               :interval="config.interval"
-             >
+            >
               <swiper-item
                 @click="jump"
                 class="banner-wrap _3142106"
@@ -179,7 +179,7 @@
                 :data-link="advert.link"
                 :data-appid="advert.appid"
                 :key="advert.id"
-               >
+              >
                 <image
                   class="pic _3142106"
                   :src="advert.img"
@@ -195,15 +195,28 @@
           <div class="ad">
             <ad unitId="adunit-b195e9267cb30a9e"></ad>
           </div>
-          
+
         </div>
       </div>
     </div>
+
+    <!-- 弹窗 -->
+    <ls-dialog
+      @closeDialog="closeDialog"
+      @okBtnHandler="okBtnHandler"
+      :showDialog="showDialog"
+      :dialogTitle="dialogTitle"
+      :dialogContent="dialogContent"
+      :openType="openType"
+      :singleBtn="singleBtn"
+      :confirmText="confirmText"
+    />
   </div>
 </template>
 
 <script>
 import headBar from "@/components/headBar";
+import lsDialog from "@/components/lsDialog";
 import util from "@/utils/util";
 import api from "@/utils/api";
 // import request from "@/utils/request";
@@ -216,6 +229,14 @@ export default {
       title: "我的",
       headerBackground: "#FF696C",
       titleColor: "#fff",
+      // 弹窗
+      showDialog: false,
+      dialogTitle: "",
+      dialogContent: "",
+      openType: "",
+      singleBtn: false,
+      confirmText: "",
+
       orderList: [
         {
           type: "1",
@@ -251,10 +272,23 @@ export default {
   },
 
   components: {
-    headBar
+    headBar,
+    lsDialog
   },
 
   methods: {
+    // 确定按钮关闭弹窗事件
+    okBtnHandler() {
+      // this.showDialog = false;
+      wx.setStorageSync("mineHideDialog", "1");
+      console.log(this.showDialog);
+    },
+    // 关闭弹窗
+    closeDialog(ev) {
+      console.log("closeDialog");
+
+      this.showDialog = false;
+    },
     navToOrder() {
       wx.navigateTo({
         url: "/pages/order/main"
@@ -267,7 +301,7 @@ export default {
     },
     // 跳转
     jump(e) {
-      util.jump(e);
+      util.jump(e, this);
     },
     // 获取数据
     async getData() {
@@ -298,6 +332,11 @@ export default {
     wx.removeStorageSync("goodsDetailFrom");
   },
   onShow() {
+    // 设置顶级以便返回的时候使用tab页面
+    wx.setStorageSync("tabPage", "mine");
+    if (wx.getStorageSync("mineHideDialog") == "1") {
+      this.showDialog = false;
+    }
     this.getData();
   }
 };
@@ -670,11 +709,11 @@ page {
   border-radius: 10rpx;
   display: block;
 }
-.bannerImg{
-  height: 80px!important;
+.bannerImg {
+  height: 80px !important;
 
-  .pic{
-    height: 80px!important;
+  .pic {
+    height: 80px !important;
   }
 }
 </style>

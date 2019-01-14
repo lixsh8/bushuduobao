@@ -31,7 +31,7 @@ const api = {
   ZHBAdReward: ApiRootUrl + "?act=index&op=getAdReward",
   // 获取首页要登录才显示的数据
   getPacks: r =>
-    request.get("?act=index&op=getIndexInfo", null, {
+    request.get("?act=index&op=getIndexInfo", r, {
       baseURL: ApiRootUrl
     }),
   // 红包气泡点击请求

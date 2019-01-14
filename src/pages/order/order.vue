@@ -229,6 +229,8 @@ export default {
         duration: 0
       });
       this.page = 1;
+      this.showNoMore = false;
+      this.hasMore = true;
       this.getList(idx);
     },
     // 跳转到物流信息
@@ -241,9 +243,8 @@ export default {
 
       wx.navigateTo({ url: "/pages/order_detail/main?orderId=" + oid });
     },
-    // 设置地址
-    setAddress(orderId) {
-      console.log();
+    // 选择地址
+    goChooseAddress() {
       var _this = this;
       wx.chooseAddress({
         success: function(res) {
@@ -262,7 +263,7 @@ export default {
             .then(res => {
               console.log(res);
               if (res.code === 0) {
-                console.log('保存地址成功');
+                console.log("保存地址成功");
                 _this.page = 1;
                 _this.getList(_this.currentType, 1);
 
@@ -288,6 +289,44 @@ export default {
             .catch(err => {
               console.log(err);
             });
+        }
+      });
+    },
+    // 设置地址
+    setAddress(orderId) {
+      console.log("收货地址按钮点击");
+      var _this = this;
+
+      wx.getSetting({
+        success(res) {
+          if (!res.authSetting["scope.address"]) {
+            wx.showModal({
+              title: "通讯地址授权失败，请重新授权",
+              content: "为了方便你管理收货地址，步数换商品申请获取你的通讯地址",
+              showCancel: true,
+              cancelText: "取消",
+              cancelColor: "#000000",
+              confirmText: "去授权",
+              confirmColor: "#3CC51F",
+              success: res => {
+                if (res.confirm) {
+                  wx.authorize({
+                    scope: "scope.address",
+                    success() {
+                      console.log("系统自带的授权弹窗点了拒绝授权  成功");
+                      _this.goChooseAddress();
+                    },
+                    fail() {
+                      console.log("系统自带的授权弹窗点了拒绝授权  失败");
+                      wx.openSetting({ success: res => {} });
+                    }
+                  });
+                }
+              }
+            });
+          } else {
+            _this.goChooseAddress();
+          }
         }
       });
     }

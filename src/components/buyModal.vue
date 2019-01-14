@@ -258,10 +258,15 @@ export default {
     }
 
     .buy-ft {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+      left: 0;
       display: flex;
       flex-direction: row;
       align-items: center;
       border-top: 10px solid #f5f5f5;
+      height: 48px;
 
       .total-t {
         width: 36px;
@@ -276,6 +281,7 @@ export default {
         overflow: hidden;
       }
       .makeBuy {
+        display: block;
         flex-shrink: 0;
         width: 130px;
         height: 48px;

@@ -279,6 +279,7 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       orderId: "",
+      from: "",
       receivingInfo: null,
       receivingState: "",
       data: null
@@ -303,12 +304,22 @@ export default {
     // 返回上一页
     back() {
       console.log("back func");
+      if (this.from == "result") {
+        wx.navigateBack({
+          delta: 1,
+          fail: function() {
+            console.log("backFailed");
 
-      wx.redirectTo({
-        url:
-          "/pages/order/main?ifBack=0&type=" +
-            wx.getStorageSync("currentType") || ""
-      });
+            wx.switchTab({ url: "/pages/index/main" });
+          }
+        });
+      } else {
+        wx.redirectTo({
+          url:
+            "/pages/order/main?ifBack=0&type=" +
+              wx.getStorageSync("currentType") || ""
+        });
+      }
     },
     // 跳转到商品详情
     goDetail(is_id) {
@@ -364,8 +375,8 @@ export default {
         });
       }
     },
-    // 选择地址
-    gotoAddress() {
+    // 去选择地址
+    goChooseAddress() {
       var _this = this;
       wx.chooseAddress({
         success: function(res) {
@@ -400,6 +411,42 @@ export default {
             .catch(err => {
               console.log(err);
             });
+        }
+      });
+    },
+    // 选择地址
+    gotoAddress() {
+      var _this = this;
+
+      wx.getSetting({
+        success(res) {
+          if (!res.authSetting["scope.address"]) {
+            wx.showModal({
+              title: "通讯地址授权失败，请重新授权",
+              content: "为了方便你管理收货地址，步数换商品申请获取你的通讯地址",
+              showCancel: true,
+              cancelText: "取消",
+              cancelColor: "#000000",
+              confirmText: "去授权",
+              confirmColor: "#3CC51F",
+              success: res => {
+                if (res.confirm) {
+                  wx.authorize({
+                    scope: "scope.address",
+                    success() {
+                      _this.goChooseAddress();
+                    },
+                    fail() {
+                      console.log("系统自带的授权弹窗点了拒绝授权");
+                      wx.openSetting({ success: res => {} });
+                    }
+                  });
+                }
+              }
+            });
+          } else {
+            _this.goChooseAddress();
+          }
         }
       });
     },
@@ -447,6 +494,7 @@ export default {
     mta.Page.init();
 
     var orderId = this.$root.$mp.query.orderId;
+    this.from = this.$root.$mp.query.from;
     this.orderId = orderId;
     console.log(orderId);
 
@@ -598,6 +646,7 @@ page {
         font-size: 14px;
         color: #aaaeb9;
         line-height: 20px;
+        height: 40px;
       }
     }
 

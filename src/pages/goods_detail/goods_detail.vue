@@ -157,6 +157,12 @@
           class="content-item"
           :class="{active: currentTab == 0}"
         >
+          <div class="description">
+            <rich-text
+              v-if="duobaoData&&duobaoData.goodsInfo&&duobaoData.goodsInfo.dgoods_description"
+              :nodes="duobaoData.goodsInfo.dgoods_description"
+            />
+          </div>
           <div class="rich-text">
             <rich-text
               v-if="article"
@@ -339,7 +345,7 @@ export default {
       totalPrice: 0,
       showDialog: !1,
       dialogTitle: "参与机会不足",
-      dialogContent: "可邀请好友赞助更多机会哦！",
+      dialogContent: "可邀请好友赞助<span style='color:#FF3B30'>更多机会</span>哦！",
       openType: "share",
       historyList: []
     };
@@ -606,7 +612,7 @@ export default {
     },
     changeNum(e) {
       var num = parseInt(e) || 1;
-      num = num > this.leftNum ? this.leftNum : num;
+      // num = num > this.leftNum ? this.leftNum : num;
       this.buyNum = num;
       this.useTime = this.duobaoData.useTime - num;
       this.totalPrice = num * this.price;
@@ -730,6 +736,7 @@ export default {
 
   onUnload() {
     this.article = "";
+    this.duobaoData = "";
   },
   // 页面加载
   async onLoad() {
@@ -1102,6 +1109,11 @@ page {
       word-break: break-all;
       word-wrap: break-word;
     }
+  }
+  .description{
+    padding: 15px;
+    word-break: break-all;
+    word-wrap: break-word;
   }
 }
 

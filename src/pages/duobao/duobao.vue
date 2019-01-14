@@ -236,6 +236,9 @@ export default {
     this.hasMore = true;
     this.canScroll = true;
     this.showNoMore = false;
+
+    // 设置顶级以便返回的时候使用tab页面
+    wx.setStorageSync("tabPage", "duobao");
     // 列表
     this.getList();
     // 消息

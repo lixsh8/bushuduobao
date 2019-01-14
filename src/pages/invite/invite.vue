@@ -319,6 +319,9 @@ export default {
     wx.removeStorageSync("goodsDetailFrom");
   },
   onShow() {
+    // 设置顶级以便返回的时候使用tab页面
+    wx.setStorageSync("tabPage", "invite");
+
     this.getData();
   }
 };

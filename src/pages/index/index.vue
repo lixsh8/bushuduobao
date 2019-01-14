@@ -343,7 +343,11 @@
       :showNoMore="showNoMore"
       noMoreTips="没有更多数据了"
     />
-    <div class="blank" style="height:100px;" v-if="showBlank"></div>
+    <div
+      class="blank"
+      style="height:100px;"
+      v-if="showBlank"
+    ></div>
 
     <!-- 腾讯广告 -->
 
@@ -355,7 +359,16 @@
       @clsSignModal="clsSignModal"
       @subBtnClick="subBtnClick"
     />
-
+    <!-- 弹窗 -->
+    <ls-dialog
+      @closeDialog="closeDialog"
+      :showDialog="showDialog"
+      :dialogTitle="dialogTitle"
+      :dialogContent="dialogContent"
+      :openType="openType"
+      :singleBtn="singleBtn"
+      :confirmText="confirmText"
+    />
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 授权弹窗 -->
@@ -370,6 +383,7 @@
 import headBar from "@/components/headBar";
 import goodsItem from "@/components/goodsItem";
 import signModal from "@/components/signModal";
+import lsDialog from "@/components/lsDialog";
 import backTop from "@/components/backTop";
 import authModal from "@/components/authModal";
 import pagingFooter from "@/components/pagingFooter";
@@ -388,7 +402,15 @@ export default {
       showBackTop: true,
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
+      // 签到弹窗
       ifShowSign: !1,
+      // 弹窗
+      showDialog: false,
+      dialogTitle: "",
+      dialogContent: "",
+      openType: "share",
+      singleBtn: true,
+      confirmText: "",
       days: 0,
       hb_amount: 0,
       packAmount: 0,
@@ -440,6 +462,7 @@ export default {
     headBar,
     goodsItem,
     signModal,
+    lsDialog,
     backTop,
     authModal,
     pagingFooter
@@ -498,9 +521,15 @@ export default {
         url: "/pages/pack_list/main"
       });
     },
-    // 关闭签到按钮
+    // 关闭签到弹窗按钮
     clsSignModal(ev) {
       this.ifShowSign = false;
+    },
+    // 关闭弹窗
+    closeDialog(ev) {
+      console.log("closeDialog");
+
+      this.showDialog = false;
     },
     // 预订提醒按钮 发送消息
     subBtnClick(ev) {
@@ -515,25 +544,32 @@ export default {
       });
     },
     // 获取气泡红包和红包数据，需登录
-    getPacks() {
+    getPacks(register_code_url, assistance_url) {
       var _this = this;
 
       if (_this.requestNum > 20 && _this.requestTimer.getPacks) {
         clearInterval(_this.requestTimer.getPacks);
       }
 
-      api.getPacks().then(function(res) {
-        if (res.code === 0) {
-          console.log(11);
-          _this.hb_amount = res.data.hb_amount;
-          _this.bubble = res.data.bubble;
-          _this.share = res.data.share;
+      api
+        .getPacks(
+          "register_code=" +
+            (register_code_url || "") +
+            "&assistance=" +
+            (assistance_url || "")
+        )
+        .then(function(res) {
+          if (res.code === 0) {
+            console.log(11);
+            _this.hb_amount = res.data.hb_amount;
+            _this.bubble = res.data.bubble;
+            _this.share = res.data.share;
 
-          if (_this.requestTimer.getPacks) {
-            clearInterval(_this.requestTimer.getPacks);
+            if (_this.requestTimer.getPacks) {
+              clearInterval(_this.requestTimer.getPacks);
+            }
           }
-        }
-      });
+        });
     },
     // 点击气泡获取金币
     handlePrize(e) {
@@ -560,15 +596,22 @@ export default {
             } else if (type === "newReward") {
               // 新用户
             } else {
-              wx.showModal({
-                title: "提示",
-                content: res.msg,
-                showCancel: false,
-                cancelColor: "#000000",
-                confirmText: "知道了",
-                confirmColor: "#3CC51F",
-                success: res => {}
-              });
+              console.log("好友贡献弹窗");
+              
+              // 好友贡献弹窗
+              _this.dialogTitle = "领取成功";
+              _this.dialogContent = res.msg;
+              _this.confirmText = "爱分享的人,红包都不会少";
+              _this.showDialog = true;
+              // wx.showModal({
+              //   title: "提示",
+              //   content: res.msg,
+              //   showCancel: false,
+              //   cancelColor: "#000000",
+              //   confirmText: "知道了",
+              //   confirmColor: "#3CC51F",
+              //   success: res => {}
+              // });
             }
           }
         });
@@ -686,6 +729,11 @@ export default {
 
         this.totalStep = 0;
         this.hb_amount = res.data.hb_amount;
+        // 兑换步数成功弹窗
+        this.dialogTitle = "兑换成功";
+        this.dialogContent = res.data.msg;
+        this.confirmText = "邀好友兑换，拿红包奖励";
+        this.showDialog = true;
       } else {
       }
     },
@@ -874,6 +922,9 @@ export default {
     _this.hasMore = true;
     _this.showNoMore = false;
 
+    // 设置顶级以便返回的时候使用tab页面
+    wx.setStorageSync("tabPage", "index");
+
     wx.pageScrollTo({
       scrollTop: 0
     });
@@ -905,8 +956,12 @@ export default {
         }
       }
     } else {
+      // 已经登录了
       // 获取红包等数据 需要登录的
-      _this.getPacks();
+      _this.getPacks(
+        wx.getStorageSync("register_code_url"),
+        wx.getStorageSync("assistance_url")
+      );
     }
 
     // const { id } = options;

@@ -24,8 +24,13 @@ export default {
     var assistance = opts.query.assistance;
     console.log("上一个人的register_code=" + register_code);
 
-    wx.setStorageSync("register_code", register_code);
-    wx.setStorageSync("assistance", assistance);
+    if (wx.getStorageSync("token")) {
+      wx.setStorageSync("register_code_url", register_code);
+      wx.setStorageSync("assistance_url", assistance);
+    } else {
+      wx.setStorageSync("register_code", register_code);
+      wx.setStorageSync("assistance", assistance);
+    }
 
     // const checkSession = await util.checkSession();
 
