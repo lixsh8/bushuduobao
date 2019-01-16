@@ -25,7 +25,8 @@
           :data-id="item.id"
           :data-appid="item.appid"
           :data-url="item.url"
-          :gotStatus="item.gotStatus"
+          :data-qr="item.img"
+          :data-gotStatus="item.gotStatus"
           class="ad-list-item _7200772"
           v-for="(item,index) in list"
           :key="index"
@@ -109,26 +110,35 @@ export default {
   methods: {
     getCoin(e) {
       var _this = this;
-      let { id, appid, link, gotStatus } = e.currentTarget.dataset;
-      this.currentId = id;
-      if (_this.viewTimer) clearInterval(_this.viewTimer);
-      wx.navigateToMiniProgram({
-        appId: appid,
-        path: link,
-        extraData: {
-          foo: "bar"
-        },
-        envVersion: api.mienvVersion,
-        success(res) {
-          console.log("跳转成功");
-          if (gotStatus) return;
-          _this.viewTimer = setInterval(() => {
-            console.log("1111");
+      let { id, appid, link, gotstatus } = e.currentTarget.dataset;
+      console.log(e.currentTarget.dataset);
 
-            _this.num++;
-          }, 1000);
-        }
-      });
+      this.currentId = id;
+      if (appid) {
+        if (_this.viewTimer) clearInterval(_this.viewTimer);
+        wx.navigateToMiniProgram({
+          appId: appid,
+          path: link,
+          extraData: {
+            foo: "bar"
+          },
+          envVersion: api.mienvVersion,
+          success(res) {
+            console.log("跳转成功" + gotstatus);
+            if (gotstatus) return;
+            _this.viewTimer = setInterval(() => {
+              console.log("1111");
+
+              _this.num++;
+            }, 1000);
+          }
+        });
+      } else {
+        // wx.previewImage({
+        //   current: qr, // 当前显示图片的http链接
+        //   urls: [qr] // 需要预览的图片http链接列表
+        // });
+      }
     },
     getPrize() {
       var _this = this;
@@ -164,7 +174,7 @@ export default {
       this.getPrize();
     } else if (this.num < this.second && this.num > 0) {
       wx.showModal({
-        title: "提示", 
+        title: "提示",
         content: this.tips,
         showCancel: false,
         confirmText: "知道了"

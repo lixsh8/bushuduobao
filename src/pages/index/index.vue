@@ -184,7 +184,7 @@
           <text class="_b790fd0">点击查看更多</text>
         </div>
       </div>
-
+      
       <!-- 最新开奖 -->
       <div
         class="one-coin _2edb85c"
@@ -272,6 +272,7 @@
               :data-appid="advert.appid"
               :key="advert.id"
             >
+
               <img
                 class="pic _3142106"
                 :src="advert.img"
@@ -343,10 +344,15 @@
       :showNoMore="showNoMore"
       noMoreTips="没有更多数据了"
     />
+    <!-- 空白为了滚动 -->
     <div
       class="blank"
       style="height:100px;"
       v-if="showBlank"
+    ></div>
+    <div
+      id="flag"
+      style="height:1px;"
     ></div>
 
     <!-- 腾讯广告 -->
@@ -540,6 +546,10 @@ export default {
         console.log("提交发送消息1：" + JSON.stringify(res));
         if (res.code === 0) {
           _this.ifShowSign = false;
+          wx.showToast({
+            title: "预定提醒成功",
+            icon: "none"
+          });
         }
       });
     },
@@ -597,7 +607,7 @@ export default {
               // 新用户
             } else {
               console.log("好友贡献弹窗");
-              
+
               // 好友贡献弹窗
               _this.dialogTitle = "领取成功";
               _this.dialogContent = res.msg;
@@ -642,8 +652,9 @@ export default {
       });
     },
     // 点击购买按钮
-    btnClickHandler(ev) {
-      console.log(ev);
+    btnClickHandler(ev, dgoods_state) {
+      console.log(ev, dgoods_state);
+
       wx.navigateTo({
         url: "/pages/goods_detail/main?id=" + ev
       });
@@ -675,12 +686,9 @@ export default {
           }
         });
     },
-    // 获取微信步数
-    getWeRunData() {
-      console.log("正在获取步数...");
-
+    // 微信原生获取微信步数方法
+    wxRunDataHandler() {
       var _this = this;
-      _this.loadingWeRunData = !0;
       wx.getWeRunData({
         success(res) {
           // 发送数据到后台解码
@@ -704,7 +712,8 @@ export default {
         fail() {
           wx.showModal({
             title: "提示",
-            content: "请到设置里面打开",
+            // content: "如需授权请点击右上角【...】-【关于】- 右上角【...】-【设置】-打开微信运动",
+            content: "为了更好的为你提供服务，请允许访问微信步数",
             success(res) {
               if (res.confirm) {
                 wx.openSetting({
@@ -719,6 +728,15 @@ export default {
           });
         }
       });
+    },
+    // 获取微信步数
+    getWeRunData() {
+      console.log("正在获取步数...");
+
+      var _this = this;
+      _this.loadingWeRunData = !0;
+
+      _this.wxRunDataHandler();
     },
     // 兑换步数
     async exchangeStep() {
@@ -833,9 +851,10 @@ export default {
 
   // 分享
   onShareAppMessage(res) {
-    if (res.from === "button") {
+    var resData = res[0]
+    if (resData.from === "button") {
       // 来自页面内转发按钮
-      console.log(res);
+      console.log(resData);
       return util.getCommonShareData(
         this.share.title,
         this.share.image,
@@ -849,7 +868,11 @@ export default {
       this.share.link
     );
   },
-
+  // 页面滚动事件
+  onPageScroll(e) {
+    // console.log(e); // {scrollTop:99}
+    this.globalData.indexScrollTop = e.scrollTop;
+  },
   // 滚动加载
   async onReachBottom() {
     console.log(
@@ -913,6 +936,7 @@ export default {
 
     // 删除存储的商品详情的来源
     wx.removeStorageSync("goodsDetailFrom");
+    _this.showBlank = true;
   },
 
   async onShow(options) {
@@ -920,13 +944,31 @@ export default {
     var _this = this;
     _this.page = 1;
     _this.hasMore = true;
-    _this.showNoMore = false;
 
     // 设置顶级以便返回的时候使用tab页面
     wx.setStorageSync("tabPage", "index");
 
+    // 计算文档高度
+    // const query = wx.createSelectorQuery();
+    // query.select("#flag").boundingClientRect();
+    // query.selectViewport().scrollOffset();
+    // query.exec(function(res) {
+    //   console.log(
+    //     "res.scrollTop,this.globalData.indexScrollTop",
+    //     res.scrollTop,
+    //     _this.globalData.indexScrollTop
+    //   );
+    //   var scrollTop = Math.min(_this.globalData.indexScrollTop, res.scrollTop);
+    //   if (scrollTop) {
+    //     wx.pageScrollTo({
+    //       scrollTop: scrollTop - 300
+    //     });
+    //   }
+    // });
+    // 往上滚动
     wx.pageScrollTo({
-      scrollTop: 0
+      scrollTop: 0,
+      duration: 0
     });
 
     // 登录

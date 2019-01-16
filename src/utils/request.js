@@ -33,9 +33,8 @@ request.interceptors.response.use(
   },
   (err, promise) => {
     wx.hideNavigationBarLoading();
-    wx.showToast({
-      title: err.message,
-      icon: "none"
+    wx.navigateTo({
+      url: "/pages/login/main"
     });
 
     return promise.resolve();

@@ -74,12 +74,22 @@ export default {
       } else {
         console.log("has token==" + util.parseParams(this.options));
 
-        wx.reLaunch({
-          url: "/" + this.page + "?ifBack=0&" + util.parseParams(this.options),
-          success: function() {
-            wx.removeStorageSync("ifDirectToLogin");
-          }
-        });
+        if (this.page.indexOf("/login/") > 0) {
+          wx.reLaunch({
+            url: "/pages/index/main",
+            success: function() {
+              wx.removeStorageSync("ifDirectToLogin");
+            }
+          });
+        } else {
+          wx.reLaunch({
+            url:
+              "/" + this.page + "?ifBack=0&" + util.parseParams(this.options),
+            success: function() {
+              wx.removeStorageSync("ifDirectToLogin");
+            }
+          });
+        }
       }
     }
   },
@@ -89,7 +99,7 @@ export default {
     mta.Page.init();
 
     // 删除存储的商品详情的来源
-    wx.removeStorageSync("goodsDetailFrom");
+    // wx.removeStorageSync("goodsDetailFrom");
     // var { id, income, detail } = this.$root.$mp.query;
 
     var pages = getCurrentPages();

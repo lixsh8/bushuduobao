@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 6,
+			"current": 17,
 			"list": [
 				{
 					"id": 0,
@@ -93,7 +93,8 @@
 					"id": 9,
 					"name": "参与明细",
 					"pathName": "pages/join_list/main",
-					"query": "id=84"
+					"query": "id=176",
+					"scene": "1012"
 				},
 				{
 					"id": 10,
@@ -141,7 +142,8 @@
 					"id": 17,
 					"name": "物流",
 					"pathName": "pages/logistics/main",
-					"query": "id=c2hlbnRvbmctMzM4MDMyNDE0MjY3OA"
+					"query": "id=804064211536232599",
+					"scene": "1012"
 				},
 				{
 					"id": -1,

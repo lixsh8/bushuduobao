@@ -123,14 +123,14 @@
           @click="gotoAddress"
           v-if="receivingState==2"
         >
-          去添加地址
+          点击填写收货地址
         </div>
       </div>
       <!-- 产品信息 -->
       <div class="goods-panel">
         <div
           class="goods-info"
-          @click="goDetail(data.is_id)"
+          @click="goDetail(data.is_id,data.dgoods_state)"
         >
           <img
             class="goods-avatar"
@@ -256,6 +256,18 @@
 
     <div class="btn-kf-cover"></div>
 
+    <!-- 弹窗 -->
+    <ls-dialog
+      @closeDialog="closeDialog"
+      @okBtnHandler="okBtnHandler"
+      :showDialog="showDialog"
+      :dialogTitle="dialogTitle"
+      :dialogContent="dialogContent"
+      :openType="openType"
+      :singleBtn="singleBtn"
+      :confirmText="confirmText"
+    />
+
     <!-- 快速导航 -->
     <!-- <quick-navigate /> -->
   </div>
@@ -267,6 +279,7 @@ import api from "@/utils/api";
 // import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import quickNavigate from "@/components/quickNavigate";
+import lsDialog from "@/components/lsDialog";
 
 var mta = require("@/utils/mta_analysis.js");
 
@@ -278,6 +291,14 @@ export default {
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
+      // 弹窗
+      showDialog: false,
+      dialogTitle: "",
+      dialogContent: "",
+      openType: "",
+      singleBtn: false,
+      confirmText: "",
+
       orderId: "",
       from: "",
       receivingInfo: null,
@@ -288,7 +309,8 @@ export default {
 
   components: {
     headBar,
-    quickNavigate
+    quickNavigate,
+    lsDialog
   },
 
   computed: {
@@ -322,10 +344,17 @@ export default {
       }
     },
     // 跳转到商品详情
-    goDetail(is_id) {
-      wx.navigateTo({
-        url: "/pages/goods_detail/main?id=" + is_id
-      });
+    goDetail(is_id, dgoods_state) {
+      if (dgoods_state == 1) {
+        wx.navigateTo({
+          url: "/pages/goods_detail/main?id=" + is_id
+        });
+      } else {
+        wx.showToast({
+          title: "商品已经下架",
+          icon: "none"
+        });
+      }
     },
     // 跳转到收益规则
     goIncome() {
@@ -375,7 +404,7 @@ export default {
         });
       }
     },
-    // 去选择地址
+    // 去微信选择地址
     goChooseAddress() {
       var _this = this;
       wx.chooseAddress({
@@ -406,6 +435,17 @@ export default {
                   data.cityName +
                   data.countyName +
                   data.detailInfo;
+              } else {
+                wx.showModal({
+                  title: "提示",
+                  content: "保存地址失败",
+                  showCancel: true,
+                  cancelText: "取消",
+                  cancelColor: "#000000",
+                  confirmText: "确定",
+                  confirmColor: "#3CC51F",
+                  success: res => {}
+                });
               }
             })
             .catch(err => {
@@ -414,6 +454,18 @@ export default {
         }
       });
     },
+    // 确定按钮关闭弹窗事件
+    okBtnHandler() {
+      // this.showDialog = false;
+      wx.setStorageSync("mineHideDialog", "1");
+      console.log(this.showDialog);
+    },
+    // 关闭弹窗
+    closeDialog(ev) {
+      console.log("closeDialog");
+
+      this.showDialog = false;
+    },
     // 选择地址
     gotoAddress() {
       var _this = this;
@@ -421,27 +473,22 @@ export default {
       wx.getSetting({
         success(res) {
           if (!res.authSetting["scope.address"]) {
-            wx.showModal({
-              title: "通讯地址授权失败，请重新授权",
-              content: "为了方便你管理收货地址，步数换商品申请获取你的通讯地址",
-              showCancel: true,
-              cancelText: "取消",
-              cancelColor: "#000000",
-              confirmText: "去授权",
-              confirmColor: "#3CC51F",
-              success: res => {
-                if (res.confirm) {
-                  wx.authorize({
-                    scope: "scope.address",
-                    success() {
-                      _this.goChooseAddress();
-                    },
-                    fail() {
-                      console.log("系统自带的授权弹窗点了拒绝授权");
-                      wx.openSetting({ success: res => {} });
-                    }
-                  });
-                }
+            wx.authorize({
+              scope: "scope.address",
+              success() {
+                _this.goChooseAddress();
+              },
+              fail() {
+                console.log("系统自带的授权弹窗点了拒绝授权");
+                // 自定义地址授权按钮弹窗
+                _this.dialogTitle = "通讯地址授权失败，请重新授权";
+                _this.dialogContent =
+                  "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
+                _this.confirmText = "去授权";
+                _this.cancelText = "取消";
+                _this.singleBtn = false;
+                _this.openType = "openSetting";
+                _this.showDialog = true;
               }
             });
           } else {
@@ -499,6 +546,12 @@ export default {
     console.log(orderId);
 
     this.getData(orderId);
+  },
+  onShow() {
+    // 跳转到其他地方授权回来关闭弹窗
+    if (wx.getStorageSync("mineHideDialog") == "1") {
+      this.showDialog = false;
+    }
   }
 };
 </script>
@@ -646,7 +699,7 @@ page {
         font-size: 14px;
         color: #aaaeb9;
         line-height: 20px;
-        height: 40px;
+        height: 36px;
       }
     }
 

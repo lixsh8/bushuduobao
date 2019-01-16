@@ -145,14 +145,6 @@ export default {
     },
     showList() {
       var isshowmine = this.isshowmine;
-      if (!this.canRequest) {
-        wx.showToast({
-          title: "你点击的太快了",
-          icon: "warn"
-        });
-
-        return;
-      }
       this.page = 1;
       if (isshowmine === 1) {
         this.isshowmine = 0;

@@ -115,6 +115,9 @@ function request(url, data = {}, method = "GET") {
         }
       },
       fail: function(err) {
+        wx.navigateTo({
+          url: "/pages/login/main"
+        });
         reject(err);
         console.log("请求失败，url", url);
         // console.log('请求参数，data:', data);
@@ -359,6 +362,18 @@ function getCommonShareData(title, image, link) {
   return {
     title: title,
     imageUrl: image,
+    success: function(res) {
+      // 转发成功之后的回调
+      if (res.errMsg == "shareAppMessage:ok") {
+        console.log("分享成功");
+        
+      } else {
+        console.log("分享失败");
+      }
+    },
+    fail: function() {
+      console.log("分享失败");
+    },
     path: link
   };
 }
@@ -387,10 +402,11 @@ function jump(e, _this) {
               });
             },
             fail() {
-              console.log('系统自带的授权弹窗点了拒绝授权');
+              console.log("系统自带的授权弹窗点了拒绝授权");
               // 自定义地址授权按钮弹窗
               _this.dialogTitle = "通讯地址授权失败，请重新授权";
-              _this.dialogContent = "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
+              _this.dialogContent =
+                "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
               _this.confirmText = "去授权";
               _this.cancelText = "取消";
               _this.singleBtn = false;
@@ -406,44 +422,6 @@ function jump(e, _this) {
         }
       }
     });
-
-    // wx.getSetting({
-    //   success(res) {
-    //     if (!res.authSetting["scope.address"]) {
-    //       wx.showModal({
-    //         title: "通讯地址授权失败，请重新授权",
-    //         content: "为了方便你管理收货地址，步数换商品申请获取你的通讯地址",
-    //         showCancel: true,
-    //         cancelText: "取消",
-    //         cancelColor: "#000000",
-    //         confirmText: "去授权",
-    //         confirmColor: "#3CC51F",
-    //         success: res => {
-    //           if (res.confirm) {
-    //             wx.authorize({
-    //               scope: "scope.address",
-    //               success() {
-    //                 wx.chooseAddress({
-    //                   success(res) {},
-    //                   fail: function() {}
-    //                 });
-    //               },
-    //               fail() {
-    //                 console.log('系统自带的授权弹窗点了拒绝授权');
-    //                 wx.openSetting({ success: res => {} });
-    //               }
-    //             });
-    //           }
-    //         }
-    //       });
-    //     } else {
-    //       wx.chooseAddress({
-    //         success(res) {},
-    //         fail: function() {}
-    //       });
-    //     }
-    //   }
-    // });
   } else if (appid) {
     console.log("跳转小程序");
 

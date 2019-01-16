@@ -122,9 +122,11 @@ export default {
         this.$emit("back");
       } else {
         console.log("nativeback");
-        wx.removeStorageSync("goodsDetailFrom");
         wx.navigateBack({
           delta: 1,
+          success: function() {
+            // wx.removeStorageSync("goodsDetailFrom");
+          },
           fail: function() {
             console.log("backFailed");
 

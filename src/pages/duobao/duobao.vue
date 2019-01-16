@@ -237,6 +237,12 @@ export default {
     this.canScroll = true;
     this.showNoMore = false;
 
+    // 往上滚动
+    wx.pageScrollTo({
+      scrollTop: 0,
+      duration: 0
+    });
+
     // 设置顶级以便返回的时候使用tab页面
     wx.setStorageSync("tabPage", "duobao");
     // 列表

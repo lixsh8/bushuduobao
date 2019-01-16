@@ -103,6 +103,18 @@
     <!-- 无数据 -->
     <no-data :showNoData="!list||list.length<=0" />
 
+    <!-- 弹窗 -->
+    <ls-dialog
+      @closeDialog="closeDialog"
+      @okBtnHandler="okBtnHandler"
+      :showDialog="showDialog"
+      :dialogTitle="dialogTitle"
+      :dialogContent="dialogContent"
+      :openType="openType"
+      :singleBtn="singleBtn"
+      :confirmText="confirmText"
+    />
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
@@ -126,6 +138,7 @@ import backTop from "@/components/backTop";
 import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
 import quickNavigate from "@/components/quickNavigate";
+import lsDialog from "@/components/lsDialog";
 
 var mta = require("@/utils/mta_analysis.js");
 
@@ -138,6 +151,14 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       headerHeight: 46,
+      // 弹窗
+      showDialog: false,
+      dialogTitle: "",
+      dialogContent: "",
+      openType: "",
+      singleBtn: false,
+      confirmText: "",
+
       notice: "",
       navs: [
         { id: 0, name: "全部" },
@@ -159,7 +180,8 @@ export default {
     backTop,
     pagingFooter,
     noData,
-    quickNavigate
+    quickNavigate,
+    lsDialog
   },
 
   computed: {
@@ -244,7 +266,7 @@ export default {
       wx.navigateTo({ url: "/pages/order_detail/main?orderId=" + oid });
     },
     // 选择地址
-    goChooseAddress() {
+    goChooseAddress(orderId) {
       var _this = this;
       wx.chooseAddress({
         success: function(res) {
@@ -292,6 +314,18 @@ export default {
         }
       });
     },
+    // 确定按钮关闭弹窗事件
+    okBtnHandler() {
+      // this.showDialog = false;
+      wx.setStorageSync("mineHideDialog", "1");
+      console.log(this.showDialog);
+    },
+    // 关闭弹窗
+    closeDialog(ev) {
+      console.log("closeDialog");
+
+      this.showDialog = false;
+    },
     // 设置地址
     setAddress(orderId) {
       console.log("收货地址按钮点击");
@@ -300,32 +334,26 @@ export default {
       wx.getSetting({
         success(res) {
           if (!res.authSetting["scope.address"]) {
-            wx.showModal({
-              title: "通讯地址授权失败，请重新授权",
-              content: "为了方便你管理收货地址，步数换商品申请获取你的通讯地址",
-              showCancel: true,
-              cancelText: "取消",
-              cancelColor: "#000000",
-              confirmText: "去授权",
-              confirmColor: "#3CC51F",
-              success: res => {
-                if (res.confirm) {
-                  wx.authorize({
-                    scope: "scope.address",
-                    success() {
-                      console.log("系统自带的授权弹窗点了拒绝授权  成功");
-                      _this.goChooseAddress();
-                    },
-                    fail() {
-                      console.log("系统自带的授权弹窗点了拒绝授权  失败");
-                      wx.openSetting({ success: res => {} });
-                    }
-                  });
-                }
+            wx.authorize({
+              scope: "scope.address",
+              success() {
+                _this.goChooseAddress(orderId);
+              },
+              fail() {
+                console.log("系统自带的授权弹窗点了拒绝授权");
+                // 自定义地址授权按钮弹窗
+                _this.dialogTitle = "通讯地址授权失败，请重新授权";
+                _this.dialogContent =
+                  "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
+                _this.confirmText = "去授权";
+                _this.cancelText = "取消";
+                _this.singleBtn = false;
+                _this.openType = "openSetting";
+                _this.showDialog = true;
               }
             });
           } else {
-            _this.goChooseAddress();
+            _this.goChooseAddress(orderId);
           }
         }
       });
@@ -337,7 +365,7 @@ export default {
     console.log("刷新");
     this.page = 1;
     this.showNoMore = false;
-    this.getList(0, 1);
+    this.getList(this.currentType, 1);
 
     wx.stopPullDownRefresh();
   },
@@ -392,6 +420,12 @@ export default {
     // mta统计
     mta.Page.init();
 
+    // 往上滚动
+    wx.pageScrollTo({
+      scrollTop: 0,
+      duration: 0
+    });
+
     var ifBack = this.$root.$mp.query.ifBack;
     console.log("ifback=", ifBack);
     if (ifBack == 0) {
@@ -411,6 +445,11 @@ export default {
   },
   onShow(e) {
     this.page = 1;
+
+    // 跳转到其他地方授权回来关闭弹窗
+    if (wx.getStorageSync("mineHideDialog") == "1") {
+      this.showDialog = false;
+    }
     // var type = e.type || 0;
     // this.currentType = type;
   }

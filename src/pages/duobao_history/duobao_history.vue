@@ -25,6 +25,7 @@
               @click="goDetail"
               v-for="item in historyList"
               :data-is_id="item.is_id"
+              :data-dgoods_state="item.dgoods_state"
               :key="item.is_id"
             >
               <div class="duobao-hd">
@@ -115,10 +116,18 @@ export default {
     // 跳转详情
     goDetail(e) {
       console.log(e);
+      var { dgoods_state, is_id } = e.currentTarget.dataset;
 
-      wx.navigateTo({
-        url: "/pages/goods_detail/main?id=" + e.currentTarget.dataset.is_id
-      });
+      if (dgoods_state == 1) {
+        wx.navigateTo({
+          url: "/pages/goods_detail/main?id=" + is_id
+        });
+      } else {
+        wx.showToast({
+          title: "商品已经下架",
+          icon: "none"
+        });
+      }
     }
   },
 

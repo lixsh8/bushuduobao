@@ -24,11 +24,11 @@
       />
     </div>
     <!-- 底部按钮 -->
-    <div
+    <!-- <div
       class="fixed-btn"
       @click="goBuy"
     >立即参与</div>
-    <div class="fixed-btn-cover"></div>
+    <div class="fixed-btn-cover"></div> -->
   </div>
 </template>
 

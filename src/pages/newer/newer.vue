@@ -48,6 +48,7 @@
     <!-- 无数据 -->
     <no-data :showNoData="!list||list.length<=0" />
 
+
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
     <!-- 规则弹窗 -->
@@ -68,6 +69,7 @@ import api from "@/utils/api";
 // import request from "@/utils/request";
 import headBar from "@/components/headBar";
 import goodsItem from "@/components/goodsItem";
+import noData from "@/components/noData";
 import quickNavigate from "@/components/quickNavigate";
 import backTop from "@/components/backTop";
 import rulesModal from "@/components/rulesModal";
@@ -91,6 +93,7 @@ export default {
   components: {
     headBar,
     goodsItem,
+    noData,
     backTop,
     quickNavigate,
     rulesModal

@@ -9,6 +9,7 @@ app.$mount()
 
 Vue.prototype.globalData = getApp().globalData;
 Vue.prototype.globalData.img_url = 'https://resourcecdn.xiaotaotao123.cn/wxapp_img/';
+Vue.prototype.globalData.indexScrollTop = 0;
 
 wx.getSystemInfo({
   success: res => {

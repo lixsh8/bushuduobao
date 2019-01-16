@@ -78,7 +78,6 @@ export default {
       page_size: 20,
       hasMore: !0,
       showNoMore: !1,
-      scrollTimer: null,
       list: null
     };
   },
@@ -169,6 +168,7 @@ export default {
     mta.Page.init();
 
     this.page = 1;
+    this.hasMore = true;
     this.getList();
   }
 };

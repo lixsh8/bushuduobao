@@ -247,8 +247,9 @@ export default {
   created() {},
   // 分享
   onShareAppMessage(res) {
-    console.log(res);
-    if (res.from === "button" && res.target.dataset.type == 3) {
+    var resData = res[0]
+    console.log(resData);
+    if (resData.from === "button" && resData.target.dataset.type == 3) {
       console.log("加成按钮");
 
       // 来自页面内转发按钮
@@ -257,7 +258,7 @@ export default {
         this.totalData.share.image,
         this.totalData.share.link
       );
-    } else if (res.from === "button" && res.target.dataset.type == 6) {
+    } else if (resData.from === "button" && resData.target.dataset.type == 6) {
       console.log("召唤按钮");
       // 来自页面内转发按钮
       return util.getCommonShareData(

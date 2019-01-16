@@ -232,9 +232,10 @@ export default {
 
   // 分享
   onShareAppMessage(res) {
-    if (res.from === "button") {
+    console.log(res);
+    var resData = res[0]
+    if (resData.from === "button") {
       // 来自页面内转发按钮
-      console.log(res);
       return util.getCommonShareData(
         this.shareData.title,
         this.shareData.image,

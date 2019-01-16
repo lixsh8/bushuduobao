@@ -74,7 +74,14 @@
         </div>
         <div class="progress-desc">
           <div class="progress-desc-total">满{{duobaoData.goodsInfo.is_totalnum}}份开奖</div>
-          <div class="progress-desc-left">差{{duobaoData.goodsInfo.is_oddnum}}份</div>
+          <div
+            class="progress-desc-left"
+            v-if="duobaoData.goodsInfo.is_oddnum>0"
+          >差{{duobaoData.goodsInfo.is_oddnum}}份</div>
+          <div
+            class="progress-desc-left disabled"
+            v-else
+          >已满员</div>
         </div>
       </div>
       <!-- 已开奖 -->
@@ -162,6 +169,7 @@
               v-if="duobaoData&&duobaoData.goodsInfo&&duobaoData.goodsInfo.dgoods_description"
               :nodes="duobaoData.goodsInfo.dgoods_description"
             />
+            <!-- <wxParse v-if="duobaoData&&duobaoData.goodsInfo&&duobaoData.goodsInfo.dgoods_description" :content="duobaoData.goodsInfo.dgoods_description" /> -->
           </div>
           <div class="rich-text">
             <rich-text
@@ -243,7 +251,11 @@
     <!-- 底部按钮 -->
 
     <div
-      v-if="is_soldout==1"
+      v-if="dgoods_state==0"
+      class="fixed-btn"
+    >已下架</div>
+    <div
+      v-else-if="is_soldout==1"
       class="fixed-btn"
     >已抢光</div>
     <div
@@ -296,6 +308,7 @@ import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
 import buyModal from "@/components/buyModal";
 import lsDialog from "@/components/lsDialog";
+// import wxParse from 'mpvue-wxparse'
 
 var mta = require("@/utils/mta_analysis.js");
 
@@ -322,6 +335,8 @@ export default {
       },
       banners: [],
       article: "",
+      // 是否下架
+      dgoods_state: "",
       // 这期是否结束
       is_end: 0,
       // 购买期数id
@@ -345,7 +360,8 @@ export default {
       totalPrice: 0,
       showDialog: !1,
       dialogTitle: "参与机会不足",
-      dialogContent: "可邀请好友赞助<span style='color:#FF3B30'>更多机会</span>哦！",
+      dialogContent:
+        "可邀请好友赞助<span style='color:#FF3B30'>更多机会</span>哦！",
       openType: "share",
       historyList: []
     };
@@ -358,6 +374,7 @@ export default {
     noData,
     quickNavigate,
     buyModal,
+    // wxParse,
     lsDialog
   },
 
@@ -377,6 +394,8 @@ export default {
   methods: {
     async getData(id) {
       // 夺宝详情
+      console.log("getData");
+
       const res = await util.request(api.DuobaoDetail, { id: id }, "GET", this);
       if (res.data && res.code === 0) {
         // this.totalData = res.data;
@@ -397,6 +416,7 @@ export default {
         this.useTime = res.data.useTime - 1;
         this.is_end = res.data.is_end;
         this.is_soldout = res.data.is_soldout;
+        this.dgoods_state = res.data.dgoods_state;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
         if (!info.dgoods_body) {
@@ -473,7 +493,7 @@ export default {
         wx.redirectTo({
           url: url,
           success() {
-            wx.removeStorageSync("goodsDetailFrom");
+            // wx.removeStorageSync("goodsDetailFrom");
           }
         });
       }
@@ -612,7 +632,7 @@ export default {
     },
     changeNum(e) {
       var num = parseInt(e) || 1;
-      // num = num > this.leftNum ? this.leftNum : num;
+      num = num > this.leftNum ? this.leftNum : num;
       this.buyNum = num;
       this.useTime = this.duobaoData.useTime - num;
       this.totalPrice = num * this.price;
@@ -663,9 +683,10 @@ export default {
 
   // 分享
   onShareAppMessage(res) {
-    if (res.from === "button") {
+    var resData = res[0]
+    console.log(res);
+    if (resData.from === "button") {
       // 来自页面内转发按钮
-      console.log(res);
       return util.getCommonShareData(
         this.duobaoData.share.title,
         this.duobaoData.share.image,
@@ -739,11 +760,17 @@ export default {
     this.duobaoData = "";
   },
   // 页面加载
-  async onLoad() {
+  onShow() {
     // mta统计
     mta.Page.init();
+    // 重置tab
+    this.currentTab = 0;
+    this.page = 1;
+    this.showBuyModal = false;
+
     var id = this.$root.$mp.query.id;
     var ifBack = this.$root.$mp.query.ifBack;
+
     console.log("ifback=", ifBack);
     // 获取要不要有返回按钮
     if (ifBack == 0) {
@@ -762,18 +789,19 @@ export default {
     // 存储页面哪里来的
     if (!wx.getStorageSync("goodsDetailFrom")) {
       var pages = getCurrentPages();
-      console.log("getCurrentPages==" + JSON.stringify(pages));
-      var fromPage = pages[pages.length - 2].route || "pages/index/main";
-      var fromOptions = pages[pages.length - 2].options || "";
-      wx.setStorageSync(
-        "goodsDetailFrom",
-        fromPage + "?" + util.parseParams(fromOptions)
-      );
+      // console.log("getCurrentPages==" + JSON.stringify(pages));
+      if (pages[pages.length - 2]) {
+        var fromPage = pages[pages.length - 2].route || "pages/index/main";
+        var fromOptions = pages[pages.length - 2].options || "";
+        wx.setStorageSync(
+          "goodsDetailFrom",
+          fromPage + "?" + util.parseParams(fromOptions)
+        );
+      } else {
+        wx.setStorageSync("goodsDetailFrom", "pages/index/main");
+      }
     }
 
-    // 重置tab
-    this.currentTab = 0;
-    this.page = 1;
     // var id = e.id;
     this.getData(id);
   }
@@ -882,6 +910,9 @@ page {
         width: 50%;
         color: #ff3b30;
         text-align: right;
+      }
+      .progress-desc-left.disabled {
+        color: #999;
       }
     }
   }
@@ -1110,7 +1141,7 @@ page {
       word-wrap: break-word;
     }
   }
-  .description{
+  .description {
     padding: 15px;
     word-break: break-all;
     word-wrap: break-word;

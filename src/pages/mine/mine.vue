@@ -334,6 +334,7 @@ export default {
   onShow() {
     // 设置顶级以便返回的时候使用tab页面
     wx.setStorageSync("tabPage", "mine");
+    // 跳转到其他地方授权回来关闭弹窗
     if (wx.getStorageSync("mineHideDialog") == "1") {
       this.showDialog = false;
     }

@@ -33,6 +33,7 @@ module.exports = {
     'no-undef': 0,
     'camelcase': 0,
     'eqeqeq': 0,
+    'handle-callback-err': 0,
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0
   },
