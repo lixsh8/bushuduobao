@@ -184,7 +184,7 @@
           <text class="_b790fd0">点击查看更多</text>
         </div>
       </div>
-      
+
       <!-- 最新开奖 -->
       <div
         class="one-coin _2edb85c"
@@ -362,12 +362,15 @@
       :ifShowSign="ifShowSign"
       :days="days"
       :packAmount="packAmount"
+      :confirmText="confirmText"
+      :openType="openType"
       @clsSignModal="clsSignModal"
-      @subBtnClick="subBtnClick"
+      @okBtnHandler="okBtnHandler"
     />
     <!-- 弹窗 -->
     <ls-dialog
       @closeDialog="closeDialog"
+      @okBtnHandler="okBtnHandler"
       :showDialog="showDialog"
       :dialogTitle="dialogTitle"
       :dialogContent="dialogContent"
@@ -409,17 +412,20 @@ export default {
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
       // 签到弹窗
-      ifShowSign: !1,
+      ifShowSign: false,
       // 弹窗
       showDialog: false,
       dialogTitle: "",
       dialogContent: "",
-      openType: "share",
+      openType: "",
       singleBtn: true,
       confirmText: "",
+
       days: 0,
       hb_amount: 0,
       packAmount: 0,
+      // 加密
+      sign: "",
       share: {},
       // 金币列表
       bubble: null,
@@ -537,22 +543,104 @@ export default {
 
       this.showDialog = false;
     },
-    // 预订提醒按钮 发送消息
-    subBtnClick(ev) {
+    // 弹窗确定按钮点击事件
+    async okBtnHandler(ev) {
       var _this = this;
-      console.log("form_id=" + ev);
-      // this.ifShowSign = false
-      api.sendMessage("form_id=" + ev).then(function(res) {
-        console.log("提交发送消息1：" + JSON.stringify(res));
-        if (res.code === 0) {
-          _this.ifShowSign = false;
-          wx.showToast({
-            title: "预定提醒成功",
-            icon: "none"
-          });
+      console.log("okBtnHandler click");
+
+      _this.showDialog = false;
+      _this.ifShowSign = false;
+
+      if (_this.openType == "share") {
+        // 发送请求去翻倍 DoubleReward
+        const resDoubleReward = await util.request(
+          api.DoubleReward,
+          { sign: _this.sign },
+          "GET",
+          this
+        );
+        console.log(resDoubleReward.data);
+        if (resDoubleReward.data && resDoubleReward.code === 0) {
+          // this.totalData = res.data;
+          // 翻倍按钮点击成功后
+          _this.hb_amount = resDoubleReward.data.hb_amount;
+          _this.dialogTitle = "恭喜获得翻倍红包";
+          _this.dialogContent = resDoubleReward.data.amount + "元";
+          _this.confirmText = "收下";
+          _this.showDialog = true;
+          _this.openType = "";
         }
-      });
+      }
     },
+    // 点击气泡获取金币
+    handlePrize(e) {
+      var type = e.currentTarget.dataset.type;
+      var _this = this;
+      console.log(type);
+
+      if (type) {
+        api.clickPacks("type=" + type).then(function(res) {
+          console.log(res);
+          if (res.code === 0) {
+            var bubble = _this.bubble || [];
+            var index = bubble.findIndex(
+              (value, index, arr) => value.type === type
+            );
+            _this.bubble.splice(index, 1);
+            _this.hb_amount = res.data.hb_amount;
+            _this.sign = res.data.sign;
+
+            // 点红包收取红包翻倍、广告的类型
+            if (res.data.type == "share") {
+              _this.openType = "share";
+            } else {
+              _this.openType = "";
+            }
+
+            // 签到气泡点击弹窗
+            if (type === "attendanceReward") {
+              _this.ifShowSign = true;
+              _this.packAmount = res.data.amount;
+              _this.confirmText = res.data.btn_text;
+              _this.days = res.data.continueSign;
+            } else {
+              console.log("好友贡献弹窗");
+
+              // 好友贡献弹窗
+              _this.dialogTitle = "恭喜获得翻倍红包";
+              _this.dialogContent = res.data.amount + "元";
+              _this.confirmText = res.data.btn_text;
+              _this.showDialog = true;
+              // wx.showModal({
+              //   title: "提示",
+              //   content: res.msg,
+              //   showCancel: false,
+              //   cancelColor: "#000000",
+              //   confirmText: "知道了",
+              //   confirmColor: "#3CC51F",
+              //   success: res => {}
+              // });
+            }
+          }
+        });
+      }
+    },
+    // 预订提醒按钮 发送消息
+    // subBtnClick(ev) {
+    //   var _this = this;
+    //   console.log("form_id=" + ev);
+    //   // this.ifShowSign = false
+    //   api.sendMessage("form_id=" + ev).then(function(res) {
+    //     console.log("提交发送消息1：" + JSON.stringify(res));
+    //     if (res.code === 0) {
+    //       _this.ifShowSign = false;
+    //       wx.showToast({
+    //         title: "预定提醒成功",
+    //         icon: "none"
+    //       });
+    //     }
+    //   });
+    // },
     // 获取气泡红包和红包数据，需登录
     getPacks(register_code_url, assistance_url) {
       var _this = this;
@@ -580,52 +668,6 @@ export default {
             }
           }
         });
-    },
-    // 点击气泡获取金币
-    handlePrize(e) {
-      var type = e.currentTarget.dataset.type;
-      var _this = this;
-      console.log(type);
-
-      if (type) {
-        api.clickPacks("type=" + type).then(function(res) {
-          console.log(res);
-          if (res.code === 0) {
-            var bubble = _this.bubble || [];
-            var index = bubble.findIndex(
-              (value, index, arr) => value.type === type
-            );
-            _this.bubble.splice(index, 1);
-            _this.hb_amount = res.data.hb_amount;
-
-            // 签到气泡点击弹窗
-            if (type === "attendanceReward") {
-              _this.ifShowSign = true;
-              _this.packAmount = res.data.hb;
-              _this.days = res.data.continueSign;
-            } else if (type === "newReward") {
-              // 新用户
-            } else {
-              console.log("好友贡献弹窗");
-
-              // 好友贡献弹窗
-              _this.dialogTitle = "领取成功";
-              _this.dialogContent = res.msg;
-              _this.confirmText = "爱分享的人,红包都不会少";
-              _this.showDialog = true;
-              // wx.showModal({
-              //   title: "提示",
-              //   content: res.msg,
-              //   showCancel: false,
-              //   cancelColor: "#000000",
-              //   confirmText: "知道了",
-              //   confirmColor: "#3CC51F",
-              //   success: res => {}
-              // });
-            }
-          }
-        });
-      }
     },
     // 统一跳转
     jump(e) {
@@ -748,10 +790,16 @@ export default {
         this.totalStep = 0;
         this.hb_amount = res.data.hb_amount;
         // 兑换步数成功弹窗
-        this.dialogTitle = "兑换成功";
-        this.dialogContent = res.data.msg;
-        this.confirmText = "邀好友兑换，拿红包奖励";
+        this.dialogTitle = "恭喜获得红包";
+        this.dialogContent = res.data.amount + "元";
         this.showDialog = true;
+        this.confirmText = res.data.btn_text;
+        this.sign = res.data.sign;
+        if (res.data.type == "share") {
+          this.openType = "share";
+        } else {
+          this.openType = "";
+        }
       } else {
       }
     },
@@ -851,7 +899,7 @@ export default {
 
   // 分享
   onShareAppMessage(res) {
-    var resData = res[0]
+    var resData = res[0];
     if (resData.from === "button") {
       // 来自页面内转发按钮
       console.log(resData);
@@ -1345,22 +1393,6 @@ button::after {
   background-size: 39rpx 39rpx;
 }
 
-.topArea .coinBubble {
-  margin: 0 auto;
-  width: 194rpx;
-  height: 55rpx;
-  line-height: 45rpx;
-  text-align: center;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/newIndex/coinBubble.png")
-    no-repeat;
-  background-size: 100% 100%;
-  position: absolute;
-  top: 40rpx;
-  left: 280rpx;
-  font-size: 22rpx;
-  color: #ffffff;
-}
-
 .topArea .asyncRun {
   position: absolute;
   top: 241rpx;
@@ -1442,19 +1474,6 @@ button::after {
   left: 60rpx;
 }
 
-.topArea .dailyEnvelope {
-  position: absolute;
-  top: 414rpx;
-  right: 20rpx;
-  height: 130rpx;
-  width: 108rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/newIndex/dailyEnvelope.png")
-    no-repeat;
-  background-size: 100% 100%;
-  animation: redEnvelope 0.3s 8;
-  animation-fill-mode: forwards;
-}
-
 .topArea .award {
   position: absolute;
   top: 290rpx;
@@ -1471,18 +1490,6 @@ button::after {
   animation-fill-mode: forwards;
 }
 
-.topArea .inviteBg {
-  background: url("https://pic1.zhuanstatic.com/zhuanzh/n_v22bbe1cf24df143a8bc7ad37781850324.png")
-    no-repeat;
-  background-size: 100% 100%;
-}
-
-.topArea .activeBg {
-  background: url("https://pic1.zhuanstatic.com/zhuanzh/n_v295c661a2681d43b789f2353ae40962d2.png")
-    no-repeat;
-  background-size: 100% 100%;
-}
-
 .topArea .scaleSize {
   font-size: 36rpx;
 }
@@ -1493,8 +1500,7 @@ button::after {
   margin: 0 auto;
   width: 340rpx;
   height: 320rpx;
-  background: url("https://pic1.zhuanstatic.com/zhuanzh/n_v2649a06032f744127a30dfa346ff15d1a.png")
-    no-repeat center top;
+  background: url(#{$img_url}top_circle.png) no-repeat center top;
   background-size: 320rpx 246rpx;
   display: flex;
   flex-direction: column;
@@ -1803,29 +1809,6 @@ button::after {
   animation: prize-ani 2s infinite;
 }
 
-.share-group-image {
-  width: 96rpx;
-  height: 96rpx;
-  background: url(https://pic1.zhuanstatic.com/zhuanzh/n_v27f55d2b6747841ad9e557bd75d2d4e80.png)
-    no-repeat center center;
-  background-size: 100% 100%;
-}
-
-.share-group-name {
-  font-family: PingFang-SC-Medium;
-  font-size: 20rpx;
-  color: #fff;
-  text-align: center;
-  line-height: 24rpx;
-  padding: 4rpx 0;
-  background: rgba(0, 0, 0, 0.11);
-  border-radius: 8rpx;
-}
-
-page {
-  background: #8054ff;
-}
-
 ad {
   position: absolute;
   bottom: 0;
@@ -1943,18 +1926,6 @@ ad {
 .indexBanner img {
   width: 100%;
   height: 100%;
-}
-
-.loading {
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/common/loading2.gif)
-    no-repeat center center #8054ff;
-  background-size: 115rpx 100rpx;
-  width: 750rpx;
-  height: 100vh;
-  position: absolute;
-  z-index: 100;
-  top: 0;
-  left: 0;
 }
 
 .friendsInfo {
@@ -2126,16 +2097,6 @@ ad {
   line-height: 50rpx;
 }
 
-.GoodCardA-price .coinStep {
-  display: inline-block;
-  color: #f6a000;
-  background: url(https://pic1.zhuanstatic.com/zhuanzh/n_v2693e0243c74f4c5fa381c0679844fad4.png)
-    no-repeat 0 center;
-  background-size: 32rpx 32rpx;
-  padding-left: 45rpx;
-  padding-top: 0;
-}
-
 .GoodCardA-price .payInfo {
   display: inline-block;
 }
@@ -2202,8 +2163,7 @@ ad {
 }
 
 .more._b790fd0 {
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/mine/slice.png)
-    no-repeat right center;
+  background: url(#{$img_url}icon_arr_r_black.png) no-repeat right center;
   background-size: 28rpx 28rpx;
   font-family: PingFang-SC-Regular;
   color: #9b9b9b;
@@ -2285,21 +2245,6 @@ ad {
   margin-left: 16rpx;
 }
 
-.GoodCardA-price._b790fd0 {
-  font-size: 24rpx;
-  position: relative;
-  margin: 8rpx 0 20rpx;
-  height: 50rpx;
-  background: url(https://pic1.zhuanstatic.com/zhuanzh/n_v2693e0243c74f4c5fa381c0679844fad4.png)
-    no-repeat 16rpx center;
-  background-size: 32rpx 32rpx;
-  padding-left: 56rpx;
-  line-height: 50rpx;
-  font-family: PingFang-SC-Medium;
-  font-size: 36rpx;
-  color: #f6a000;
-}
-
 .div-more._b790fd0 {
   padding-top: 6rpx;
   padding-bottom: 32rpx;
@@ -2308,8 +2253,7 @@ ad {
 
 .div-more text._b790fd0 {
   display: inline-block;
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/mine/slice.png)
-    no-repeat right center;
+  background: url(#{$img_url}icon_arr_r_black.png) no-repeat right center;
   background-size: 28rpx 28rpx;
   font-family: PingFang-SC-Regular;
   font-size: 28rpx;
@@ -2342,8 +2286,7 @@ ad {
 }
 
 .more._2edb85c {
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/mine/slice.png)
-    no-repeat right center;
+  background: url(#{$img_url}icon_arr_r_black.png) no-repeat right center;
   background-size: 28rpx 28rpx;
   font-family: PingFang-SC-Regular;
   color: #9b9b9b;
@@ -2404,20 +2347,6 @@ ad {
   margin-left: 12rpx;
 }
 
-.goods-price._2edb85c {
-  font-size: 24rpx;
-  position: relative;
-  height: 50rpx;
-  background: url(https://pic1.zhuanstatic.com/zhuanzh/n_v2693e0243c74f4c5fa381c0679844fad4.png)
-    no-repeat 12rpx center;
-  background-size: 32rpx 32rpx;
-  padding-left: 52rpx;
-  line-height: 50rpx;
-  font-family: PingFang-SC-Medium;
-  font-size: 36rpx;
-  color: #f6a000;
-}
-
 // 推荐商品
 .tabsArea {
   width: 718rpx;
@@ -2466,37 +2395,12 @@ ad {
   background-color: #ffffff;
 }
 
-.RecommendGoods-title {
-  background: url(https://pic5.zhuanstatic.com/zhuanzh/n_v2e75fb35bd46f4c1e8ae5daabb4fe2fe2.png)
-    no-repeat;
-  background-size: 100% 100%;
-  width: 100%;
-  height: 45rpx;
-}
-
 .RecommendGoods-intro {
   width: 100%;
   text-align: center;
   font-size: 20rpx;
   color: #9b9b9b;
   margin-bottom: 22rpx;
-}
-
-.RecommendGoods-intro-new {
-  float: right;
-  background: url("https://pic1.zhuanstatic.com/zhuanzh/n_v261ed2b67db0d4dc5a09d23ddb06fdb54.png")
-    no-repeat;
-  background-size: 100% 100%;
-  width: 104rpx;
-  text-align: center;
-  height: 29rpx;
-  line-height: 24rpx;
-  font-family: PingFangSC-Medium;
-  font-weight: 500;
-  font-size: 18rpx;
-  color: #ffffff;
-  margin-right: 160rpx;
-  margin-top: -65rpx;
 }
 
 .RecommendGoods-freeTip {
@@ -2511,18 +2415,6 @@ ad {
   color: #ffffff;
   background-color: #fdae64;
   border-radius: 22rpx 0 0 22rpx;
-}
-
-.RecommendGoods-freeTipNew {
-  position: fixed;
-  right: 32rpx;
-  bottom: 32rpx;
-  width: 142rpx;
-  height: 142rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/newIndex/exchangeRecord.png")
-    no-repeat;
-  background-size: 100% 100%;
-  z-index: 10;
 }
 
 .RecommendGoods-list {

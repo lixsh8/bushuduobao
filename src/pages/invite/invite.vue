@@ -31,22 +31,22 @@
               class="gotReward"
               @click="goPromoteList"
             >
-              {{totalData.plusNum}}
+              {{totalData.todayInvite}}
               <!-- <text>币</text> -->
             </div>
             <div
               class="tips"
               @click="goPromoteList"
             >
-              <!-- 累计奖励{{totalData.accumulateReward}}红包 -->
-              加成倍数越高，到手红包越大
-              <!-- <text bindtap="goDetailPage">查看明细</text> -->
+              累计奖励{{totalData.totalInvite}}红包
+              
+              <text bindtap="goDetailPage">查看明细></text>
             </div>
             <button
               class="inviteBtn"
               data-type="3"
               openType="share"
-            >邀请新用户得{{totalData.inviteTotalReward}}加成</button>
+            >邀请好友得最高66{{totalData.inviteTotalReward}}红包</button>
             <!-- <div class="bottomTips">邀请成功立得</div> -->
           </div>
 
@@ -391,8 +391,6 @@ page {
 .launchScreen .launcher .bg._6a61420 {
   width: 100%;
   height: 284rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/wave.png")
-    no-repeat;
   background-size: 100% 100%;
   position: absolute;
   top: 0;
@@ -421,8 +419,6 @@ page {
 .launchScreen .launcher .award1._6a61420 {
   width: 460rpx;
   height: 124rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/temp.png")
-    no-repeat;
   background-size: 100% 100%;
   position: absolute;
   top: 118rpx;
@@ -530,8 +526,6 @@ button._e59e4f5::after {
   top: -70rpx;
   width: 547rpx;
   height: 184rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/curtain.png")
-    no-repeat;
   background-size: 100% 100%;
   line-height: 124rpx;
   text-align: center;
@@ -672,7 +666,7 @@ button._e59e4f5::after {
   left: 238rpx;
   width: 72rpx;
   height: 72rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/dialog/dialog_close.png")
+  background: url(#{$img_url}dialog_close_gray.png)
     no-repeat;
   background-size: 100% 100%;
 }
@@ -751,18 +745,6 @@ page {
   color: #ffffff;
 }
 
-.loading {
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/common/loading2.gif)
-    no-repeat center center #fff;
-  background-size: 115rpx 100rpx;
-  width: 100%;
-  height: 100vh;
-  position: absolute;
-  z-index: 100;
-  top: 0;
-  left: 0;
-}
-
 .topBg {
   width: 750rpx;
   height: 511rpx;
@@ -791,8 +773,6 @@ page {
 
 .topBg .tips text {
   margin-left: 10rpx;
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/arrow.png)
-    no-repeat center right;
   background-size: 13rpx 20rpx;
   padding-right: 20rpx;
 }
@@ -802,7 +782,7 @@ page {
   height: 134rpx;
   line-height: 130rpx;
   text-align: center;
-  background: url(https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/inviteBtnbg.png)
+  background: url(#{$img_url}inviteBtnbg.png)
     no-repeat;
   background-size: 100% 100%;
   animation: breathe 1.2s infinite linear;
@@ -858,8 +838,6 @@ page {
 .centerBg .award1 {
   width: 460rpx;
   height: 124rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/temp.png")
-    no-repeat;
   background-size: 100% 100%;
   position: absolute;
   top: 134rpx;
@@ -886,8 +864,6 @@ page {
 .centerBg .award2 {
   width: 453rpx;
   height: 267rpx;
-  background: url("https://img1.zhuanstatic.com/open/zhuanzhuan/zzwa/runningbear/award/award2.png")
-    no-repeat;
   background-size: 100% 100%;
   position: absolute;
   top: 277rpx;
@@ -898,8 +874,6 @@ page {
   width: 100%;
   height: 120rpx;
   border-radius: 10rpx;
-  background: url("https://pic1.zhuanstatic.com/zhuanzh/n_v2f351b51d2ab5423d836717f13746a624.png")
-    no-repeat;
   background-size: 100% 100%;
   display: flex;
   justify-content: space-between;

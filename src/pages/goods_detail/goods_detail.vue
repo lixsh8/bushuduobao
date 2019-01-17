@@ -244,7 +244,7 @@
     <back-top :showBackTop="showBackTop&&currentTab==1" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore&&page!=1"
+      :showNoMore="showNoMore"
       noMoreTips="没有更多数据了"
     />
 
@@ -424,14 +424,14 @@ export default {
         } else {
           this.article = info.dgoods_body.replace(
             /<img/gi,
-            '<img style="width:375px;height:auto;display:block;" '
+            '<img style="width:100%;height:auto;display:block;" '
           );
         }
         console.log(
           "详情：====" +
             info.dgoods_body.replace(
               /<img/gi,
-              '<img style="width:375px;height:auto;display:block;" '
+              '<img style="width:100%;height:auto;display:block;" '
             )
         );
 
@@ -505,6 +505,11 @@ export default {
         duration: 0
       });
       this.currentTab = idx;
+      if (idx === 1 && !this.hasMore) {
+        this.showNoMore = true;
+      } else {
+        this.showNoMore = false;
+      }
     },
     // 去下一期购买
     goNext() {
@@ -636,6 +641,7 @@ export default {
       this.buyNum = num;
       this.useTime = this.duobaoData.useTime - num;
       this.totalPrice = num * this.price;
+      this.$forceUpdate();
 
       console.log(this.buyNum);
     },
@@ -767,6 +773,8 @@ export default {
     this.currentTab = 0;
     this.page = 1;
     this.showBuyModal = false;
+    this.showNoMore = false;
+    this.hasMore = true;
 
     var id = this.$root.$mp.query.id;
     var ifBack = this.$root.$mp.query.ifBack;

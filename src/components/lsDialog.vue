@@ -3,12 +3,13 @@
   <div
     class='dialog'
     :class="{show:showDialog}"
-    @click="close"
+    @touchmove.stop="stopPropagation"
   >
     <div
       class="dialog-cnt"
       @click.stop="stopPropagation"
     >
+      <div class="cls-btn" @click="close"></div>
       <div class="dialog-hd">{{dialogTitle}}</div>
       <div class="dialog-bd">
         <rich-text :nodes="dialogContent" />
@@ -94,6 +95,7 @@ export default {
 </script>
 
 <style lang='scss' scoped>
+@import "../common/style/variable";
 .dialog {
   position: fixed;
   width: 100%;
@@ -117,6 +119,17 @@ export default {
     background: #fff;
     border-radius: 6px;
     color: #666;
+
+    .cls-btn{
+      width: 36px;
+      height: 36px;
+      position: absolute;
+      right: 0;
+      top: 0;
+      background: url(#{$img_url}icon_close_black.png) no-repeat center;
+      background-size: 16px;
+      border-radius: 0 6px 0 0;
+    }
 
     .dialog-hd {
       padding: 25px 10px 0 10px;

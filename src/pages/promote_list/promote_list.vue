@@ -1,4 +1,4 @@
-<!-- 加成明细 -->
+<!-- 邀请明细 -->
 <template>
   <div style="height:100%;">
     <head-bar
@@ -64,7 +64,7 @@ var mta = require("@/utils/mta_analysis.js");
 export default {
   data() {
     return {
-      title: "加成明细",
+      title: "邀请明细",
       headerBackground: "#fff",
       titleColor: "black",
       showCustomBar: !0,

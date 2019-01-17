@@ -22,6 +22,7 @@ const api = {
   IndexDuobao: ApiRootUrl + "?act=duobao&op=index",
   WelfareAd: ApiRootUrl + "?act=index&op=makeMoney",
   IndexPackPrize: ApiRootUrl + "?act=index&op=getIndexInfo",
+  DoubleReward: ApiRootUrl + "?act=index&op=getDoubleReward",
   // 发送消息模板
   sendMessage: r =>
     request.get("?act=friend&op=signSendMsg", r, {

@@ -1,52 +1,79 @@
 <!-- 通用规则弹窗组件 -->
 <template>
-<form @submit="subBtnClick" report-submit="true">
-  <div
-    class="rule-modal"
-    :class="{show:ifShowSign}"
-  >
-    <div class="dialog-cnt">
-      <div class="dialog-top">
-        <div class="title">连续签到第{{days}}天</div>
-        <div class="pack-num">
-          <div class="unit">￥</div>
-          <div class="num">{{packAmount}}</div>
-        </div>
-        <div class="subtitle">今日签到红包</div>
-        <div class="sign">
-          <div class="day-box">
-            <div class="day" :class="{active:days>=1}">1</div>
-            <div class="day" :class="{active:days>=2}">2</div>
-            <div class="day" :class="{active:days>=3}">3</div>
-            <div class="day" :class="{active:days>=4}">4</div>
-            <div class="day" :class="{active:days>=5}">5</div>
-            <div class="day" :class="{active:days>=6}">6</div>
-            <div class="day day-7" :class="{active:days>=7}"></div>
+  <form report-submit="true">
+    <div
+      class="rule-modal"
+      :class="{show:ifShowSign}"
+    >
+      <div class="dialog-cnt">
+        <div class="dialog-top">
+          <div
+            class="cls-btn"
+            @click="clsSignModal"
+          ></div>
+          <div class="title">连续签到第{{days}}天</div>
+          <div class="pack-num">
+            <div class="unit">￥</div>
+            <div class="num">{{packAmount}}</div>
           </div>
-          <div class="line"></div>
+          <div class="subtitle">今日签到红包</div>
+          <div class="sign">
+            <div class="day-box">
+              <div
+                class="day"
+                :class="{active:days>=1}"
+              >1</div>
+              <div
+                class="day"
+                :class="{active:days>=2}"
+              >2</div>
+              <div
+                class="day"
+                :class="{active:days>=3}"
+              >3</div>
+              <div
+                class="day"
+                :class="{active:days>=4}"
+              >4</div>
+              <div
+                class="day"
+                :class="{active:days>=5}"
+              >5</div>
+              <div
+                class="day"
+                :class="{active:days>=6}"
+              >6</div>
+              <div
+                class="day day-7"
+                :class="{active:days>=7}"
+              ></div>
+            </div>
+            <div class="line"></div>
+          </div>
         </div>
+
+        <div class="dialog-md">预约明天20:00签到提醒</div>
+
+        <div class="dialog-ft">
+          <!-- <div class="btn" @click="clsSignModal">不用了</div> -->
+          <button
+            @click="okBtnHandler"
+            :open-type="openType"
+            class="btn btn-subscribe"
+          >{{confirmText}}</button>
+        </div>
+
       </div>
-
-      <div class="dialog-md">预约明天20:00签到提醒</div>
-
-      <div class="dialog-ft">
-        <div class="btn" @click="clsSignModal">不用了</div>
-        <button form-type="submit" class="btn btn-subscribe">好的，预约提醒</button>
-      </div>
-
     </div>
-  </div>
-</form>
+  </form>
 </template>
 
 <script type="text/ecmascript-6">
-
 export default {
   data() {
     return {};
   },
-  components: {
-  },
+  components: {},
 
   props: {
     ifShowSign: {
@@ -60,6 +87,14 @@ export default {
     packAmount: {
       type: Number,
       default: 0
+    },
+    confirmText: {
+      type: String,
+      default: "确定"
+    },
+    openType: {
+      type: String,
+      default: ""
     }
   },
 
@@ -67,9 +102,9 @@ export default {
     clsSignModal(ev) {
       this.$emit("clsSignModal", ev);
     },
-    subBtnClick(ev) {
+    okBtnHandler(ev) {
       console.log(ev);
-      this.$emit("subBtnClick", ev.target.formId);
+      this.$emit("okBtnHandler", ev);
     }
   }
 };
@@ -103,8 +138,26 @@ export default {
     .dialog-top {
       width: 290px;
       height: 239px;
-      background: #fff url(#{$img_url}signin_bg.png) no-repeat center top;
+      position: relative;
+      background: url(#{$img_url}signin_bg.png?v=2) no-repeat center;
       background-size: 100%;
+
+      .cls-btn {
+        /* width: 36px;
+        height: 36px;
+        position: absolute;
+        right: -10px;
+        top: 10px;
+        background: url(#{$img_url}icon_close_black.png) no-repeat center;
+        background-size: 12px; */
+        position:absolute;
+        top:-20px;
+        right:0;
+        width:72rpx;
+        height:72rpx;
+        background:url(#{$img_url}dialog_close.png) no-repeat;
+        background-size:100% 100%;
+      }
 
       .title {
         padding-top: 13px;
@@ -177,7 +230,7 @@ export default {
           text-align: center;
           color: #fff;
         }
-        .day.active{
+        .day.active {
           background: url(#{$img_url}signin_date_active.png) no-repeat center;
           background-size: 100%;
         }
@@ -202,22 +255,22 @@ export default {
       }
     }
 
-    .dialog-md{
+    .dialog-md {
       width: 100%;
       height: 48px;
       line-height: 48px;
       text-align: center;
       font-size: 14px;
-      color: #9B9B9B;
+      color: #9b9b9b;
       background: #fff;
     }
 
-    .dialog-ft{
+    .dialog-ft {
       width: 100%;
       display: flex;
       flex-direction: row;
 
-      .btn{
+      /* .btn{
         width: 120px;
         text-align: center;
         line-height: 44px;
@@ -225,13 +278,13 @@ export default {
         color: #333;
         background: #e9e9e9;
         border-radius: 0 0 0 6px;
-      }
-      .btn-subscribe{
+      } */
+      .btn-subscribe {
         flex: 1;
         background: #fc3d46;
         border-radius: 0;
         color: #fff;
-        border-radius: 0 0 6px 0;
+        border-radius: 0 0 6px 6px;
       }
     }
   }
