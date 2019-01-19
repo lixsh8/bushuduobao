@@ -1,4 +1,4 @@
-<!-- 登录页面 -->
+<!-- 网络错误页 -->
 <template>
   <div class="login">
     <!-- 底部按钮 -->
@@ -11,7 +11,7 @@
         mode="widthFix"
         alt=""
       >
-      登录请重新登录！~</div>
+      唔，网络不给力，轻触屏幕重试</div>
   </div>
 </template>
 

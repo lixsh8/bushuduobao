@@ -34,7 +34,7 @@ request.interceptors.response.use(
   (err, promise) => {
     wx.hideNavigationBarLoading();
     wx.navigateTo({
-      url: "/pages/login/main"
+      url: "/pages/page_error/main"
     });
 
     return promise.resolve();

@@ -241,6 +241,7 @@
       @closeBuyModal="closeBuyModal"
       @changeNum="changeNum"
       @makeBuy="makeBuy"
+      @tili="tili"
     />
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop&&currentTab==1" />
@@ -265,8 +266,8 @@
       @click="goNext"
       v-else-if="is_end==1&&nextId"
     >
-      <div class="btn-t">继续夺宝</div>
-      <div class="btn-sub-t">第{{nextId}}期正在进行中</div>
+      <div class="btn-t">继续参与</div>
+      <div class="btn-sub-t">第{{next_is_number}}期正在进行中</div>
     </div>
 
     <div
@@ -421,6 +422,7 @@ export default {
         this.member_id = res.data.member_id;
         this.title = res.data.title;
         this.nextId = res.data.next_is_id;
+        this.next_is_number = res.data.next_is_number;
         this.useTime = res.data.useTime - 10;
         this.is_end = res.data.is_end;
         this.is_soldout = res.data.is_soldout;
@@ -658,6 +660,11 @@ export default {
 
       console.log(this.buyNum);
     },
+    // 点击领体力按钮
+    tili() {
+      // 购买统计
+      mta.Event.stat("tili_btn", {});
+    },
     // 关闭购买弹窗
     closeBuyModal() {
       this.buyNum = 1;
@@ -842,11 +849,14 @@ export default {
         .request(api.PowerGet, null, "GET", this)
         .then(res => {
           if (res.code == 0) {
-            this.useTime = res.data.useTime;
+            this.duobaoData.useTime = res.data.useTime;
+            this.useTime =
+        this.duobaoData.useTime - this.buyNum * this.duobaoData.joinPowerDown;
+            // this.$forceUpdate();
           }
         })
         .then(() => {});
-    }, 1000);
+    }, 3000);
   }
 };
 </script>

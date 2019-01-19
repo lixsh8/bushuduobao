@@ -20,6 +20,7 @@
     "pages/mine/main",
     "pages/strategy/main",
     "pages/detail_rules/main",
+    "pages/page_error/main",
     "pages/login/main"
   ],
   "window": {

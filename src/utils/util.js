@@ -117,7 +117,7 @@ function request(url, data = {}, method = "GET") {
       },
       fail: function(err) {
         wx.navigateTo({
-          url: "/pages/login/main"
+          url: "/pages/page_error/main"
         });
         reject(err);
         console.log("请求失败，url", url);

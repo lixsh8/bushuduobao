@@ -988,6 +988,13 @@ export default {
     wx.closeSocket();
   },
 
+  onUnload() {
+    console.log('unload......');
+    
+    this.hasClickShareBtn = false;
+    this.showDialog = false;
+  },
+
   // 页面加载
   async onLoad(options) {
     // mta统计

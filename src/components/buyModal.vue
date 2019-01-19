@@ -44,9 +44,10 @@
           <div class="buy-chance"><text>体力 <text class="red">{{useTime>=0?useTime:0}}</text></text>
             <div
               class="add-chance"
+              :class="{green:useTime>=100}"
               @click="tiliHandler"
               open-type="share"
-            >{{useTime>=100?"体力充沛":"体力告急"}}</div>
+            >{{useTime>=100?"体力充沛":"补充体力"}}</div>
           </div>
         </div>
 
@@ -121,7 +122,8 @@ export default {
       this.$emit("makeBuy", ev.target.formId);
     },
     tiliHandler() {
-      wx.redirectTo({
+      this.$emit("tili");
+      wx.navigateTo({
         url: '/pages/promote_rules/main'
       })
     }
@@ -255,6 +257,10 @@ export default {
           box-shadow: none !important;
           outline: 0 !important;
           border: 1px solid #ff3b30 !important;
+        }
+        .green{
+          border: 1px solid #3ba700 !important;
+          color: #3ba700;
         }
         button::after {
           padding: 0 !important;
