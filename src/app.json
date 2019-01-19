@@ -6,6 +6,7 @@
     "pages/newer/main",
     "pages/invite/main",
     "pages/promote_list/main",
+    "pages/promote_rules/main",
     "pages/welfare_ad/main",
     "pages/order/main",
     "pages/order_detail/main",

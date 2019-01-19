@@ -23,6 +23,9 @@ const api = {
   WelfareAd: ApiRootUrl + "?act=index&op=makeMoney",
   IndexPackPrize: ApiRootUrl + "?act=index&op=getIndexInfo",
   DoubleReward: ApiRootUrl + "?act=index&op=getDoubleReward",
+  // 用户指引 
+  MemberInfoSet: ApiRootUrl + "?act=index&op=setMemberInfo",
+
   // 发送消息模板
   sendMessage: r =>
     request.get("?act=friend&op=signSendMsg", r, {
@@ -55,6 +58,10 @@ const api = {
   DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
   DuobaoMessage: ApiRootUrl + "?act=duobao&op=duobaoInfo",
   DuobaoResult: ApiRootUrl + "?act=duobao&op=joinSuccess",
+  DuobaoResultDB: ApiRootUrl + "?act=duobao&op=getJoinSuccReward",
+  // 加体力规则
+  PowerRule: ApiRootUrl + "?act=duobao&op=power",
+
   // 最新开奖
   DuobaoHistory: ApiRootUrl + "?act=duobao&op=latestAwardList",
   JoinDuobao: ApiRootUrl + "?act=duobao&op=join",
@@ -68,6 +75,7 @@ const api = {
   AddressSave: ApiRootUrl + "?act=address&op=saveAddress",
   IncomeRule: ApiRootUrl + "?act=duobao&op=revenuRule",
   OrderReceive: ApiRootUrl + "?act=duobao_order&op=receiveOrder",
+  OrderShareRecord: ApiRootUrl + "?act=duobao_order&op=saveOrderState",
   // 物流信息
   Logistics: ApiRootUrl + "?act=duobao_order&op=deliveryInfo",
 

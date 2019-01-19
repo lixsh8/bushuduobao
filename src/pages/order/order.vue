@@ -87,15 +87,15 @@
             @click.stop="goLogistics(item.delivery_id)"
           >查看物流</div>
         </div>
-        <div
+        <!-- <div
           class="item-ft"
           v-if="item.showAddress"
-        >
+         >
           <div
             class="btn-logistics"
             @click.stop="setAddress(item.order_id)"
           >收货地址</div>
-        </div>
+        </div> -->
       </div>
 
     </div>
@@ -325,39 +325,39 @@ export default {
       console.log("closeDialog");
 
       this.showDialog = false;
-    },
-    // 设置地址
-    setAddress(orderId) {
-      console.log("收货地址按钮点击");
-      var _this = this;
-
-      wx.getSetting({
-        success(res) {
-          if (!res.authSetting["scope.address"]) {
-            wx.authorize({
-              scope: "scope.address",
-              success() {
-                _this.goChooseAddress(orderId);
-              },
-              fail() {
-                console.log("系统自带的授权弹窗点了拒绝授权");
-                // 自定义地址授权按钮弹窗
-                _this.dialogTitle = "通讯地址授权失败，请重新授权";
-                _this.dialogContent =
-                  "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
-                _this.confirmText = "去授权";
-                _this.cancelText = "取消";
-                _this.singleBtn = false;
-                _this.openType = "openSetting";
-                _this.showDialog = true;
-              }
-            });
-          } else {
-            _this.goChooseAddress(orderId);
-          }
-        }
-      });
     }
+    // 设置地址
+    // setAddress(orderId) {
+    //   console.log("收货地址按钮点击");
+    //   var _this = this;
+
+    //   wx.getSetting({
+    //     success(res) {
+    //       if (!res.authSetting["scope.address"]) {
+    //         wx.authorize({
+    //           scope: "scope.address",
+    //           success() {
+    //             _this.goChooseAddress(orderId);
+    //           },
+    //           fail() {
+    //             console.log("系统自带的授权弹窗点了拒绝授权");
+    //             // 自定义地址授权按钮弹窗
+    //             _this.dialogTitle = "通讯地址授权失败，请重新授权";
+    //             _this.dialogContent =
+    //               "为了方便你管理收货地址，步数换商品申请获取你的通讯地址";
+    //             _this.confirmText = "去授权";
+    //             _this.cancelText = "取消";
+    //             _this.singleBtn = false;
+    //             _this.openType = "openSetting";
+    //             _this.showDialog = true;
+    //           }
+    //         });
+    //       } else {
+    //         _this.goChooseAddress(orderId);
+    //       }
+    //     }
+    //   });
+    // }
   },
 
   // 下拉刷新

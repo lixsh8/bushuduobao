@@ -11,11 +11,11 @@
 
     <!-- 正文 -->
     <div class="income-box">
-      <div class="income-hd">当前收益</div>
+      <div class="income-hd">福气红包</div>
       <div class="income-bd">￥{{income}}</div>
     </div>
     <div class="rules-title">
-      收益规则
+      {{data&&data.hb_amount_title}}
     </div>
     <div class="rules">
       <rich-text
@@ -43,14 +43,15 @@ var mta = require("@/utils/mta_analysis.js");
 export default {
   data() {
     return {
-      title: "收益规则",
+      title: "福气红包",
       headerBackground: "#fff",
       titleColor: "black",
       showCustomBar: !0,
       customBarStyle: "black",
       income: "-",
       detail: "",
-      article: ""
+      article: "",
+      data: null
     };
   },
 
@@ -89,6 +90,7 @@ export default {
     if (res.data && res.code === 0) {
       // this.totalData = res.data;
       console.log(res.data);
+      this.data = res.data;
 
       this.article = res.data.rules;
     } else {

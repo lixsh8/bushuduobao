@@ -107,7 +107,7 @@
           data-type="0"
           openType="share"
         >
-          邀请新人永久加成
+          邀请好友拿红包
         </button>
 
         <div
@@ -371,6 +371,7 @@
     <ls-dialog
       @closeDialog="closeDialog"
       @okBtnHandler="okBtnHandler"
+      :dialogType="dialogType"
       :showDialog="showDialog"
       :dialogTitle="dialogTitle"
       :dialogContent="dialogContent"
@@ -385,6 +386,12 @@
       @getUserInfos="getUserInfos"
       :authModalShow="authModalShow"
     />
+
+    <div
+      class="guide"
+      @click="guideClickHandler"
+      v-if="showGuide"
+    ></div>
   </div>
 </template>
 
@@ -409,11 +416,14 @@ export default {
       headerBackground: "#FF696C",
       titleColor: "#fff",
       showBackTop: true,
+      // 新用户教育蒙层
+      showGuide: false,
       // 是否需要弹窗授权获取用户信息
       authModalShow: !1,
       // 签到弹窗
       ifShowSign: false,
       // 弹窗
+      dialogType: "",
       showDialog: false,
       dialogTitle: "",
       dialogContent: "",
@@ -424,6 +434,7 @@ export default {
       days: 0,
       hb_amount: 0,
       packAmount: 0,
+      hasClickShareBtn: false,
       // 加密
       sign: "",
       share: {},
@@ -480,6 +491,21 @@ export default {
     pagingFooter
   },
   methods: {
+    // 新用户教育蒙层
+    guideClickHandler(ev) {
+      var _this = this;
+
+      request
+        .get(api.MemberInfoSet, {
+          show_guide: 0
+        })
+        .then(function(res) {
+          if (res.code == 0) {
+            _this.showGuide = false;
+          }
+        });
+      //
+    },
     // 通过id来更新数据
     updateData(newData) {
       var _this = this;
@@ -550,27 +576,7 @@ export default {
 
       _this.showDialog = false;
       _this.ifShowSign = false;
-
-      if (_this.openType == "share") {
-        // 发送请求去翻倍 DoubleReward
-        const resDoubleReward = await util.request(
-          api.DoubleReward,
-          { sign: _this.sign },
-          "GET",
-          this
-        );
-        console.log(resDoubleReward.data);
-        if (resDoubleReward.data && resDoubleReward.code === 0) {
-          // this.totalData = res.data;
-          // 翻倍按钮点击成功后
-          _this.hb_amount = resDoubleReward.data.hb_amount;
-          _this.dialogTitle = "恭喜获得翻倍红包";
-          _this.dialogContent = resDoubleReward.data.amount + "元";
-          _this.confirmText = "收下";
-          _this.showDialog = true;
-          _this.openType = "";
-        }
-      }
+      _this.hasClickShareBtn = true;
     },
     // 点击气泡获取金币
     handlePrize(e) {
@@ -607,8 +613,9 @@ export default {
               console.log("好友贡献弹窗");
 
               // 好友贡献弹窗
-              _this.dialogTitle = "恭喜获得翻倍红包";
-              _this.dialogContent = res.data.amount + "元";
+              _this.dialogType = "pack";
+              _this.dialogTitle = "恭喜获得";
+              _this.dialogContent = res.data.amount + "元红包";
               _this.confirmText = res.data.btn_text;
               _this.showDialog = true;
               // wx.showModal({
@@ -662,6 +669,8 @@ export default {
             _this.hb_amount = res.data.hb_amount;
             _this.bubble = res.data.bubble;
             _this.share = res.data.share;
+            // 是否显示用户指引
+            _this.showGuide = res.data.show_guide;
 
             if (_this.requestTimer.getPacks) {
               clearInterval(_this.requestTimer.getPacks);
@@ -790,8 +799,9 @@ export default {
         this.totalStep = 0;
         this.hb_amount = res.data.hb_amount;
         // 兑换步数成功弹窗
-        this.dialogTitle = "恭喜获得红包";
-        this.dialogContent = res.data.amount + "元";
+        this.dialogType = "pack";
+        this.dialogTitle = "恭喜获得";
+        this.dialogContent = res.data.amount + "元红包";
         this.showDialog = true;
         this.confirmText = res.data.btn_text;
         this.sign = res.data.sign;
@@ -801,6 +811,10 @@ export default {
           this.openType = "";
         }
       } else {
+        wx.showModal({
+          title: "提示",
+          content: res.msg || "兑换失败"
+        });
       }
     },
     checkAuth() {
@@ -995,6 +1009,32 @@ export default {
 
     // 设置顶级以便返回的时候使用tab页面
     wx.setStorageSync("tabPage", "index");
+
+    // 是否点击了分享按钮去翻倍
+    if (_this.openType == "share" && _this.hasClickShareBtn) {
+      // 发送请求去翻倍 DoubleReward
+      const resDoubleReward = await util.request(
+        api.DoubleReward,
+        { sign: _this.sign },
+        "GET",
+        this
+      );
+
+      console.log("翻倍：" + JSON.stringify(resDoubleReward.data));
+      if (resDoubleReward.data && resDoubleReward.code === 0) {
+        // this.totalData = res.data;
+        // 翻倍按钮点击成功后
+        _this.hb_amount = resDoubleReward.data.hb_amount;
+        _this.dialogType = "pack";
+        _this.dialogContent = resDoubleReward.data.amount + "元红包";
+        _this.confirmText = "收下";
+        _this.showDialog = true;
+        _this.openType = "";
+      }
+
+      _this.openType = "";
+      _this.hasClickShareBtn = false;
+    }
 
     // 计算文档高度
     // const query = wx.createSelectorQuery();
@@ -1717,7 +1757,7 @@ button::after {
   position: absolute;
   top: 60rpx;
   left: 50rpx;
-  z-index: 89;
+  z-index: 19;
 }
 /* 邀请拉新红包 */
 .invite-new-prize,
@@ -1725,7 +1765,7 @@ button::after {
   position: absolute;
   top: 200rpx;
   left: 50rpx;
-  z-index: 89;
+  z-index: 19;
 }
 
 /* 好友夺宝兑换 */
@@ -1733,28 +1773,28 @@ button::after {
   position: absolute;
   top: 20rpx;
   right: 60rpx;
-  z-index: 89;
+  z-index: 19;
 }
 /* 兑换商品收益 */
 .duobaoReward {
   position: absolute;
   top: 140rpx;
   right: 60rpx;
-  z-index: 89;
+  z-index: 19;
 }
 
 .recall-user-prize {
   position: absolute;
   top: 40rpx;
   right: 20rpx;
-  z-index: 89;
+  z-index: 19;
 }
 
 .friend-help-prize {
   position: absolute;
   top: 290rpx;
   left: 10rpx;
-  z-index: 89;
+  z-index: 19;
 }
 
 .activity-challenge {
@@ -2510,5 +2550,15 @@ ad {
     color: #2e3135;
     line-height: 40rpx;
   }
+}
+.guide {
+  position: fixed;
+  top: 0px;
+  left: 0;
+  z-index: 1001;
+  width: 100%;
+  height: 100%;
+  background: url(#{$img_url}guide_index.png) no-repeat center;
+  background-size: 100%;
 }
 </style>

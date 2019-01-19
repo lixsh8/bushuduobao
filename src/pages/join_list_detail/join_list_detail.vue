@@ -20,26 +20,26 @@
       <div class="list-t">号码：</div>
       <div
         class="list"
-        v-if="data.list"
+        v-if="list"
       >
 
         <div
           class="item"
-          v-for="(item,index) in data.list"
+          v-for="(item,index) in list"
           data-index="index"
           :key="index"
         >
           {{item}}
         </div>
 
-        <block v-if="data.list&&(data.list.length%3)==1">
+        <block v-if="list&&(list.length%3)==1">
           <div class="item">
           </div>
           <div class="item">
           </div>
         </block>
 
-        <block v-if="data.list&&(data.list.length%3)==2">
+        <block v-if="list&&(list.length%3)==2">
           <div class="item">
           </div>
         </block>
@@ -47,11 +47,16 @@
       </div>
 
       <!-- 无数据 -->
-      <no-data :showNoData="data&&!data.list||data.list.length<=0" />
+      <no-data :showNoData="!list||list.length<=0" />
     </div>
 
     <!-- 返回頂部 -->
     <back-top :showBackTop="showBackTop" />
+    <!-- 底部没有更多 -->
+    <paging-footer
+      :showNoMore="showNoMore&&list&&list.length>0"
+      noMoreTips="没有更多数据了"
+    />
     <!-- 快速导航 -->
     <!-- <quick-navigate /> -->
   </div>
@@ -80,7 +85,12 @@ export default {
       customBarStyle: "black",
       is_id: "",
       member_id: "",
-      data: null
+      order_id: "",
+      data: null,
+      showNoMore: !1,
+      page: 1,
+      hasMore: true,
+      list: null
     };
   },
 
@@ -106,6 +116,7 @@ export default {
         api.JoinListDetail,
         {
           is_id: this.is_id,
+          order_id: this.order_id,
           member_id: this.member_id
         },
         "GET",
@@ -116,17 +127,70 @@ export default {
         console.log(res.data);
 
         this.data = res.data;
+        this.list = res.data.list;
       } else {
       }
     }
   },
 
+  // 滚动加载更多
+  async onReachBottom() {
+    console.log('onReachBottom');
+    
+    if (this.hasMore) {
+      let list = this.list;
+      let page = this.page;
+
+      page++;
+
+      wx.showToast({
+        title: "数据加载中...", // 提示的内容,
+        icon: "loading", // 图标,
+        duration: 1000 // 延迟时间,
+      });
+
+      const res = await util.request(
+        api.JoinListDetail,
+        {
+          page: page,
+          is_id: this.is_id,
+          order_id: this.order_id,
+          member_id: this.member_id
+        },
+        "GET",
+        this
+      );
+
+      if (res.data && res.code === 0 && res.data.list) {
+        // this.totalData = res.data;
+        var data = res.data;
+        if (res.data.list.length > 0) {
+          this.list = list.concat(data.list);
+          this.page = data.page;
+        }
+        this.hasMore = data.hasMore;
+        if (data.hasMore) {
+          this.showNoMore = !1;
+        } else {
+          this.showNoMore = !0;
+        }
+      }
+    } else {
+      this.showNoMore = !0;
+    }
+  },
+
   // 页面加载
   async onLoad(e) {
+
+    this.page = 1;
+    this.showNoMore = false;
+    this.hasMore = true;
     // mta统计
     mta.Page.init();
     this.is_id = this.$root.$mp.query.is_id;
     this.member_id = this.$root.$mp.query.member_id;
+    this.order_id = this.$root.$mp.query.order_id;
 
     this.getList();
   }

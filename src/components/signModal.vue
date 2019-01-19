@@ -52,7 +52,8 @@
           </div>
         </div>
 
-        <div class="dialog-md">预约明天20:00签到提醒</div>
+        <div class="dialog-md"></div>
+        <!-- <div class="dialog-md">预约明天20:00签到提醒</div> -->
 
         <div class="dialog-ft">
           <!-- <div class="btn" @click="clsSignModal">不用了</div> -->
@@ -139,7 +140,7 @@ export default {
       width: 290px;
       height: 239px;
       position: relative;
-      background: url(#{$img_url}signin_bg.png?v=2) no-repeat center;
+      background: url(#{$img_url}signin_bg.png?v=2) no-repeat bottom center;
       background-size: 100%;
 
       .cls-btn {
@@ -281,9 +282,13 @@ export default {
       } */
       .btn-subscribe {
         flex: 1;
+        padding: 16px 0;
         background: #fc3d46;
         border-radius: 0;
+        font-size: 15px;
         color: #fff;
+        line-height: 1;
+        text-align: center;
         border-radius: 0 0 6px 6px;
       }
     }

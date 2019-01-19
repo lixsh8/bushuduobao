@@ -108,6 +108,7 @@ function request(url, data = {}, method = "GET") {
             //     reject(err);
             //   });
           } else {
+            
             resolve(res.data);
           }
         } else {

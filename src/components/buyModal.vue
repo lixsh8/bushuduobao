@@ -41,11 +41,12 @@
               ></div>
             </div>
           </div>
-          <div class="buy-chance">今日剩余<text>{{useTime>=0?useTime:0}}</text>份参与机会<button
+          <div class="buy-chance"><text>体力 <text class="red">{{useTime>=0?useTime:0}}</text></text>
+            <div
               class="add-chance"
-              @click="okBtnHandler"
+              @click="tiliHandler"
               open-type="share"
-            >提升</button>
+            >{{useTime>=100?"体力充沛":"体力告急"}}</div>
           </div>
         </div>
 
@@ -81,6 +82,7 @@ export default {
       type: Number,
       default: 0
     },
+    // 剩余次数 体力次数
     useTime: {
       type: Number,
       default: 0
@@ -89,6 +91,7 @@ export default {
       type: Number,
       default: 0
     },
+    // 购买次数
     buyNum: {
       type: Number,
       default: 1
@@ -116,6 +119,11 @@ export default {
       console.log("formId=" + ev.target.formId);
 
       this.$emit("makeBuy", ev.target.formId);
+    },
+    tiliHandler() {
+      wx.redirectTo({
+        url: '/pages/promote_rules/main'
+      })
     }
   }
 };
@@ -228,17 +236,17 @@ export default {
         text {
           display: inline-block;
           vertical-align: center;
+        }
+        .red {
           color: #ff3b30;
         }
 
         .add-chance {
           display: inline-block;
-          padding: 0;
+          padding: 2px 5px;
           vertical-align: center;
-          width: 32px;
-          height: 16px;
           margin: 0 0 0 10px !important;
-          line-height: 16px;
+          line-height: 1;
           text-align: center;
           font-size: 10px;
           color: #ff3b30;
@@ -289,7 +297,7 @@ export default {
         text-align: center;
         font-size: 18px;
         color: #fff;
-        border-radius: 0!important;
+        border-radius: 0 !important;
         background: linear-gradient(
           135deg,
           rgba(255, 106, 107, 1) 0%,
@@ -301,7 +309,7 @@ export default {
         padding: 0 !important;
         margin: 0 !important;
         border: none !important;
-        border-radius: 0!important;
+        border-radius: 0 !important;
       }
     }
   }

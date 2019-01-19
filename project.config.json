@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 6,
+			"current": 20,
 			"list": [
 				{
 					"id": 0,
@@ -74,14 +74,15 @@
 					"id": 6,
 					"name": "商品詳情",
 					"pathName": "pages/goods_detail/main",
-					"query": "id=248",
+					"query": "id=177",
 					"scene": "1012"
 				},
 				{
 					"id": 7,
 					"name": "订单详情",
 					"pathName": "pages/order_detail/main",
-					"query": "orderId=100000086100000141"
+					"query": "orderId=100000238100000141",
+					"scene": "1012"
 				},
 				{
 					"id": -1,
@@ -93,7 +94,7 @@
 					"id": 9,
 					"name": "参与明细",
 					"pathName": "pages/join_list/main",
-					"query": "id=176",
+					"query": "is_id=274&member_id=10046",
 					"scene": "1012"
 				},
 				{
@@ -115,10 +116,11 @@
 					"query": "orderId=1912290002100001041"
 				},
 				{
-					"id": -1,
+					"id": 13,
 					"name": "兑商成功",
 					"pathName": "pages/result/main",
-					"query": "orderId=1912290002100001041"
+					"query": "id=153&orderId=100000153100001841&dgoods_id=16",
+					"scene": "1012"
 				},
 				{
 					"id": 14,
@@ -150,6 +152,20 @@
 					"name": "兑换成功页",
 					"pathName": "pages/result/main",
 					"query": "id=100&orderId=100000100100001941"
+				},
+				{
+					"id": 19,
+					"name": "号码明细",
+					"pathName": "pages/join_list_detail/main",
+					"query": "is_id=246&order_id=100000246100000164&member_id=10064",
+					"scene": "1012"
+				},
+				{
+					"id": -1,
+					"name": "体力规则",
+					"pathName": "pages/promote_rules/main",
+					"query": "id=177",
+					"scene": "1012"
 				}
 			]
 		}

@@ -25,22 +25,15 @@
       >订单详情</div>
     </div>
 
-    <div class="share-panel">
-      <img
-        class="share-img"
-        mode="widthFix"
-        :src="bannerImg"
-      />
+    <div class="share-panel" v-if="showMsg">
+      <div class="title">{{data&&data.text}}</div>
+      <div class="num">{{data&&data.sub_text}}</div>
       <div class="share-btn-wrapper">
         <button
           class="share-btn"
+          @click="dbbtnClickHandler"
           openType="share"
-        >
-          <img
-            :src="hyImg"
-            alt=""
-          >
-          <div class="btn-title">晒单给好友</div>
+        >{{data&&data.btn_text}}
         </button>
         <!-- <div
           class="share-btn"
@@ -83,6 +76,7 @@
     <ls-dialog
       @closeDialog="closeDialog"
       @okBtnHandler="okBtnHandler"
+      :dialogType="dialogType"
       :showDialog="showDialog"
       :dialogTitle="dialogTitle"
       :dialogContent="dialogContent"
@@ -119,17 +113,21 @@ export default {
       showCustomBar: !0,
       customBarStyle: "black",
       // 弹窗
+      dialogType: "",
       showDialog: false,
       dialogTitle: "",
       dialogContent: "",
       openType: "",
       singleBtn: true,
       confirmText: "",
+      hasClickShareBtn: false,
 
       banner: null,
+      showMsg: true,
       id: "",
       orderId: "",
       dgoods_id: "",
+      data: null,
       shareData: {},
       list: null
     };
@@ -163,6 +161,19 @@ export default {
   },
 
   methods: {
+    // 按钮点击事件处理函数
+    dbbtnClickHandler() {
+      var _this = this;
+
+      // 翻倍按钮点击成功后
+      _this.hasClickShareBtn = true;
+      // const resDoubleReward = await util.request(
+      //     api.DoubleReward,
+      //     { sign: _this.sign },
+      //     "GET",
+      //     this
+      //   );
+    },
     // 确定按钮关闭弹窗事件
     okBtnHandler() {
       this.showDialog = false;
@@ -176,16 +187,23 @@ export default {
     // 返回上一页
     back() {
       console.log("back func");
-      wx.redirectTo({
-        url: "/pages/goods_detail/main?id=" + this.id + "&ifBack=0"
-      });
+      wx.navigateBack({
+        delta: 1
+      })
+      // wx.redirectTo({
+      //   url: "/pages/goods_detail/main?id=" + this.id + "&ifBack=0"
+      // });
     },
     // 点击购买按钮
     btnClickHandler(ev) {
       console.log(ev);
-      wx.navigateTo({
-        url: "/pages/goods_detail/main?id=" + ev
-      });
+      // wx.redirectTo({
+      //   url: "/pages/goods_detail/main?id=" + ev + "&ifBack=0"
+      // });
+      wx.setStorageSync("is_id", ev);
+      wx.navigateBack({
+        delta: 1
+      })
     },
     // 点击查看订单详情
     goOrderDetail() {
@@ -194,46 +212,72 @@ export default {
       });
     },
     // 保存图片
-    savePic() {
-      wx.showToast({
-        title: "正在保存图片...",
-        icon: "loading",
-        duration: 20000,
-        mask: true,
-        success: res => {}
-      });
+    // savePic() {
+    //   wx.showToast({
+    //     title: "正在保存图片...",
+    //     icon: "loading",
+    //     duration: 20000,
+    //     mask: true,
+    //     success: res => {}
+    //   });
 
-      wx.getImageInfo({
-        src: "https://resourcecdn.xiaotaotao123.cn/wxapp_img/result_banner.png",
-        success: function(sres) {
-          wx.saveImageToPhotosAlbum({
-            filePath: sres.path,
-            success: function(res) {
-              console.log(res);
-              if (res.errMsg === "saveImageToPhotosAlbum:ok") {
-                wx.showModal({
-                  title: "提示",
-                  content: "图片已经保存到相册，可以到微信去分享了",
-                  showCancel: false,
-                  confirmText: "确定",
-                  confirmColor: "#3CC51F",
-                  success: res => {}
-                });
-              }
-            },
-            complete: function() {
-              wx.hideToast();
-            }
-          });
-        }
-      });
+    //   wx.getImageInfo({
+    //     src: "https://resourcecdn.xiaotaotao123.cn/wxapp_img/result_banner.png",
+    //     success: function(sres) {
+    //       wx.saveImageToPhotosAlbum({
+    //         filePath: sres.path,
+    //         success: function(res) {
+    //           console.log(res);
+    //           if (res.errMsg === "saveImageToPhotosAlbum:ok") {
+    //             wx.showModal({
+    //               title: "提示",
+    //               content: "图片已经保存到相册，可以到微信去分享了",
+    //               showCancel: false,
+    //               confirmText: "确定",
+    //               confirmColor: "#3CC51F",
+    //               success: res => {}
+    //             });
+    //           }
+    //         },
+    //         complete: function() {
+    //           wx.hideToast();
+    //         }
+    //       });
+    //     }
+    //   });
+    // }
+    async getData(orderId, dgoods_id) {
+      // 列表
+      const res = await util.request(
+        api.DuobaoResult,
+        {
+          id: orderId,
+          dgoods_id: dgoods_id
+        },
+        "GET",
+        this
+      );
+      if (res.data && res.code === 0) {
+        // this.totalData = res.data;
+        console.log(res.data);
+        this.data = res.data;
+        this.list = res.data.list;
+        this.shareData = res.data.share;
+
+        // 好友贡献弹窗
+        // this.dialogTitle = "恭喜获得";
+        // this.dialogContent = "参与兑商品收益" + res.data.fuli_amount + "元";
+        // this.confirmText = "收下";
+        // this.showDialog = true;
+      } else {
+      }
     }
   },
 
   // 分享
   onShareAppMessage(res) {
     console.log(res);
-    var resData = res[0]
+    var resData = res[0];
     if (resData.from === "button") {
       // 来自页面内转发按钮
       return util.getCommonShareData(
@@ -253,33 +297,49 @@ export default {
   async onLoad(e) {
     // mta统计
     mta.Page.init();
+
     this.orderId = this.$root.$mp.query.orderId;
     this.id = this.$root.$mp.query.id;
     this.dgoods_id = this.$root.$mp.query.dgoods_id;
-    console.log("this.orderId=" + this.orderId);
-    // 列表
-    const res = await util.request(
-      api.DuobaoResult,
-      {
-        id: this.orderId,
-        dgoods_id: this.dgoods_id
-      },
-      "GET",
-      this
-    );
-    if (res.data && res.code === 0) {
-      // this.totalData = res.data;
-      console.log(res.data);
+    console.log("this.orderId=, this.dgoods_id=", this.orderId, this.dgoods_id);
+    this.getData(this.orderId, this.dgoods_id);
+  },
 
-      this.list = res.data.list;
-      this.shareData = res.data.share;
+  // 页面显示
+  async onShow(e) {
+    var _this = this;
+    _this.showMsg = true;
+    console.log(_this.hasClickShareBtn);
+    // 是否点击了分享按钮去翻倍
+    if (_this.hasClickShareBtn) {
+      
+      // 发送请求去翻倍 DoubleReward
+      const resDoubleReward = await util.request(
+        api.DuobaoResultDB,
+        { sign: _this.data.sign },
+        "GET",
+        this
+      );
+      console.log(resDoubleReward);
+      if (resDoubleReward && resDoubleReward.code == 0) {
+        // 隐藏显示结果
+        _this.showMsg = false;
+        // this.totalData = res.data;
+        // 翻倍按钮点击成功后
+        _this.dialogType = this.data.reward_type == "fulihb" ? "pack" : "tili";
+        _this.dialogContent = resDoubleReward.msg;
+        _this.confirmText = "收下";
+        _this.showDialog = true;
+        _this.openType = "";
+      } else {
+        wx.showModal({
+          title: "提示",
+          content: resDoubleReward.msg
+        });
+      }
 
-      // 好友贡献弹窗
-      this.dialogTitle = "恭喜获得";
-      this.dialogContent = "参与兑商品收益" + res.data.fuli_amount + "元";
-      this.confirmText = "收下";
-      this.showDialog = true;
-    } else {
+      _this.openType = "";
+      _this.hasClickShareBtn = false;
     }
   }
 };
@@ -326,44 +386,54 @@ export default {
 }
 
 .share-panel {
-  width: 306px;
+  width: 340px;
+  height: 322px;
   margin: -24px auto 10px auto;
-  background: rgba(255, 255, 255, 1);
-  box-shadow: 0px 2px 5px 0px rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  padding: 12px;
+  background: url(#{$img_url}result_bg.png) no-repeat center;
+  background-size: 100%;
+  position: relative;
 
-  .share-img {
-    display: block;
-    width: 100%;
+  .title {
+    padding-top: 130px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1;
+    color: #ff3a39;
+    font-weight: bold;
+  }
+
+  .num {
+    padding-top: 6px;
+    text-align: center;
+    font-size: 15px;
+    line-height: 1;
+    color: #ff3a39;
+    font-weight: bold;
   }
 
   .share-btn-wrapper {
     display: flex;
     flex-direction: row;
-    margin-top: 22px;
+    position: absolute;
+    bottom: 30px;
+    width: 100%;
 
     .share-btn {
-      width: 50%;
       display: block;
-      background: none !important;
       border: none !important;
-
-      img {
-        display: block;
-        width: 44px;
-        height: 44px;
-        margin: 0 auto;
-      }
-
-      .btn-title {
-        padding-top: 8px;
-        padding-bottom: 26px;
-        text-align: center;
-        line-height: 1;
-        font-size: 14px;
-        color: #666;
-      }
+      width: 210px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      font-size: 16px;
+      color: #fff;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 106, 107, 1) 0%,
+        rgba(255, 58, 57, 1) 100%
+      ) !important;
+      border-radius: 20px;
+      animation: breathe 1.2s infinite linear;
     }
   }
 }
@@ -387,5 +457,26 @@ button::after {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+}
+@keyframes breathe {
+  0% {
+    transform: scale(0.95);
+  }
+
+  17% {
+    transform: scale(1);
+  }
+
+  33% {
+    transform: scale(1.05);
+  }
+
+  66% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(0.95);
+  }
 }
 </style>

@@ -5,11 +5,104 @@
     :class="{show:showDialog}"
     @touchmove.stop="stopPropagation"
   >
+    <!-- 获得红包弹窗 -->
     <div
+      class="dialog-cnt pack"
+      v-if="dialogType=='pack'"
+     >
+      <div
+        class="cls-btn"
+        @click="close"
+      ></div>
+      <div class="dialog-top">
+
+        <div class="dialog-bd">
+          {{dialogContent}}
+        </div>
+      </div>
+
+      <div class="dialog-ft">
+        <div
+          class="btn-wrapper"
+          v-if="singleBtn"
+        >
+          <button
+            class="btn btn-ok btn-sg"
+            @click="okBtnHandler"
+            :open-type="openType"
+          >{{confirmText}}</button>
+        </div>
+
+        <block v-else>
+          <div
+            class="btn btn-cancel"
+            @click="close"
+          >{{cancelText}}</div>
+          <button
+            class="btn btn-ok"
+            @click="okBtnHandler"
+            @opensetting='handleSetting'
+            :open-type="openType"
+          >{{confirmText}}</button>
+        </block>
+      </div>
+
+    </div>
+
+    <!-- 体力弹窗 -->
+    <div
+      class="dialog-cnt tili"
+      v-else-if="dialogType=='tili'"
+     >
+      <div
+        class="cls-btn"
+        @click="close"
+      ></div>
+      <div class="dialog-top">
+
+        <div class="dialog-bd">
+          {{dialogContent}}
+        </div>
+      </div>
+
+      <div class="dialog-ft">
+        <div
+          class="btn-wrapper"
+          v-if="singleBtn"
+        >
+          <button
+            class="btn btn-ok btn-sg"
+            @click="okBtnHandler"
+            :open-type="openType"
+          >{{confirmText}}</button>
+        </div>
+
+        <block v-else>
+          <div
+            class="btn btn-cancel"
+            @click="close"
+          >{{cancelText}}</div>
+          <button
+            class="btn btn-ok"
+            @click="okBtnHandler"
+            @opensetting='handleSetting'
+            :open-type="openType"
+          >{{confirmText}}</button>
+        </block>
+      </div>
+
+    </div>
+
+    <!-- 默认弹窗 -->
+    <div
+      v-else
       class="dialog-cnt"
       @click.stop="stopPropagation"
     >
-      <div class="cls-btn" @click="close"></div>
+      <div
+        class="cls-btn"
+        @click="close"
+      ></div>
       <div class="dialog-hd">{{dialogTitle}}</div>
       <div class="dialog-bd">
         <rich-text :nodes="dialogContent" />
@@ -41,6 +134,10 @@
 
       </div>
     </div>
+
+    <!-- <div class="dialog-cnt tili">
+
+    </div> -->
   </div>
 </template>
 
@@ -50,6 +147,10 @@ export default {
     return {};
   },
   props: {
+    dialogType: {
+      type: String,
+      default: "default"
+    },
     showDialog: {
       type: Boolean,
       default: !0
@@ -87,8 +188,7 @@ export default {
     okBtnHandler() {
       this.$emit("okBtnHandler");
     },
-    handleSetting(e) {
-    },
+    handleSetting(e) {},
     stopPropagation() {}
   }
 };
@@ -120,7 +220,7 @@ export default {
     border-radius: 6px;
     color: #666;
 
-    .cls-btn{
+    .cls-btn {
       width: 36px;
       height: 36px;
       position: absolute;
@@ -177,16 +277,106 @@ export default {
         font-size: 14px;
         color: #3ed48f;
         background: none !important;
-        border: none!important;
+        border: none !important;
       }
-      button::after{
+      button::after {
         background: none !important;
-        border: none!important;
+        border: none !important;
         box-shadow: none;
       }
-      .btn-wrapper{
+      .btn-wrapper {
         width: 100%;
         border-top: 1px solid #ccc;
+      }
+    }
+  }
+/* 红包弹窗 */
+  .dialog-cnt.pack {
+    width: 290px;
+
+    .cls-btn {
+      width: 36px;
+      height: 36px;
+      position: absolute;
+      right: 0;
+      top: -40px;
+      background: url(#{$img_url}dialog_close_hallow.png) no-repeat center;
+      background-size: 100%;
+    }
+
+    .dialog-top {
+      width: 290px;
+      height: 218px;
+      background: url(#{$img_url}dialog_pack.png) no-repeat center;
+      background-size: 100%;
+    }
+
+    .dialog-bd {
+      text-align: center;
+      width: 80%;
+      margin: 0 auto;
+      padding-top: 176px;
+      font-size: 19px;
+      font-weight: 500;
+      color: #ff3b30;
+      line-height: 21px;
+    }
+
+    .dialog-ft {
+      .btn-wrapper {
+        border: none;
+      }
+
+      .btn-sg {
+        background: #ff3b30 !important;
+        font-size: 16px;
+        color: #fff;
+        border-radius: 0 0 6px 6px;
+      }
+    }
+  }
+/* 体力弹窗 */
+  .dialog-cnt.tili {
+    width: 290px;
+
+    .cls-btn {
+      width: 36px;
+      height: 36px;
+      position: absolute;
+      right: 0;
+      top: -40px;
+      background: url(#{$img_url}dialog_close_hallow.png) no-repeat center;
+      background-size: 100%;
+    }
+
+    .dialog-top {
+      width: 290px;
+      height: 218px;
+      background: url(#{$img_url}dialog_tili.png) no-repeat center;
+      background-size: 100%;
+    }
+
+    .dialog-bd {
+      text-align: center;
+      width: 80%;
+      margin: 0 auto;
+      padding-top: 176px;
+      font-size: 19px;
+      font-weight: 500;
+      color: #ff3b30;
+      line-height: 21px;
+    }
+
+    .dialog-ft {
+      .btn-wrapper {
+        border: none;
+      }
+
+      .btn-sg {
+        background: #ff3b30 !important;
+        font-size: 16px;
+        color: #fff;
+        border-radius: 0 0 6px 6px;
       }
     }
   }

@@ -121,10 +121,18 @@
         <div
           class="no-address"
           @click="gotoAddress"
-          v-if="receivingState==2"
+          v-else-if="receivingState==2 && data&& data.is_shared==1"
         >
           点击填写收货地址
         </div>
+        <button
+          openType="share"
+          class="no-address share"
+          @click="shareBtnHandler"
+          v-else-if="receivingState==2"
+        >
+          运气爆棚,先炫耀一下,再领奖吧~
+        </button>
       </div>
       <!-- 产品信息 -->
       <div class="goods-panel">
@@ -178,11 +186,12 @@
         >
       </div>
       <div
+        v-if="data.hb_amount>0"
         class="income-item"
         :data-is_id="data.is_id"
         @click="goIncome"
       >
-        <div class="income-t">当前收益</div>
+        <div class="income-t">福气红包</div>
         <div class="income-num">￥{{data.hb_amount}}</div>
         <img
           class="arr-r"
@@ -293,6 +302,7 @@ export default {
       customBarStyle: "black",
       // 弹窗
       showDialog: false,
+      hasClickShareBtn: false,
       dialogTitle: "",
       dialogContent: "",
       openType: "",
@@ -369,7 +379,13 @@ export default {
     // 跳转到参与明细
     goJoinList() {
       wx.navigateTo({
-        url: "/pages/join_list/main?id=" + this.data.is_id
+        url:
+          "/pages/join_list_detail/main?is_id=" +
+          this.data.is_id +
+          "&member_id=" +
+          this.data.member_id +
+          "&order_id=" +
+          this.order_id
       });
     },
     // 查看物流
@@ -404,6 +420,26 @@ export default {
         });
       }
     },
+    // 确定按钮关闭弹窗事件
+    okBtnHandler() {
+      // this.showDialog = false;
+      wx.setStorageSync("mineHideDialog", "1");
+
+      this.gotoAddress();
+      console.log(this.showDialog);
+    },
+    // 关闭弹窗
+    closeDialog(ev) {
+      console.log("closeDialog");
+
+      this.showDialog = false;
+
+      this.getData(this.orderId);
+    },
+    shareBtnHandler() {
+      // 是否点击了分享
+      this.hasClickShareBtn = true;
+    },
     // 去微信选择地址
     goChooseAddress() {
       var _this = this;
@@ -425,16 +461,17 @@ export default {
               console.log(res);
               if (res.code === 0) {
                 console.log(data);
+                // _this.getData(_this.orderId);
 
-                _this.receivingState = 1;
-                _this.receivingInfo = {};
-                _this.receivingInfo.deliveryName = data.telNumber;
-                _this.receivingInfo.deliveryPhone = data.userName;
-                _this.receivingInfo.deliveryAddress =
-                  data.provinceName +
-                  data.cityName +
-                  data.countyName +
-                  data.detailInfo;
+                // _this.receivingState = 1;
+                // _this.receivingInfo = {};
+                // _this.receivingInfo.deliveryName = data.telNumber;
+                // _this.receivingInfo.deliveryPhone = data.userName;
+                // _this.receivingInfo.deliveryAddress =
+                //   data.provinceName +
+                //   data.cityName +
+                //   data.countyName +
+                //   data.detailInfo;
               } else {
                 wx.showModal({
                   title: "提示",
@@ -451,20 +488,11 @@ export default {
             .catch(err => {
               console.log(err);
             });
+        },
+        complete: function() {
+          _this.getData(_this.orderId);
         }
       });
-    },
-    // 确定按钮关闭弹窗事件
-    okBtnHandler() {
-      // this.showDialog = false;
-      wx.setStorageSync("mineHideDialog", "1");
-      console.log(this.showDialog);
-    },
-    // 关闭弹窗
-    closeDialog(ev) {
-      console.log("closeDialog");
-
-      this.showDialog = false;
     },
     // 选择地址
     gotoAddress() {
@@ -530,12 +558,34 @@ export default {
         console.log(res.data);
 
         this.data = res.data;
+        this.shareData = res.data.share;
         this.receivingState = res.data.receivingState;
         this.receivingInfo = res.data.receivingInfo;
       } else {
       }
     }
   },
+  // 分享
+  onShareAppMessage(res) {
+    var resData = res[0];
+    if (resData.from === "button") {
+      // 来自页面内转发按钮
+      console.log(resData);
+      return util.getCommonShareData(
+        this.shareData.title,
+        this.shareData.image,
+        this.shareData.link
+      );
+    }
+    // 公用的分享转发数据
+    return util.getCommonShareData(
+      this.shareData.title,
+      this.shareData.image,
+      this.shareData.link
+    );
+  },
+
+  // 页面加载
   onLoad(e) {
     // mta统计
     mta.Page.init();
@@ -545,12 +595,36 @@ export default {
     this.orderId = orderId;
     console.log(orderId);
 
-    this.getData(orderId);
+    this.getData(this.orderId);
   },
-  onShow() {
+  async onShow() {
+    var _this = this;
     // 跳转到其他地方授权回来关闭弹窗
     if (wx.getStorageSync("mineHideDialog") == "1") {
       this.showDialog = false;
+    }
+
+    // 是否点击了分享按钮去翻倍
+    if (_this.hasClickShareBtn && !_this.data.isShared) {
+      console.log(111111);
+
+      // 发送请求去记录已经分享
+      util.request(
+        api.OrderShareRecord,
+        { is_shared: 1, order_id: this.orderId },
+        "GET",
+        this
+      );
+      // 翻倍按钮点击成功后,弹窗填写收货地址
+      _this.dialogTitle = "请填写收货地址";
+      _this.dialogContent = "收货地址修改后，不能再修改哦~";
+      _this.confirmText = "去填写";
+      _this.singleBtn = true;
+      _this.showDialog = true;
+      _this.openType = "";
+
+      _this.openType = "";
+      _this.hasClickShareBtn = false;
     }
   }
 };
@@ -657,7 +731,7 @@ page {
     font-size: 14px;
     color: #333;
     line-height: 1;
-    padding: 18px 0;
+    padding: 15px 0;
 
     .info {
       display: flex;
@@ -674,9 +748,14 @@ page {
     }
 
     .no-address {
+      font-size: 15px;
       text-align: center;
       background: url(#{$img_url}/icon_arr_gray.png) no-repeat right center;
       background-size: 15px;
+
+      &.share{
+        color: #ff5540;
+      }
     }
   }
 

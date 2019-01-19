@@ -32,7 +32,7 @@
           v-for="(item,index) in list"
           data-index="index"
           :key="index"
-          @click="goDetail(item.is_id, item.member_id)"
+          @click="goDetail(item.is_id, item.member_id, item.order_id)"
         >
           <img
             :src="item.avatarUrl"
@@ -56,7 +56,7 @@
     <back-top :showBackTop="showBackTop" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore&&page!=1"
+      :showNoMore="showNoMore&&list&&list.length>0"
       noMoreTips="没有更多数据了"
     />
     <!-- 快速导航 -->
@@ -89,8 +89,8 @@ export default {
       isshowmine: 0,
       page: 1,
       page_size: 20,
+      hasMore: true,
       showNoMore: !1,
-      scrollTimer: null,
       list: null
     };
   },
@@ -112,11 +112,13 @@ export default {
 
   methods: {
     // 跳转到号码详情
-    goDetail(is_id, member_id) {
+    goDetail(is_id, member_id, order_id) {
       wx.navigateTo({
         url:
           "/pages/join_list_detail/main?is_id=" +
           is_id +
+          "&order_id=" +
+          order_id +
           "&member_id=" +
           member_id
       });
@@ -180,6 +182,8 @@ export default {
         "GET",
         this
       );
+      console.log(1111);
+      
 
       if (res.data && res.code === 0 && res.data.list) {
         // this.totalData = res.data;
@@ -195,10 +199,6 @@ export default {
           this.showNoMore = !0;
         }
       }
-      if (this.scrollTimer) clearTimeout(this.scrollTimer);
-      this.scrollTimer = setTimeout(() => {
-        this.canScroll = true;
-      }, 3000);
     } else {
       this.showNoMore = !0;
     }
@@ -209,6 +209,7 @@ export default {
     mta.Page.init();
     this.id = this.$root.$mp.query.id;
     this.page = 1;
+    this.hasMore = true;
     this.getList();
   }
 };

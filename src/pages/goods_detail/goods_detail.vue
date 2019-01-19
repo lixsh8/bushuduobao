@@ -19,15 +19,18 @@
         class="box indexBanner"
         v-if="duobaoData&&duobaoData.goodsInfo&&duobaoData.goodsInfo.dgoods_image.length>0"
       >
+        <div
+          class="is-number"
+          v-if="duobaoData.goodsInfo.is_number_text"
+        >{{duobaoData.goodsInfo.is_number_text}}</div>
         <swiper
           :autoplay="config.autoplay"
           :circular="config.circular"
           :duration="config.duration"
           :indicatorActiveColor="config.indicatorActiveColor"
           :indicatorColor="config.indicatorColor"
-          :indicatorDots="config.indicatorDots"
+          :indicatorDots="duobaoData.goodsInfo.dgoods_image.length>1"
           :interval="config.interval"
-          v-if="duobaoData.goodsInfo.dgoods_image.length>1"
         >
           <swiper-item
             catchtap="onBanner"
@@ -112,23 +115,22 @@
           >{{duobaoData.buyNumbers||"0"}}个</div>
         </div>
         <div class="my-money">
-          <div class="my-money-hd">当前收益</div>
+          <div class="my-money-hd">福气红包</div>
           <div
-            v-if="duobaoData.fuli_amount>0"
             class="my-money-bd"
             @click="goIncome"
           >¥{{duobaoData.fuli_amount||"0"}}</div>
-          <div
+          <!-- <div
             class="my-money-bd-emy"
             v-else
             @click="goIncome"
-          >
+           >
             参与后获得
             <img
               :src="helpIcon"
               alt=""
             >
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -274,10 +276,10 @@
     >红包不足，立即赚红包</div>
 
     <div
-      v-else-if="duobaoData&&duobaoData.useTime<=0"
+      v-else-if="duobaoData&&duobaoData.useTime<10"
       class="fixed-btn"
       @click="showInviteModal"
-    >参与机会不足，邀请好友赞助</div>
+    >体力不足，喊好友给我加油</div>
     <div
       v-else
       class="fixed-btn"
@@ -291,6 +293,8 @@
       :openType="openType"
       :dialogTitle="dialogTitle"
       :dialogContent="dialogContent"
+      :cancelText="cancelText"
+      :confirmText="confirmText"
       @okBtnHandler="okBtnHandler"
       @closeDialog="closeDialog"
     />
@@ -358,10 +362,12 @@ export default {
       totalNum: 0,
       price: 0,
       totalPrice: 0,
+      // 弹窗
       showDialog: !1,
-      dialogTitle: "参与机会不足",
-      dialogContent:
-        "可邀请好友赞助<span style='color:#FF3B30'>更多机会</span>哦！",
+      dialogTitle: "体力不足",
+      dialogContent: "好友加油可立即获得体力",
+      cancelText: "休息一会",
+      confirmText: "喊好友给我加油",
       openType: "share",
       historyList: []
     };
@@ -413,7 +419,7 @@ export default {
         this.member_id = res.data.member_id;
         this.title = res.data.title;
         this.nextId = res.data.next_is_id;
-        this.useTime = res.data.useTime - 1;
+        this.useTime = res.data.useTime - 10;
         this.is_end = res.data.is_end;
         this.is_soldout = res.data.is_soldout;
         this.dgoods_state = res.data.dgoods_state;
@@ -547,7 +553,7 @@ export default {
       // 购买统计
       mta.Event.stat("buy_btn", {});
       // 购买次数不够
-      if (this.duobaoData.useTime <= 0) {
+      if (this.duobaoData.useTime < 10) {
         this.showDialog = true;
         return;
       }
@@ -638,8 +644,13 @@ export default {
     changeNum(e) {
       var num = parseInt(e) || 1;
       num = num > this.leftNum ? this.leftNum : num;
+      num =
+        num > Math.floor(this.duobaoData.useTime / 10)
+          ? Math.floor(this.duobaoData.useTime / 10)
+          : num;
       this.buyNum = num;
-      this.useTime = this.duobaoData.useTime - num;
+      this.useTime =
+        this.duobaoData.useTime - num * this.duobaoData.joinPowerDown;
       this.totalPrice = num * this.price;
       this.$forceUpdate();
 
@@ -648,7 +659,8 @@ export default {
     // 关闭购买弹窗
     closeBuyModal() {
       this.buyNum = 1;
-      this.useTime = this.duobaoData.useTime - 1;
+      this.useTime =
+        this.duobaoData.useTime - 1 * this.duobaoData.joinPowerDown;
       this.totalPrice = this.price;
       this.showBuyModal = !1;
     },
@@ -689,7 +701,7 @@ export default {
 
   // 分享
   onShareAppMessage(res) {
-    var resData = res[0]
+    var resData = res[0];
     console.log(res);
     if (resData.from === "button") {
       // 来自页面内转发按钮
@@ -711,7 +723,7 @@ export default {
     console.log("刷新");
     this.page = 1;
     this.showNoMore = false;
-
+    this.buyNum = 1;
     this.getData(this.is_id);
 
     wx.stopPullDownRefresh();
@@ -771,13 +783,16 @@ export default {
     mta.Page.init();
     // 重置tab
     this.currentTab = 0;
+    this.buyNum = 1;
     this.page = 1;
     this.showBuyModal = false;
     this.showNoMore = false;
     this.hasMore = true;
 
-    var id = this.$root.$mp.query.id;
+    var id = wx.getStorageSync("is_id") || this.$root.$mp.query.id;
     var ifBack = this.$root.$mp.query.ifBack;
+
+    wx.removeStorageSync("is_id");
 
     console.log("ifback=", ifBack);
     // 获取要不要有返回按钮
@@ -824,6 +839,23 @@ page {
 
 .banner {
   padding: 15px 15px 0 15px;
+
+  .indexBanner {
+    position: relative;
+
+    .is-number {
+      display: inline-block;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 2px 10px;
+      font-size: 14px;
+      color: #fff;
+      border-radius: 100px;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 9;
+    }
+  }
 
   swiper {
     display: block;

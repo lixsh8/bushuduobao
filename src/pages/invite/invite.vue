@@ -27,6 +27,7 @@
           >加成规则</div>
 
           <div class="topBg">
+            <div class="top_title">今日已获得奖励</div>
             <div
               class="gotReward"
               @click="goPromoteList"
@@ -46,7 +47,7 @@
               class="inviteBtn"
               data-type="3"
               openType="share"
-            >邀请好友得最高66{{totalData.inviteTotalReward}}红包</button>
+            >邀请好友立得最高66元红包</button>
             <!-- <div class="bottomTips">邀请成功立得</div> -->
           </div>
 
@@ -98,17 +99,24 @@
                       <div
                         class="tips"
                         v-if="item.hb_amount>0"
-                      >好友今日已兑换{{item.StepNumber}}步</div>
+                        >好友今日已兑换{{item.StepNumber}}步</div>
                       <div
                         class="tips"
                         v-else
-                      >好友今日未兑换步数</div>
+                        >好友今日未兑换步数</div>
+                    </div>
+
+                    <div
+                      class="coinInfo2 gray2"
+                      v-if="item.type==1"
+                     >
+                      已获得红包<text class="info-m">￥{{item.hb_amount}}</text>
                     </div>
                     <div
                       class="coinInfo2 gray2"
-                      v-if="item.hb_amount>0"
-                    >
-                      已获得红包<text class="info-m">￥{{item.hb_amount}}</text>
+                      v-else-if="item.type==2"
+                     >
+                      红包多到装不下了
                     </div>
                     <button
                       class="coinInfo2"
@@ -751,13 +759,21 @@ page {
   background: url(#{$img_url}invite_bg.png) no-repeat;
   background-size: 100% 100%;
 }
+.top_title{
+  padding-top: 30px;
+  text-align: center;
+  font-size:14px;
+  font-weight:500;
+  color:rgba(159,56,0,1);
+  line-height:14px;
+}
 
 .topBg .gotReward {
   font-family: PingFangSC-Semibold;
   font-size: 60px;
   color: #ff6742;
   text-align: center;
-  padding-top: 100rpx;
+  padding-top: 10px;
 }
 
 .topBg .gotReward text {
@@ -766,7 +782,7 @@ page {
 
 .topBg .tips {
   font-size: 24rpx;
-  color: #ff6742;
+  color: #ac4700;
   text-align: center;
   margin-top: 16rpx;
 }
