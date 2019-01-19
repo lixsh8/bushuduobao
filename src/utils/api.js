@@ -54,7 +54,7 @@ const api = {
       baseURL: ApiRootUrl
     }),
 
-  // 夺宝详情页
+  // 兑商品详情页
   DuobaoDetail: ApiRootUrl + "?act=duobao&op=getDetail",
   DuobaoMessage: ApiRootUrl + "?act=duobao&op=duobaoInfo",
   DuobaoResult: ApiRootUrl + "?act=duobao&op=joinSuccess",

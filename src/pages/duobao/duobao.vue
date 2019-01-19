@@ -1,4 +1,4 @@
-<!-- 夺宝 兑换商品 -->
+<!-- 兑商品 兑换商品 -->
 <template>
   <div style="height:100%;">
     <head-bar

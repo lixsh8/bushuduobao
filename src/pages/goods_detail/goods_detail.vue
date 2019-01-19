@@ -370,8 +370,6 @@ export default {
       cancelText: "休息一会",
       confirmText: "喊好友给我加油",
       openType: "share",
-      // 更新体力定时器
-      tiliTimer: null,
       historyList: []
     };
   },
@@ -402,7 +400,7 @@ export default {
 
   methods: {
     async getData(id) {
-      // 夺宝详情
+      // 兑商品详情
       console.log("getData");
 
       const res = await util.request(api.DuobaoDetail, { id: id }, "GET", this);
@@ -839,24 +837,6 @@ export default {
 
     // var id = e.id;
     this.getData(id);
-
-    // 请求体力更新
-    if (this.tiliTimer) {
-      clearInterval(this.tiliTimer);
-    }
-    this.tiliTimer = setInterval(() => {
-      util
-        .request(api.PowerGet, null, "GET", this)
-        .then(res => {
-          if (res.code == 0) {
-            this.duobaoData.useTime = res.data.useTime;
-            this.useTime =
-        this.duobaoData.useTime - this.buyNum * this.duobaoData.joinPowerDown;
-            // this.$forceUpdate();
-          }
-        })
-        .then(() => {});
-    }, 3000);
   }
 };
 </script>

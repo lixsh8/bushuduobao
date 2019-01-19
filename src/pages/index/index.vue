@@ -285,7 +285,7 @@
         </div>
       </div>
 
-      <!-- 兑换商品夺宝  -->
+      <!-- 兑换商品兑商品  -->
       <div
         class="duobao"
         v-if="duobao&&duobaoList&&duobaoList.length>0"
@@ -535,7 +535,7 @@ export default {
         }
       }
 
-      // 夺宝
+      // 兑商品
       if (!newData || !this.duobaoList || this.duobaoList.length <= 0) {
         return;
       }
@@ -682,7 +682,7 @@ export default {
     jump(e) {
       util.jump(e);
     },
-    // 跳转到最新夺宝
+    // 跳转到最新兑商品
     goDuobaoHistory() {
       wx.navigateTo({
         url: "/pages/duobao_history/main"
@@ -1115,7 +1115,7 @@ export default {
     // 最新开奖 IndexLatestAward
     _this.getLatestAward();
 
-    // 夺宝列表 IndexDuobao
+    // 兑商品列表 IndexDuobao
     _this.getDuobaoList();
 
     // socket
@@ -1775,7 +1775,7 @@ button::after {
   z-index: 19;
 }
 
-/* 好友夺宝兑换 */
+/* 好友兑商品兑换 */
 .friendsduobaoReward {
   position: absolute;
   top: 20rpx;
