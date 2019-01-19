@@ -46,7 +46,7 @@
     </div>
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore&&page!=1"
+      :showNoMore="showNoMore&&list&&list.length>0"
       noMoreTips="没有更多数据了"
     />
     <!-- 腾讯广告 -->
