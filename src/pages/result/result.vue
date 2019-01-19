@@ -293,6 +293,16 @@ export default {
     );
   },
 
+  onUnload() {
+    console.log('unload');
+    
+    this.hasClickShareBtn = false;
+    this.showDialog = false;
+    this.data = null;
+    this.list = null;
+    this.shareData = null;
+  },
+
   // 页面加载
   async onLoad(e) {
     // mta统计

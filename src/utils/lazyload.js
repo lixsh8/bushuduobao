@@ -1,3 +1,4 @@
+/* eslint-disable */
 export default class LazyLoad{
 	constructor(context, opt = {}){
 		this.page = context;

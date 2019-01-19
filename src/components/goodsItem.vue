@@ -1,15 +1,26 @@
 <!-- 商品列表组件 -->
 <template>
-  <div class="goods-item"  @click="btnClickHandler(goodsItem.is_id)">
+  <div
+    class="goods-item"
+    :class="itemIndex"
+    @click="btnClickHandler(goodsItem.is_id)"
+  >
     <div class="avatar-box">
       <img
         class="avatar"
         :src="goodsItem.dgoods_image"
         alt=""
+        style="{display: index < __LAZT_LOAD_COUNT + 1 ? 'block' : 'none'}"
         mode="widthFix"
       />
-      <div class="soldout" v-if="goodsItem.is_soldout"></div>
-      <div class="top-tips" v-if="showTips">{{goodsItem.is_totalnum}}份即开奖</div>
+      <div
+        class="soldout"
+        v-if="goodsItem.is_soldout"
+      ></div>
+      <div
+        class="top-tips"
+        v-if="showTips"
+      >{{goodsItem.is_totalnum}}份即开奖</div>
       <div class="process">
         <div
           class="process-bar"
@@ -31,17 +42,20 @@ export default {
     return {};
   },
 
-  props: ["goodsItem", "showTips"],
+  props: ["goodsItem", "showTips", "index"],
 
   computed: {
     soldoutIcon() {
-      return this.globalData.img_url + 'icon_soldout.png'
+      return this.globalData.img_url + "icon_soldout.png";
+    },
+    itemIndex() {
+      return "item-" + this.index;
     }
   },
 
   methods: {
     btnClickHandler(ev) {
-      this.$emit('btnClickHandler', ev)
+      this.$emit("btnClickHandler", ev);
     }
   }
 };
@@ -53,7 +67,7 @@ export default {
 
 .goods-item {
   width: 165px;
-  margin:10px 15px 0 15px;
+  margin: 10px 15px 0 15px;
   padding-bottom: 10px;
   box-sizing: border-box;
   overflow: hidden;
@@ -62,7 +76,7 @@ export default {
   box-shadow: 0 0 10px #eee;
   overflow: hidden;
 
-  &:nth-child(2n){
+  &:nth-child(2n) {
     margin: 10px 15px 0 0;
   }
 
@@ -78,13 +92,14 @@ export default {
       height: 100%;
     }
 
-    .soldout{
+    .soldout {
       position: absolute;
       left: 0;
       top: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.3) url(#{$img_url}icon_soldout.png) no-repeat center;
+      background: rgba(0, 0, 0, 0.3) url(#{$img_url}icon_soldout.png) no-repeat
+        center;
       background-size: 99px 77px;
       border-radius: 5px 5px 0 0;
       z-index: 6;

@@ -61,6 +61,7 @@ const api = {
   DuobaoResultDB: ApiRootUrl + "?act=duobao&op=getJoinSuccReward",
   // 加体力规则
   PowerRule: ApiRootUrl + "?act=duobao&op=power",
+  PowerGet: ApiRootUrl + "?act=duobao&op=getPower",
 
   // 最新开奖
   DuobaoHistory: ApiRootUrl + "?act=duobao&op=latestAwardList",

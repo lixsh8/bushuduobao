@@ -34,11 +34,12 @@
       v-if="list"
     >
       <block
-        v-for="item in list"
+        v-for="(item, index) in list"
         :key="item.is_id"
       >
         <goodsItem
           :goodsItem="item"
+          :index="index"
           @btnClickHandler="btnClickHandler"
         />
       </block>
@@ -75,6 +76,7 @@ import backTop from "@/components/backTop";
 import scrollMessage from "@/components/scrollMessage";
 import pagingFooter from "@/components/pagingFooter";
 import noData from "@/components/noData";
+// import lazyLoad from "@/utils/lazyload";
 
 var mta = require("@/utils/mta_analysis.js");
 
@@ -268,10 +270,19 @@ export default {
     console.log("onHide");
     wx.closeSocket();
   },
+  onReady() {
+    // lazyload.observe();
+  },
   // 页面加载
   onLoad(e) {
     // mta统计
     mta.Page.init();
+
+    // lazyload = new lazyLoad(this, {
+    //   classNote: ".item-",
+    //   initNum: 5,
+    //   limit: 5
+    // });
   }
 };
 </script>

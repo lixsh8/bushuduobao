@@ -31,6 +31,11 @@
         alt=""
         mode="widthFix"
       />
+      <img
+        :src="glImg5"
+        alt=""
+        mode="widthFix"
+      />
     </div>
 
     <div
@@ -78,6 +83,9 @@ export default {
     },
     glImg4() {
       return this.globalData.img_url + "gl04.png";
+    },
+    glImg5() {
+      return this.globalData.img_url + "gl05.png";
     }
   },
 

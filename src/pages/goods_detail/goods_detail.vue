@@ -369,6 +369,8 @@ export default {
       cancelText: "休息一会",
       confirmText: "喊好友给我加油",
       openType: "share",
+      // 更新体力定时器
+      tiliTimer: null,
       historyList: []
     };
   },
@@ -776,6 +778,9 @@ export default {
   onUnload() {
     this.article = "";
     this.duobaoData = "";
+    if (this.tiliTimer) {
+      clearInterval(this.tiliTimer);
+    }
   },
   // 页面加载
   onShow() {
@@ -827,6 +832,21 @@ export default {
 
     // var id = e.id;
     this.getData(id);
+
+    // 请求体力更新
+    if (this.tiliTimer) {
+      clearInterval(this.tiliTimer);
+    }
+    this.tiliTimer = setInterval(() => {
+      util
+        .request(api.PowerGet, null, "GET", this)
+        .then(res => {
+          if (res.code == 0) {
+            this.useTime = res.data.useTime;
+          }
+        })
+        .then(() => {});
+    }, 1000);
   }
 };
 </script>

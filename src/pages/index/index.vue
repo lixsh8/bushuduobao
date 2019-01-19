@@ -1026,7 +1026,7 @@ export default {
         // 翻倍按钮点击成功后
         _this.hb_amount = resDoubleReward.data.hb_amount;
         _this.dialogType = "pack";
-        _this.dialogContent = resDoubleReward.data.amount + "元红包";
+        _this.dialogContent = resDoubleReward.data.amount + "元红包x2";
         _this.confirmText = "收下";
         _this.showDialog = true;
         _this.openType = "";
