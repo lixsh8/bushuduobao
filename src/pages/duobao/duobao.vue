@@ -125,8 +125,11 @@ export default {
           .createIntersectionObserver()
           .relativeToViewport({ bottom: 20 })
           .observe(".loadImg" + i, ret => {
+          // .observe(".loadImg" + i, ret => {
             if (ret.intersectionRatio > 0) {
               group[i].show = true;
+              console.log('loadImg');
+              
             }
             // 更新数据
             this.list = group;
@@ -142,7 +145,7 @@ export default {
 
         this.list = res.data.list;
         this.banner = res.data.banner;
-        this.lazyload(this.list);
+        // this.lazyload(this.list);
         // this.hasMore = res.data.hasMore;
       } else {
       }
@@ -235,6 +238,7 @@ export default {
         if (res.data.list.length > 0) {
           this.list = list.concat(data.list);
           this.page = res.data.page;
+          // this.lazyload(this.list);
         }
 
         this.hasMore = res.data.hasMore;

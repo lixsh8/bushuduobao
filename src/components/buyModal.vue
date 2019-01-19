@@ -41,13 +41,13 @@
               ></div>
             </div>
           </div>
-          <div class="buy-chance"><text>体力 <text class="red">{{useTime>=0?useTime:0}}</text></text>
+          <div class="buy-chance"><text>体力 <text class="red">{{power>=0?power:0}}</text></text>
             <div
               class="add-chance"
-              :class="{green:useTime>=100}"
+              :class="{green:power>=100}"
               @click="tiliHandler"
               open-type="share"
-            >{{useTime>=100?"体力充沛":"补充体力"}}</div>
+            >{{power>=100?"体力充沛":"补充体力"}}</div>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export default {
       default: 0
     },
     // 剩余次数 体力次数
-    useTime: {
+    power: {
       type: Number,
       default: 0
     },
@@ -107,7 +107,7 @@ export default {
       this.$emit("changeNum", e.target.value);
     },
     plus() {
-      if (this.useTime === 0) {
+      if (this.power === 0) {
         return;
       }
       this.$emit("changeNum", this.buyNum * 1 + 1);

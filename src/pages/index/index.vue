@@ -37,19 +37,26 @@
           v-for="(item, index) in bubble"
           :key="index"
         >
+          <!-- 新人红包 -->
           <block v-if="item.type==='attendanceReward' ||item.type==='newReward'">
             <div
               class="prize-common-num"
-              v-if="item.hb>0"
+              v-if1="item.hb>0"
             >
               <div class="unit">￥</div>{{item.hb}}
+            </div>
+            <div class="prize-common-name">{{item.title}}</div>
+          </block>
+          <block v-else-if="item.type=='welfare'">
+            <div class="prize-common-num">
+              <div class="unit"></div>
             </div>
             <div class="prize-common-name">{{item.title}}</div>
           </block>
           <block v-else>
             <div
               class="prize-common-num"
-              v-if="item.hb>0"
+              v-if1="item.hb>0"
             >
               <div class="unit"></div>
             </div>
@@ -586,7 +593,11 @@ export default {
       var _this = this;
       console.log(type);
 
-      if (type) {
+      if (type && type == "welfare") {
+        wx.navigateTo({
+          url: "/pages/welfare_ad/main"
+        });
+      } else if (type) {
         api.clickPacks("type=" + type).then(function(res) {
           console.log(res);
           if (res.code === 0) {
@@ -684,12 +695,12 @@ export default {
     jump(e) {
       // 统计
       var btnClick = e.currentTarget.dataset.banner_click;
-      
+
       if (btnClick) {
         // 购买统计
         mta.Event.stat(btnClick, {});
       }
-      
+
       util.jump(e);
     },
     // 跳转到最新兑商品
@@ -1761,13 +1772,6 @@ button::after {
 .breathe-btn {
   animation: breathe 1.2s infinite linear;
 }
-/* 签到气泡红包 */
-.signin-prize,
-.attendanceReward {
-  position: absolute;
-  right: 40rpx;
-  top: 260rpx;
-}
 /* 新用户红包 */
 .new-user-prize,
 .newReward {
@@ -1784,14 +1788,27 @@ button::after {
   left: 50rpx;
   z-index: 19;
 }
-
 /* 好友兑商品兑换 */
 .friendsduobaoReward {
   position: absolute;
-  top: 20rpx;
+  top: 0rpx;
   right: 60rpx;
   z-index: 19;
 }
+/* 赚红包 */
+.welfare {
+  position: absolute;
+  right: 40rpx;
+  top: 120rpx;
+}
+/* 签到气泡红包 */
+.signin-prize,
+.attendanceReward {
+  position: absolute;
+  right: 40rpx;
+  top: 260rpx;
+}
+
 /* 兑换商品收益 */
 .duobaoReward {
   position: absolute;

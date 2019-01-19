@@ -235,7 +235,7 @@
       :showBuyModal="showBuyModal"
       :totalNum="totalNum"
       :leftNum="leftNum"
-      :useTime="useTime || 0"
+      :power="power || 0"
       :buyNum="buyNum"
       :totalPrice="totalPrice"
       @closeBuyModal="closeBuyModal"
@@ -277,7 +277,7 @@
     >红包不足，立即赚红包</div>
 
     <div
-      v-else-if="duobaoData&&duobaoData.useTime<10"
+      v-else-if="duobaoData&&duobaoData.power<10"
       class="fixed-btn"
       @click="showInviteModal"
     >体力不足，喊好友给我加油</div>
@@ -358,7 +358,7 @@ export default {
       showNoMore: !1,
       showBuyModal: !1,
       buyNum: 1,
-      useTime: 0,
+      power: 0,
       leftNum: 0,
       totalNum: 0,
       price: 0,
@@ -421,7 +421,7 @@ export default {
         this.title = res.data.title;
         this.nextId = res.data.next_is_id;
         this.next_is_number = res.data.next_is_number;
-        this.useTime = res.data.useTime - 10;
+        this.power = res.data.power - 10;
         this.is_end = res.data.is_end;
         this.is_soldout = res.data.is_soldout;
         this.dgoods_state = res.data.dgoods_state;
@@ -445,7 +445,7 @@ export default {
 
         this.totalNum = info.is_totalnum;
         this.leftNum = info.is_oddnum;
-        console.log("usetime" + res.data.useTime);
+        console.log("power" + res.data.power);
 
         this.price = info.db_hbAmount;
         this.totalPrice = info.db_hbAmount;
@@ -555,7 +555,7 @@ export default {
       // 购买统计
       mta.Event.stat("buy_btn", {});
       // 购买次数不够
-      if (this.duobaoData.useTime < 10) {
+      if (this.duobaoData.power < 10) {
         this.showDialog = true;
         return;
       }
@@ -647,12 +647,12 @@ export default {
       var num = parseInt(e) || 1;
       num = num > this.leftNum ? this.leftNum : num;
       num =
-        num > Math.floor(this.duobaoData.useTime / 10)
-          ? Math.floor(this.duobaoData.useTime / 10)
+        num > Math.floor(this.duobaoData.power / 10)
+          ? Math.floor(this.duobaoData.power / 10)
           : num;
       this.buyNum = num;
-      this.useTime =
-        this.duobaoData.useTime - num * this.duobaoData.joinPowerDown;
+      this.power =
+        this.duobaoData.power - num * this.duobaoData.joinPowerDown;
       this.totalPrice = num * this.price;
       this.$forceUpdate();
 
@@ -666,8 +666,8 @@ export default {
     // 关闭购买弹窗
     closeBuyModal() {
       this.buyNum = 1;
-      this.useTime =
-        this.duobaoData.useTime - 1 * this.duobaoData.joinPowerDown;
+      this.power =
+        this.duobaoData.power - 1 * this.duobaoData.joinPowerDown;
       this.totalPrice = this.price;
       this.showBuyModal = !1;
     },

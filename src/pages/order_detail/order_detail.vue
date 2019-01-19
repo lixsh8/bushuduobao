@@ -385,7 +385,7 @@ export default {
           "&member_id=" +
           this.data.member_id +
           "&order_id=" +
-          this.order_id
+          this.orderId
       });
     },
     // 查看物流
