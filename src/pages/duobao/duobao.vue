@@ -117,6 +117,22 @@ export default {
   },
 
   methods: {
+    // 懒加载图片
+    lazyload(group) {
+      for (let i in group) {
+        // 设置监听回调事件，当元素 .loadImg{{i}},进入页面20px内就触发回调事件，设置图片为真正的图片，通过show控制
+        wx
+          .createIntersectionObserver()
+          .relativeToViewport({ bottom: 20 })
+          .observe(".loadImg" + i, ret => {
+            if (ret.intersectionRatio > 0) {
+              group[i].show = true;
+            }
+            // 更新数据
+            this.list = group;
+          });
+      }
+    },
     // 获取列表
     async getList() {
       const res = await util.request(api.IndexDuobao, "GET", this);
@@ -126,6 +142,7 @@ export default {
 
         this.list = res.data.list;
         this.banner = res.data.banner;
+        this.lazyload(this.list);
         // this.hasMore = res.data.hasMore;
       } else {
       }
@@ -270,19 +287,11 @@ export default {
     console.log("onHide");
     wx.closeSocket();
   },
-  onReady() {
-    // lazyload.observe();
-  },
+  onReady() {},
   // 页面加载
   onLoad(e) {
     // mta统计
     mta.Page.init();
-
-    // lazyload = new lazyLoad(this, {
-    //   classNote: ".item-",
-    //   initNum: 5,
-    //   limit: 5
-    // });
   }
 };
 </script>

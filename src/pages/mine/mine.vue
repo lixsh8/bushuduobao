@@ -117,6 +117,7 @@
             >
               <swiper-item
                 @click="jump"
+                data-banner_click="mine_banner_top"
                 class="banner-wrap _3142106"
                 v-for="(banner,index) in banners"
                 :data-url="banner.link"
@@ -172,6 +173,7 @@
             >
               <swiper-item
                 @click="jump"
+                data-banner_click="mine_banner_middle"
                 class="banner-wrap _3142106"
                 v-for="(advert,index) in advertList"
                 :data-index="index"
@@ -301,6 +303,14 @@ export default {
     },
     // 跳转
     jump(e) {
+      // 统计
+      var btnClick = e.currentTarget.dataset.banner_click;
+      
+      if (btnClick) {
+        // 购买统计
+        mta.Event.stat(btnClick, {});
+      }
+      
       util.jump(e, this);
     },
     // 获取数据

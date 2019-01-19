@@ -10,7 +10,6 @@
         class="avatar"
         :src="goodsItem.dgoods_image"
         alt=""
-        style="{display: index < __LAZT_LOAD_COUNT + 1 ? 'block' : 'none'}"
         mode="widthFix"
       />
       <div
@@ -49,7 +48,7 @@ export default {
       return this.globalData.img_url + "icon_soldout.png";
     },
     itemIndex() {
-      return "item-" + this.index;
+      return "loadImg" + this.index;
     }
   },
 

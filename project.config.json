@@ -34,7 +34,7 @@
 			"list": [
 				{
 					"id": 0,
-					"name": "兑商品品",
+					"name": "兑商品",
 					"pathName": "pages/duobao/main",
 					"query": "",
 					"scene": "1012"

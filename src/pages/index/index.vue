@@ -137,6 +137,7 @@
         <!-- banner -->
         <div
           @click="jump"
+          data-banner_click="index_banner_top"
           :data-url='banner.link'
           class="activity-challenge"
           v-if="banner"
@@ -264,6 +265,7 @@
           >
             <swiper-item
               @click="jump"
+              data-banner_click="index_banner_middle"
               class="banner-wrap _3142106"
               v-for="(advert,index) in advertList"
               :data-index="index"
@@ -680,6 +682,14 @@ export default {
     },
     // 统一跳转
     jump(e) {
+      // 统计
+      var btnClick = e.currentTarget.dataset.banner_click;
+      
+      if (btnClick) {
+        // 购买统计
+        mta.Event.stat(btnClick, {});
+      }
+      
       util.jump(e);
     },
     // 跳转到最新兑商品
@@ -989,8 +999,8 @@ export default {
   },
 
   onUnload() {
-    console.log('unload......');
-    
+    console.log("unload......");
+
     this.hasClickShareBtn = false;
     this.showDialog = false;
   },
