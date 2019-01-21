@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 21,
 			"list": [
 				{
 					"id": 0,
@@ -165,6 +165,13 @@
 					"name": "体力规则",
 					"pathName": "pages/promote_rules/main",
 					"query": "id=177",
+					"scene": "1012"
+				},
+				{
+					"id": -1,
+					"name": "登录页",
+					"pathName": "pages/login/main",
+					"query": "",
 					"scene": "1012"
 				}
 			]

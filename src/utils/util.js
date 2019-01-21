@@ -108,7 +108,6 @@ function request(url, data = {}, method = "GET") {
             //     reject(err);
             //   });
           } else {
-            
             resolve(res.data);
           }
         } else {
@@ -367,7 +366,6 @@ function getCommonShareData(title, image, link) {
       // 转发成功之后的回调
       if (res.errMsg == "shareAppMessage:ok") {
         console.log("分享成功");
-        
       } else {
         console.log("分享失败");
       }
@@ -388,6 +386,12 @@ function jump(e, _this) {
   var appid = e.currentTarget.dataset.appid;
   var id = e.currentTarget.dataset.id;
   var type = e.currentTarget.dataset.type;
+
+  // 点击统计
+  console.log(1111);
+  
+  clickLog("click", id);
+
   if (type === "address") {
     console.log("address");
 
@@ -436,6 +440,8 @@ function jump(e, _this) {
       envVersion: api.mienvVersion,
       success(res) {
         console.log("跳转成功");
+        // 跳转小程序统计
+        clickLog("jump", id)
       }
     });
   } else if (
@@ -508,7 +514,7 @@ function socket(cb) {
 }
 
 /**
- *
+ *  更新
  */
 function updataNumByid(arr1, arr2, cb) {
   for (var i = 0, len = arr1.length; i < len; i++) {
@@ -520,6 +526,22 @@ function updataNumByid(arr1, arr2, cb) {
       }
     }
   }
+}
+/**
+ * 广告点击统计
+ * @param {*} type
+ * @param {*} id
+ */
+function clickLog(type, id) {
+  console.log(222);
+  
+  request(api.AdReport, { type: type, advertid: id }, "GET", null).then(
+    function(res) {
+      if (res.code === 0) {
+      } else {
+      }
+    }
+  );
 }
 
 const util = {
@@ -533,6 +555,7 @@ const util = {
   parseParams,
   getCommonShareData,
   jump,
+  clickLog,
   socket,
   updataNumByid,
   getUserInfo

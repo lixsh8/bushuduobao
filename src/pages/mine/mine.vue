@@ -62,7 +62,7 @@
           </div>
 
           <!-- 操作列表 -->
-          <div class="mine-operationList">
+          <div class="mine-operationList" v-if="data&&data.menuList&&data.menuList.length>0">
             <block
               v-for="(item,index) in data.menuList"
               :key="index"
@@ -322,6 +322,8 @@ export default {
         this.data = res.data;
         this.banners = res.data.banners || [];
         this.advertList = res.data.advertList || [];
+        console.log(this.advertList.length);
+        
       } else {
       }
     }

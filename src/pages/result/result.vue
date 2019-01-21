@@ -25,15 +25,18 @@
       >订单详情</div>
     </div>
 
-    <div class="share-panel" v-if="showMsg">
-      <div class="title">{{data&&data.text}}</div>
-      <div class="num">{{data&&data.sub_text}}</div>
+    <div
+      class="share-panel"
+      v-if="showMsg"
+    >
+      <div class="title">{{(data&&data.text)||""}}</div>
+      <div class="num">{{(data&&data.sub_text)||""}}</div>
       <div class="share-btn-wrapper">
         <button
           class="share-btn"
           @click="dbbtnClickHandler"
           openType="share"
-        >{{data&&data.btn_text}}
+        >{{(data&&data.btn_text)||""}}
         </button>
         <!-- <div
           class="share-btn"
@@ -189,7 +192,7 @@ export default {
       console.log("back func");
       wx.navigateBack({
         delta: 1
-      })
+      });
       // wx.redirectTo({
       //   url: "/pages/goods_detail/main?id=" + this.id + "&ifBack=0"
       // });
@@ -203,7 +206,7 @@ export default {
       wx.setStorageSync("is_id", ev);
       wx.navigateBack({
         delta: 1
-      })
+      });
     },
     // 点击查看订单详情
     goOrderDetail() {
@@ -260,6 +263,11 @@ export default {
       if (res.data && res.code === 0) {
         // this.totalData = res.data;
         console.log(res.data);
+        if (res.data.has_reward > 0) {
+          this.showMsg = true;
+        } else {
+          this.showMsg = false;
+        }
         this.data = res.data;
         this.list = res.data.list;
         this.shareData = res.data.share;
@@ -294,8 +302,8 @@ export default {
   },
 
   onUnload() {
-    console.log('unload');
-    
+    console.log("unload");
+
     this.hasClickShareBtn = false;
     this.showDialog = false;
     this.data = null;
@@ -311,6 +319,7 @@ export default {
     this.orderId = this.$root.$mp.query.orderId;
     this.id = this.$root.$mp.query.id;
     this.dgoods_id = this.$root.$mp.query.dgoods_id;
+    this.showMsg = true;
     console.log("this.orderId=, this.dgoods_id=", this.orderId, this.dgoods_id);
     this.getData(this.orderId, this.dgoods_id);
   },
@@ -318,11 +327,9 @@ export default {
   // 页面显示
   async onShow(e) {
     var _this = this;
-    _this.showMsg = true;
     console.log(_this.hasClickShareBtn);
     // 是否点击了分享按钮去翻倍
     if (_this.hasClickShareBtn) {
-      
       // 发送请求去翻倍 DoubleReward
       const resDoubleReward = await util.request(
         api.DuobaoResultDB,

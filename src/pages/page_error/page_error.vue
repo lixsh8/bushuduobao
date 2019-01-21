@@ -46,6 +46,8 @@ export default {
           let tokenResult = await util.request(api.Login, {
             code: loginResult.code,
             register_code: "",
+            scene: wx.getStorageSync("scene"),
+            channel: wx.getStorageSync("channel"),
             assistance: wx.getStorageSync("assistance")
           });
           console.log(

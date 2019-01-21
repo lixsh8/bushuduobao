@@ -247,7 +247,7 @@
     <back-top :showBackTop="showBackTop&&currentTab==1" />
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&historyList&&historyList.length>0"
       noMoreTips="没有更多数据了"
     />
 
@@ -411,6 +411,7 @@ export default {
         let info = res.data.goodsInfo;
 
         this.duobaoData = res.data;
+        // 黑名单，不让购买
         this.isBlack = res.data.is_black;
         if (this.isBlack == 1) {
           wx.redirectTo({
@@ -792,13 +793,14 @@ export default {
   onShow() {
     // mta统计
     mta.Page.init();
-    // 重置tab
+    // 重置 数据 tab
     this.currentTab = 0;
     this.buyNum = 1;
     this.page = 1;
     this.showBuyModal = false;
     this.showNoMore = false;
     this.hasMore = true;
+    this.isBlack = 0;
 
     var id = wx.getStorageSync("is_id") || this.$root.$mp.query.id;
     var ifBack = this.$root.$mp.query.ifBack;

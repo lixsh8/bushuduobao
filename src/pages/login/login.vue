@@ -1,18 +1,14 @@
 <!-- 登录页面 -->
 <template>
-  <div class="login">
-    <!-- 底部按钮 -->
-    <div
-      class="btn"
-      @click="refresh"
-    >
-      <img
-        src="/static/images/net_err.png"
-        mode="widthFix"
-        alt=""
-      >
-      登录请重新登录！~</div>
-  </div>
+  <div
+    class="login"
+    @click="refresh"
+  >
+    <img
+      :src="loginBg"
+      mode="widthFix"
+      alt=""
+    ></div>
 </template>
 
 <script type="text/ecmascript-6">
@@ -28,6 +24,12 @@ export default {
       page: "",
       options: ""
     };
+  },
+
+  computed: {
+    loginBg() {
+      return this.globalData.img_url + "login_bg.png?v=124";
+    }
   },
 
   components: {},
@@ -46,6 +48,8 @@ export default {
           let tokenResult = await util.request(api.Login, {
             code: loginResult.code,
             register_code: "",
+            scene: wx.getStorageSync("scene"),
+            channel: wx.getStorageSync("channel"),
             assistance: wx.getStorageSync("assistance")
           });
           console.log(
@@ -62,13 +66,25 @@ export default {
             wx.setStorageSync("is_update", tokenResult.data.user.is_update);
             console.log("has no token==" + JSON.stringify(this.options));
 
-            wx.reLaunch({
-              url:
-                "/" + this.page + "?ifBack=0&" + util.parseParams(this.options),
-              success: function() {
-                wx.removeStorageSync("ifDirectToLogin");
-              }
-            });
+            if (this.page.indexOf("/login/") > 0) {
+              wx.reLaunch({
+                url: "/pages/index/main",
+                success: function() {
+                  wx.removeStorageSync("ifDirectToLogin");
+                }
+              });
+            } else {
+              wx.reLaunch({
+                url:
+                  "/" +
+                  this.page +
+                  "?ifBack=0&" +
+                  util.parseParams(this.options),
+                success: function() {
+                  wx.removeStorageSync("ifDirectToLogin");
+                }
+              });
+            }
           }
         }
       } else {
@@ -121,20 +137,18 @@ export default {
   position: fixed;
   top: 0;
   left: 0;
-  align-items: center;
+  align-items: top;
   justify-content: center;
+
+  img {
+    display: block;
+    width: 100%;
+  }
 }
 .btn {
   width: 100%;
   text-align: center;
   font-size: 14px;
   color: #999;
-
-  img {
-    display: block;
-    margin: 0 auto;
-    width: 130px;
-    height: 130px;
-  }
 }
 </style>

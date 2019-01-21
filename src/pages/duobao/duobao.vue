@@ -112,7 +112,7 @@ export default {
 
   computed: {
     bg() {
-      return this.globalData.img_url + "duobao_bg.png?v=1";
+      return this.globalData.img_url + "duobao_bg.png?v=2";
     }
   },
 

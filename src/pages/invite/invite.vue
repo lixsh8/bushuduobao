@@ -98,7 +98,7 @@
                       <div class="nickName">{{item.nickName}}</div>
                       <div
                         class="tips"
-                        v-if="item.hb_amount>0"
+                        v-if="item.StepNumber>0"
                         >好友今日已兑换{{item.StepNumber}}步</div>
                       <div
                         class="tips"

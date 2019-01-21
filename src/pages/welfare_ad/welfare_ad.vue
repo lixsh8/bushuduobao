@@ -113,6 +113,9 @@ export default {
       let { id, appid, link, gotstatus } = e.currentTarget.dataset;
       console.log(e.currentTarget.dataset);
 
+      // 点击统计
+      util.clickLog("click", id);
+
       this.currentId = id;
       if (appid) {
         if (_this.viewTimer) clearInterval(_this.viewTimer);
@@ -125,6 +128,8 @@ export default {
           envVersion: api.mienvVersion,
           success(res) {
             console.log("跳转成功" + gotstatus);
+            // 跳转成功统计
+            util.clickLog("jump", id);
             if (gotstatus) return;
             _this.viewTimer = setInterval(() => {
               console.log("1111");

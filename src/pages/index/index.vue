@@ -55,9 +55,7 @@
             <div class="prize-common-name">{{item.title}}</div>
           </block>
           <block v-else>
-            <div
-              class="prize-common-num"
-            >
+            <div class="prize-common-num">
               <div class="unit"></div>
             </div>
             <div class="prize-common-name">{{item.title}}</div>
@@ -145,6 +143,7 @@
         <div
           @click="jump"
           data-banner_click="index_banner_top"
+          :data-id="banner.id"
           :data-url='banner.link'
           class="activity-challenge"
           v-if="banner"
@@ -518,7 +517,7 @@ export default {
     // 通过id来更新数据
     updateData(newData) {
       var _this = this;
-      console.log(2222);
+      console.log("通过id来更新数据");
       // 新手
       if (
         !newData ||
@@ -530,7 +529,7 @@ export default {
         return;
       }
       for (var i = 0, len = newData.length; i < len; i++) {
-        console.log(newData[i]);
+        // console.log(newData[i]);
 
         for (
           var j = 0, len2 = this.newUserZoneInfo.list.length;
@@ -548,7 +547,6 @@ export default {
       if (!newData || !this.duobaoList || this.duobaoList.length <= 0) {
         return;
       }
-      console.log(1111);
       for (var iNew = 0, lenNew = newData.length; iNew < lenNew; iNew++) {
         for (
           var jNew = 0, len2New = _this.duobaoList.length;
@@ -585,7 +583,11 @@ export default {
 
       _this.showDialog = false;
       _this.ifShowSign = false;
-      _this.hasClickShareBtn = true;
+      if (_this.openType == "share") {
+        _this.hasClickShareBtn = true;
+      } else {
+        _this.hasClickShareBtn = false;
+      }
     },
     // 点击气泡获取金币
     handlePrize(e) {
@@ -958,9 +960,9 @@ export default {
   },
   // 滚动加载
   async onReachBottom() {
-    console.log(
-      "srcoll onReachBottom========showAuthModal:" + this.authModalShow
-    );
+    // console.log(
+    //   "srcoll onReachBottom========showAuthModal:" + this.authModalShow
+    // );
     this.showBlank = false;
 
     if (this.hasMore) {
@@ -980,7 +982,7 @@ export default {
         "GET",
         this
       );
-      console.log(Duobao.data);
+      // console.log(Duobao.data);
       if (Duobao.data && Duobao.code === 0 && Duobao.data.list) {
         // this.totalData = res.data;
         var data = Duobao.data;
@@ -1010,7 +1012,7 @@ export default {
   },
 
   onUnload() {
-    console.log("unload......");
+    // console.log("unload......");
 
     this.hasClickShareBtn = false;
     this.showDialog = false;
@@ -1030,7 +1032,11 @@ export default {
   },
 
   async onShow(options) {
-    console.log("index");
+    console.log(
+      "index=======================是否点击了分享按钮,_this.openType===" +
+        this.openType,
+      +", _this.hasClickShareBtn==" + this.hasClickShareBtn
+    );
     var _this = this;
     _this.page = 1;
     _this.hasMore = true;
@@ -1048,20 +1054,21 @@ export default {
         this
       );
 
-      console.log("翻倍：" + JSON.stringify(resDoubleReward.data));
+      console.log("翻倍成功");
+      // 重置分享翻倍弹窗
+      _this.openType = "";
+      _this.hasClickShareBtn = false;
+
       if (resDoubleReward.data && resDoubleReward.code === 0) {
         // this.totalData = res.data;
         // 翻倍按钮点击成功后
         _this.hb_amount = resDoubleReward.data.hb_amount;
         _this.dialogType = "pack";
-        _this.dialogContent = resDoubleReward.data.amount + "元红包x2";
+        _this.dialogContent = resDoubleReward.data.amount + "元红包  x2";
         _this.confirmText = "收下";
         _this.showDialog = true;
         _this.openType = "";
       }
-
-      _this.openType = "";
-      _this.hasClickShareBtn = false;
     }
 
     // 计算文档高度
@@ -1089,7 +1096,7 @@ export default {
 
     // 登录
     const checkSession = await util.checkSession();
-    console.log("checkSession");
+    // console.log("checkSession");
     if (!checkSession || !wx.getStorageSync("token")) {
       let loginResult = await util.login();
       if (loginResult && loginResult.code) {
@@ -1097,10 +1104,11 @@ export default {
         let tokenResult = await request.get(api.Login, {
           code: loginResult.code,
           scene: wx.getStorageSync("scene"),
+          channel: wx.getStorageSync("channel"),
           register_code: wx.getStorageSync("register_code"),
           assistance: wx.getStorageSync("assistance")
         });
-        console.log("app全局登录");
+        // console.log("app全局登录");
 
         if (tokenResult && tokenResult.data && tokenResult.data.token) {
           wx.setStorageSync("token", tokenResult.data.token);
@@ -1144,8 +1152,8 @@ export default {
     util.socket(function(res) {
       if (res && res.data) {
         var data = JSON.parse(res.data);
-        console.log(data.updateoddtimes);
-        console.log(data.newwin);
+        // console.log(data.updateoddtimes);
+        // console.log(data.newwin);
 
         if (data.updateoddtimes && data.updateoddtimes.length > 0) {
           _this.updateData(data.updateoddtimes);
@@ -1972,14 +1980,6 @@ ad {
   color: #2e3135;
 }
 
-.guide {
-  position: fixed;
-  top: 30rpx;
-  left: 400rpx;
-  z-index: 10000;
-  font-size: 80rpx;
-}
-
 .block-line {
   width: 100%;
   height: 70rpx;
@@ -2593,7 +2593,8 @@ ad {
   z-index: 1001;
   width: 100%;
   height: 100%;
-  background: url(#{$img_url}guide_index.png) no-repeat center;
+  background: rgba(0, 0, 0, 0.5) url(#{$img_url}guide_index.png) no-repeat
+    center;
   background-size: 100%;
 }
 </style>

@@ -22,8 +22,10 @@ export default {
     console.log("apponShow" + JSON.stringify(opts));
     var register_code = opts.query.register_code;
     var assistance = opts.query.assistance;
+    var channel = opts.query.channel;
     var scene = opts.scene;
     wx.setStorageSync("scene", scene);
+    wx.setStorageSync("channel", channel);
 
     console.log("上一个人的register_code=" + register_code);
 

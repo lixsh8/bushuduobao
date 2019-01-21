@@ -33,6 +33,7 @@ const api = {
     }),
   // 看广告得红包 
   ZHBAdReward: ApiRootUrl + "?act=index&op=getAdReward",
+  AdReport: ApiRootUrl + "?act=index&op=adReport",
   // 获取首页要登录才显示的数据
   getPacks: r =>
     request.get("?act=index&op=getIndexInfo", r, {
