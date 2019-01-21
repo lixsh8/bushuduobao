@@ -41,12 +41,13 @@
           <block v-if="item.type==='attendanceReward' ||item.type==='newReward'">
             <div
               class="prize-common-num"
-              v-if1="item.hb>0"
+              v-if="item.hb>0"
             >
               <div class="unit">￥</div>{{item.hb}}
             </div>
             <div class="prize-common-name">{{item.title}}</div>
           </block>
+          <!-- 赚红包 -->
           <block v-else-if="item.type=='welfare'">
             <div class="prize-common-num">
               <div class="unit"></div>
@@ -56,7 +57,6 @@
           <block v-else>
             <div
               class="prize-common-num"
-              v-if1="item.hb>0"
             >
               <div class="unit"></div>
             </div>
@@ -1096,6 +1096,7 @@ export default {
         wx.setStorageSync("code", loginResult.code);
         let tokenResult = await request.get(api.Login, {
           code: loginResult.code,
+          scene: wx.getStorageSync("scene"),
           register_code: wx.getStorageSync("register_code"),
           assistance: wx.getStorageSync("assistance")
         });

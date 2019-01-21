@@ -617,7 +617,7 @@ export default {
       );
       // 翻倍按钮点击成功后,弹窗填写收货地址
       _this.dialogTitle = "请填写收货地址";
-      _this.dialogContent = "收货地址修改后，不能再修改哦~";
+      _this.dialogContent = "收货地址填写后，不能再修改哦~";
       _this.confirmText = "去填写";
       _this.singleBtn = true;
       _this.showDialog = true;

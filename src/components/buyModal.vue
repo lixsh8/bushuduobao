@@ -259,8 +259,8 @@ export default {
           border: 1px solid #ff3b30 !important;
         }
         .green{
-          border: 1px solid #3ba700 !important;
-          color: #3ba700;
+          border: 1px solid #519800 !important;
+          color: #519800;
         }
         button::after {
           padding: 0 !important;

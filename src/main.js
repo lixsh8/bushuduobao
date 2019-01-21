@@ -1,14 +1,21 @@
-import Vue from 'vue'
-import App from './App'
+// 阿拉丁统计
+import '../static/sdk/ald-stat'
+import Vue from "vue";
+import App from "./App";
 
-Vue.config.productionTip = false
-App.mpType = 'app'
+
+// import { MpvueApp } from "../static/sdk/ald-stat";
+
+Vue.config.productionTip = false;
+App.mpType = "app";
 
 const app = new Vue(App)
-app.$mount()
+// const app = new Vue(MpvueApp(App));
+app.$mount();
 
 Vue.prototype.globalData = getApp().globalData;
-Vue.prototype.globalData.img_url = 'https://resourcecdn.xiaotaotao123.cn/wxapp_img/';
+Vue.prototype.globalData.img_url =
+  "https://resourcecdn.xiaotaotao123.cn/wxapp_img/";
 Vue.prototype.globalData.indexScrollTop = 0;
 
 wx.getSystemInfo({

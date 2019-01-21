@@ -348,6 +348,7 @@ export default {
       is_id: "",
       // 下一期id
       nextId: "",
+      next_is_number: "",
       is_soldout: 0,
       // 商品id
       dgoods_id: "",
