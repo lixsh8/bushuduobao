@@ -269,11 +269,13 @@
     <ls-dialog
       @closeDialog="closeDialog"
       @okBtnHandler="okBtnHandler"
+      :dialogType="dialogType"
       :showDialog="showDialog"
       :dialogTitle="dialogTitle"
       :dialogContent="dialogContent"
       :openType="openType"
       :singleBtn="singleBtn"
+      :cancelText="cancelText"
       :confirmText="confirmText"
     />
 
@@ -303,16 +305,19 @@ export default {
       // 弹窗
       showDialog: false,
       hasClickShareBtn: false,
+      dialogType: "default",
       dialogTitle: "",
       dialogContent: "",
       openType: "",
       singleBtn: false,
+      cancelText: "取消",
       confirmText: "",
 
       orderId: "",
       from: "",
       receivingInfo: null,
       receivingState: "",
+      addressObj: null,
       data: null
     };
   },
@@ -346,11 +351,20 @@ export default {
           }
         });
       } else {
-        wx.redirectTo({
-          url:
-            "/pages/order/main?ifBack=0&type=" +
-              wx.getStorageSync("currentType") || ""
+        wx.setStorageSync("fromPage", "order_detail");
+        wx.navigateBack({
+          delta: 1,
+          fail: function() {
+            console.log("backFailed");
+
+            wx.switchTab({ url: "/pages/mine/main" });
+          }
         });
+        // wx.redirectTo({
+        //   url:
+        //     "/pages/order/main?ifBack=0&type=" +
+        //       wx.getStorageSync("currentType") || ""
+        // });
       }
     },
     // 跳转到商品详情
@@ -421,18 +435,32 @@ export default {
       }
     },
     // 确定按钮关闭弹窗事件
-    okBtnHandler() {
+    okBtnHandler(ev) {
       // this.showDialog = false;
-      wx.setStorageSync("mineHideDialog", "1");
+      console.log("弹窗确定按钮类型==========" + ev);
 
-      this.gotoAddress();
-      console.log(this.showDialog);
+      // 是地址弹窗
+      if (ev == "address") {
+        this.savaAddress(this.addressObj);
+        console.log("地址");
+      } else if (ev == "opensetting") {
+        console.log("地址授权弹窗");
+        // 地址授权弹窗
+        wx.setStorageSync("mineHideDialog", "1");
+
+      } else {
+        this.gotoAddress();
+      }
     },
     // 关闭弹窗
     closeDialog(ev) {
       console.log("closeDialog");
 
       this.showDialog = false;
+      // 地址弹窗，关闭就是去修改地址
+      if (ev == "address") {
+        this.gotoAddress();
+      }
 
       this.getData(this.orderId);
     },
@@ -440,54 +468,78 @@ export default {
       // 是否点击了分享
       this.hasClickShareBtn = true;
     },
+    // 保存地址
+    savaAddress(res) {
+      var _this = this;
+
+      util
+        .request(
+          api.AddressSave,
+          {
+            order_id: _this.orderId,
+            address: JSON.stringify(res)
+          },
+          "POST",
+          this
+        )
+        .then(res => {
+          console.log(res);
+          if (res.code == 0) {
+            // 保存地址成功
+            _this.getData(_this.orderId);
+            _this.showDialog = false;
+          } else {
+            // 保存地址失败
+            wx.showModal({
+              title: "提示",
+              content: "保存地址失败",
+              showCancel: true,
+              cancelText: "取消",
+              cancelColor: "#000000",
+              confirmText: "确定",
+              confirmColor: "#3CC51F",
+              success: res => {}
+            });
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     // 去微信选择地址
     goChooseAddress() {
       var _this = this;
       wx.chooseAddress({
         success: function(res) {
-          var data = res;
-          console.log(JSON.stringify(res));
-          util
-            .request(
-              api.AddressSave,
-              {
-                order_id: _this.orderId,
-                address: JSON.stringify(res)
-              },
-              "POST",
-              this
-            )
-            .then(res => {
-              console.log(res);
-              if (res.code === 0) {
-                console.log(data);
-                // _this.getData(_this.orderId);
-
-                // _this.receivingState = 1;
-                // _this.receivingInfo = {};
-                // _this.receivingInfo.deliveryName = data.telNumber;
-                // _this.receivingInfo.deliveryPhone = data.userName;
-                // _this.receivingInfo.deliveryAddress =
-                //   data.provinceName +
-                //   data.cityName +
-                //   data.countyName +
-                //   data.detailInfo;
-              } else {
-                wx.showModal({
-                  title: "提示",
-                  content: "保存地址失败",
-                  showCancel: true,
-                  cancelText: "取消",
-                  cancelColor: "#000000",
-                  confirmText: "确定",
-                  confirmColor: "#3CC51F",
-                  success: res => {}
-                });
-              }
-            })
-            .catch(err => {
-              console.log(err);
-            });
+          
+          
+          _this.addressObj = res;
+          console.log("选择的地址为======" + JSON.stringify(res));
+          // _this.savaAddress();
+          // 选择完地址返回  弹窗
+          // 弹窗确认收货地址
+          var content =
+            "<div style='text-align:left;padding:2px 10px;'>收货人：" +
+            res.userName +
+            "</div>" +
+            "<div style='text-align:left;padding:2px 10px;'>手机号码：" +
+            res.telNumber +
+            "</div>" +
+            "<div style='text-align:left;padding:2px 10px;'>收货地址：" +
+            res.provinceName +
+            res.cityName +
+            res.countyName +
+            res.detailInfo +
+            "</div>";
+          _this.dialogTitle = "请确认收货地址";
+          _this.singleBtn = false;
+          _this.showDialog = true;
+          _this.dialogType = "address";
+          _this.openType = "";
+          _this.dialogContent = content;
+          _this.cancelText = "修改地址";
+          _this.confirmText = "确认无误，请发货";
+          console.log('选择地址成功' + _this.showDialog);
         },
         complete: function() {
           _this.getData(_this.orderId);
@@ -600,7 +652,7 @@ export default {
   async onShow() {
     var _this = this;
     // 跳转到其他地方授权回来关闭弹窗
-    if (wx.getStorageSync("mineHideDialog") == "1") {
+    if (wx.getStorageSync("mineHideDialog") == "1" && _this.dialogType != "address") {
       this.showDialog = false;
     }
 
@@ -621,7 +673,6 @@ export default {
       _this.confirmText = "去填写";
       _this.singleBtn = true;
       _this.showDialog = true;
-      _this.openType = "";
 
       _this.openType = "";
       _this.hasClickShareBtn = false;
@@ -731,7 +782,7 @@ page {
     font-size: 14px;
     color: #333;
     line-height: 1;
-    padding: 15px 0;
+    padding: 5px 0;
 
     .info {
       display: flex;
@@ -747,15 +798,23 @@ page {
       }
     }
 
+    .has-address{
+      padding: 10px 0;
+    }
+
     .no-address {
+      padding: 10px 0;
       font-size: 15px;
       text-align: center;
       background: url(#{$img_url}/icon_arr_gray.png) no-repeat right center;
       background-size: 15px;
 
-      &.share{
+      &.share {
         color: #ff5540;
       }
+    }
+    button{
+      padding: 0;
     }
   }
 

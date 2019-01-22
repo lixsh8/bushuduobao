@@ -62,16 +62,34 @@
           </div>
 
           <!-- 操作列表 -->
-          <div class="mine-operationList" v-if="data&&data.menuList&&data.menuList.length>0">
+          <div
+            class="mine-operationList"
+            v-if="data&&data.menuList&&data.menuList.length>0"
+          >
             <block
               v-for="(item,index) in data.menuList"
               :key="index"
             >
+              <!-- 客服 -->
               <button
                 class="operationItem"
                 :openType="item.open_type"
-                v-if="item.open_type && item.open_type!='address'"
-              >
+                :session-from="sessionFrom"
+                v-if="item.open_type && item.open_type=='contact'"
+               >
+                <image
+                  class="operationIcon"
+                  mode="aspectFit"
+                  :src="item.img"
+                />
+                <div class="operationTxt">{{item.title}}</div>
+              </button>
+              <!-- 其他原生按钮 -->
+              <button
+                class="operationItem"
+                :openType="item.open_type"
+                v-else-if="item.open_type && item.open_type!='address'"
+               >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -278,6 +296,14 @@ export default {
     lsDialog
   },
 
+  computed: {
+    sessionFrom() {
+      return (
+        "nickName=" + this.data.nickName + "|avatarUrl=" + this.data.avatarUrl
+      );
+    }
+  },
+
   methods: {
     // 确定按钮关闭弹窗事件
     okBtnHandler() {
@@ -305,12 +331,12 @@ export default {
     jump(e) {
       // 统计
       var btnClick = e.currentTarget.dataset.banner_click;
-      
+
       if (btnClick) {
         // 购买统计
         mta.Event.stat(btnClick, {});
       }
-      
+
       util.jump(e, this);
     },
     // 获取数据
@@ -323,7 +349,6 @@ export default {
         this.banners = res.data.banners || [];
         this.advertList = res.data.advertList || [];
         console.log(this.advertList.length);
-        
       } else {
       }
     }
@@ -342,7 +367,6 @@ export default {
 
     // 删除存储的商品详情的来源
     wx.removeStorageSync("goodsDetailFrom");
-
   },
   onShow() {
     // 设置顶级以便返回的时候使用tab页面
@@ -512,8 +536,7 @@ page {
 .mine-orderList-title-tip2 {
   font-size: 24rpx;
   color: #9b9b9b;
-  background: url(#{$img_url}icon_arr_r_black.png)
-    no-repeat right center;
+  background: url(#{$img_url}icon_arr_r_black.png) no-repeat right center;
   background-size: 28rpx 28rpx;
   padding-right: 30rpx;
 }
@@ -626,8 +649,7 @@ page {
 .mine-list-item {
   width: 100%;
   height: 120rpx;
-  background: url(#{$img_url}icon_arr_r_black.png)
-    no-repeat 605rpx center;
+  background: url(#{$img_url}icon_arr_r_black.png) no-repeat 605rpx center;
   background-size: 28rpx 28rpx;
   font-size: 32rpx;
   line-height: 120rpx;

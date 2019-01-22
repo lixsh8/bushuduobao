@@ -255,11 +255,11 @@
 
     <div
       v-if="dgoods_state==0"
-      class="fixed-btn"
+      class="fixed-btn disabled"
     >已下架</div>
     <div
       v-else-if="is_soldout==1"
-      class="fixed-btn"
+      class="fixed-btn disabled"
     >已抢光</div>
     <div
       class="fixed-btn"
@@ -1226,6 +1226,10 @@ page {
     padding-top: 4px;
     font-size: 10px;
     line-height: 1;
+  }
+  &.disabled{
+    background: #ccc;
+    color: #333;
   }
 }
 </style>

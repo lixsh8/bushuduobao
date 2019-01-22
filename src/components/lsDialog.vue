@@ -9,7 +9,7 @@
     <div
       class="dialog-cnt pack"
       v-if="dialogType=='pack'"
-     >
+      >
       <div
         class="cls-btn"
         @click="close"
@@ -53,7 +53,7 @@
     <div
       class="dialog-cnt tili"
       v-else-if="dialogType=='tili'"
-     >
+      >
       <div
         class="cls-btn"
         @click="close"
@@ -93,12 +93,56 @@
 
     </div>
 
+    <!-- 地址弹窗 -->
+    <div
+      v-else-if="dialogType=='address'"
+      class="dialog-cnt address"
+      @click.stop="stopPropagation"
+      >
+      <div
+        class="cls-btn"
+        @click="close"
+      ></div>
+      <div class="dialog-hd">{{dialogTitle}}</div>
+      <div class="dialog-bd">
+        <rich-text :nodes="dialogContent" />
+        <div class="note">（收货地址确认后，不可再修改。）</div>
+      </div>
+      <div class="dialog-ft">
+        <div
+          class="btn-wrapper"
+          v-if="singleBtn"
+        >
+          <button
+            class="btn btn-ok btn-sg"
+            @click="okBtnHandler"
+            :open-type="openType"
+          >{{confirmText}}</button>
+        </div>
+
+        <block v-else>
+          <div
+            class="btn btn-cancel"
+            @click="close('address')"
+            data-isaddress="1"
+          >{{cancelText}}</div>
+          <button
+            class="btn btn-ok"
+            @click="okBtnHandler('address')"
+            data-isaddress="1"
+            :open-type="openType"
+          >{{confirmText}}</button>
+        </block>
+
+      </div>
+    </div>
+
     <!-- 默认弹窗 -->
     <div
       v-else
       class="dialog-cnt"
       @click.stop="stopPropagation"
-    >
+     >
       <div
         class="cls-btn"
         @click="close"
@@ -126,7 +170,7 @@
           >{{cancelText}}</div>
           <button
             class="btn btn-ok"
-            @click="okBtnHandler"
+            @click="okBtnHandler('opensetting')"
             @opensetting='handleSetting'
             :open-type="openType"
           >{{confirmText}}</button>
@@ -134,6 +178,7 @@
 
       </div>
     </div>
+    
 
     <!-- <div class="dialog-cnt tili">
 
@@ -161,7 +206,11 @@ export default {
     },
     dialogContent: {
       type: String,
-      default: "内容"
+      default: ""
+    },
+    address: {
+      type: Object,
+      default: {}
     },
     singleBtn: {
       type: Boolean,
@@ -181,12 +230,14 @@ export default {
     }
   },
   methods: {
-    close() {
+    close(ev) {
       console.log("closeDialog组件里");
-      this.$emit("closeDialog");
+      this.$emit("closeDialog", ev);
     },
-    okBtnHandler() {
-      this.$emit("okBtnHandler");
+    okBtnHandler(ev) {
+      console.log("closeDialog组件里,ev=" + ev);
+      
+      this.$emit("okBtnHandler", ev);
     },
     handleSetting(e) {},
     stopPropagation() {}
@@ -236,6 +287,7 @@ export default {
       text-align: center;
       line-height: 1;
       font-size: 14px;
+      font-weight: bold;
       overflow: hidden;
     }
     .dialog-bd {
@@ -378,6 +430,15 @@ export default {
         color: #fff;
         border-radius: 0 0 6px 6px;
       }
+    }
+  }
+
+  /* 地址红包 */
+  .dialog-cnt.address{
+
+    .note{
+      padding-top: 10px;
+      color: #ff3b30 !important;
     }
   }
 

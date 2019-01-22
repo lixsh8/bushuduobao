@@ -190,7 +190,7 @@ export default {
     },
     tabTop() {
       if (this.notice) {
-        return this.globalData.statusBarHeight + this.headerHeight + 34;
+        return this.globalData.statusBarHeight + this.headerHeight + 32;
       } else {
         return this.globalData.statusBarHeight + this.headerHeight;
       }
@@ -365,6 +365,7 @@ export default {
     console.log("刷新");
     this.page = 1;
     this.showNoMore = false;
+    this.hasMore = true;
     this.getList(this.currentType, 1);
 
     wx.stopPullDownRefresh();
@@ -426,30 +427,29 @@ export default {
       duration: 0
     });
 
-    var ifBack = this.$root.$mp.query.ifBack;
-    console.log("ifback=", ifBack);
-    if (ifBack == 0) {
-      // this.ifBack = false;
-      // this.ifCustomBack = true;
-    } else {
-      // this.ifBack = true;
-      // this.ifCustomBack = false;
-    }
-    console.log("id, this.ifback", this.ifBack);
-
     var type = this.$root.$mp.query.type || 0;
     this.currentType = type;
-    console.log("order页面的onload  type==" + type);
+    // console.log("order页面的onload  type==" + type);
     this.getList(type, 1);
-    wx.removeStorageSync("currentType");
   },
   onShow(e) {
     this.page = 1;
+    this.showNoMore = false;
+    this.hasMore = true;
 
-    // 跳转到其他地方授权回来关闭弹窗
-    if (wx.getStorageSync("mineHideDialog") == "1") {
-      this.showDialog = false;
+    if (wx.getStorageSync("fromPage") == "order_detail") {
+
+      // 往上滚动
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 0
+      });
+
+      this.getList(wx.getStorageSync("currentType") || 0, 1);
+      wx.removeStorageSync("fromPage");
+      wx.removeStorageSync("currentType");
     }
+
     // var type = e.type || 0;
     // this.currentType = type;
   }

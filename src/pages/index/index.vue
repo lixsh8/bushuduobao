@@ -91,14 +91,25 @@
           class="centerData"
         >
           <div class="centerData-nickName">未兑换步数</div>
-          <div class="centerData-totalStep">{{totalStep}}<text class="step-class">步</text>
+          <div
+            class="centerData-totalStep"
+            @click="clickNumberExchange"
+          >{{totalStep}}<text class="step-class">步</text>
           </div>
           <div class="centerData-stepTips">每日24点步数清零</div>
+          <!-- 步数兑换已达上线 -->
           <div
-            @tap="getWeRunData"
+            @click="exchangeFull"
             class="centerData-stepBottom"
-            v-if="totalStep<=0"
+            v-if="isFull==1"
+          >已达兑换上限</div>
+          <!-- 没有步数 -->
+          <div
+            @click="getWeRunData"
+            class="centerData-stepBottom"
+            v-else-if="totalStep<=0"
           >{{loadingWeRunData?'正在获取...':'获取最新微信步数'}}</div>
+          <!-- 有步数 -->
           <div
             @click="exchangeStep"
             class="centerData-stepBottom breathe-btn"
@@ -448,6 +459,8 @@ export default {
       share: {},
       // 金币列表
       bubble: null,
+      // 是否兑换满
+      isFull: 0,
       // 步数
       totalStep: 0,
       loadingWeRunData: !1,
@@ -760,6 +773,23 @@ export default {
           }
         });
     },
+    // 兑换满了
+    exchangeFull() {
+      wx.showModal({
+        title: "提示",
+        content: "每日最多可兑换30000步为红包，今日兑换已达上限"
+      });
+    },
+    // 点击步数数字事件
+    clickNumberExchange() {
+      if (this.isFull == 1) {
+        this.exchangeFull();
+      } else if (this.totalStep > 0) {
+        this.exchangeStep();
+      } else {
+        this.getWeRunData();
+      }
+    },
     // 微信原生获取微信步数方法
     wxRunDataHandler() {
       var _this = this;
@@ -776,7 +806,8 @@ export default {
             })
             .then(res => {
               console.log(res);
-              _this.totalStep = res.data;
+              _this.totalStep = res.data.totalStep;
+              _this.isFull = res.data.isFull;
               _this.loadingWeRunData = !1;
             })
             .catch(res => {
