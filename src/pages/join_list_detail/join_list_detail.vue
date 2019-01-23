@@ -89,6 +89,7 @@ export default {
       data: null,
       showNoMore: !1,
       page: 1,
+      start_index: 0,
       hasMore: true,
       list: null
     };
@@ -117,6 +118,7 @@ export default {
         {
           is_id: this.is_id,
           order_id: this.order_id,
+          start_index: this.start_index,
           member_id: this.member_id
         },
         "GET",
@@ -127,6 +129,7 @@ export default {
         console.log(res.data);
 
         this.data = res.data;
+        this.start_index = res.data.start_index;
         this.list = res.data.list;
       } else {
       }
@@ -154,6 +157,7 @@ export default {
         {
           page: page,
           is_id: this.is_id,
+          start_index: this.start_index,
           order_id: this.order_id,
           member_id: this.member_id
         },
@@ -167,6 +171,7 @@ export default {
         if (res.data.list.length > 0) {
           this.list = list.concat(data.list);
           this.page = data.page;
+          this.start_index = data.start_index;
         }
         this.hasMore = data.hasMore;
         if (data.hasMore) {
@@ -184,6 +189,7 @@ export default {
   async onLoad(e) {
 
     this.page = 1;
+    this.start_index = 0;
     this.showNoMore = false;
     this.hasMore = true;
     // mta统计

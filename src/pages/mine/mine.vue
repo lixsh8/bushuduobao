@@ -76,7 +76,7 @@
                 :openType="item.open_type"
                 :session-from="sessionFrom"
                 v-if="item.open_type && item.open_type=='contact'"
-               >
+              >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -89,7 +89,7 @@
                 class="operationItem"
                 :openType="item.open_type"
                 v-else-if="item.open_type && item.open_type!='address'"
-               >
+              >
                 <image
                   class="operationIcon"
                   mode="aspectFit"
@@ -298,9 +298,16 @@ export default {
 
   computed: {
     sessionFrom() {
-      return (
-        "nickName=" + this.data.nickName + "|avatarUrl=" + this.data.avatarUrl
-      );
+      if (this.data) {
+        return (
+          "nickName=" +
+          (this.data.nickName || "") +
+          "|avatarUrl=" +
+          (this.data.avatarUrl || "")
+        );
+      } else {
+        return "";
+      }
     }
   },
 

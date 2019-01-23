@@ -676,7 +676,11 @@ export default {
     // 关闭dialog
     closeDialog() {
       console.log("closeDialog--click");
-      this.showDialog = !1;
+      this.showDialog = false;
+    },
+    // 弹窗确定按钮
+    okBtnHandler() {
+      this.showDialog = false;
     },
     // 跳转到收益规则
     goIncome() {

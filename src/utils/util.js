@@ -467,9 +467,7 @@ function jump(e, _this) {
  */
 function connectSocket() {
   wx.connectSocket({
-    // url: "ws://ws.chaojitao.cn",
-    // url: "ws://devws.xiaotaotao123.cn",
-    url: "ws://134.175.43.184:9501",
+    url: api.SocketRootUrl,
     header: {
       Authorization: "cjt " + wx.getStorageSync("token")
       // "X-TOKEN": "854f671efa14b949e75a91616d878e20",

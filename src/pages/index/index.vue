@@ -360,7 +360,7 @@
     </div>
     <!-- 底部没有更多 -->
     <paging-footer
-      :showNoMore="showNoMore"
+      :showNoMore="showNoMore&&duobao.list&&duobao.list.length>0"
       noMoreTips="没有更多数据了"
     />
     <!-- 空白为了滚动 -->

@@ -1,18 +1,23 @@
 import request from "./request";
-var ApiRootUrl, mienvVersion;
+var ApiRootUrl, mienvVersion, SocketRootUrl;
 if (process.env.NODE_ENV === 'development') {
   // dev
   ApiRootUrl = "https://devapi.xiaotaotao123.cn/";
+  SocketRootUrl = "wss://devapi.xiaotaotao123.cn/ws";
+
   // 小程序环境。开发和正式
   mienvVersion = "release";
 } else {
+  // 正式环境
   ApiRootUrl = "https://api.xiaotaotao123.cn/";
+  SocketRootUrl = "wss://api.xiaotaotao123.cn/ws";
   mienvVersion = "release"
   // build
 }
 
 
 const api = {
+  SocketRootUrl: SocketRootUrl,
   mienvVersion: mienvVersion,
   // 首页
   Index: ApiRootUrl + "?act=index&op=index",

@@ -774,6 +774,7 @@ page {
   color: #ff6742;
   text-align: center;
   padding-top: 10px;
+  min-height: 70px;
 }
 
 .topBg .gotReward text {

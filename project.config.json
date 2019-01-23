@@ -1,17 +1,19 @@
 {
 	"description": "立减购",
 	"setting": {
-		"urlCheck": false,
+		"urlCheck": true,
 		"es6": true,
 		"postcss": true,
 		"minified": true,
 		"newFeature": true,
-		"autoAudits": false
+		"autoAudits": false,
+		"uglifyFileName": true
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
 	"appid": "wxde7177077fe19036",
 	"projectname": "%E6%AD%A5%E6%95%B0%E5%AE%9D",
+	"libVersion": "2.5.1",
 	"condition": {
 		"search": {
 			"current": -1,

@@ -411,18 +411,17 @@ export default {
   position: relative;
 
   .title {
-    padding-top: 130px;
+    padding-top: 100px;
     text-align: center;
-    font-size: 15px;
+    font-size: 18px;
     line-height: 1;
-    color: #ff3a39;
-    font-weight: bold;
+    color: #9B9B9B;
   }
 
   .num {
-    padding-top: 6px;
+    padding-top: 15px;
     text-align: center;
-    font-size: 15px;
+    font-size: 35px;
     line-height: 1;
     color: #ff3a39;
     font-weight: bold;
