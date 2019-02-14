@@ -150,14 +150,14 @@
     <div class="tab">
       <div class="tab-nav">
         <div
-          v-if="article"
+          v-if="article || duobaoData&&duobaoData.goodsInfo&&duobaoData.goodsInfo.dgoods_description"
           class="nav-item"
           :class="{active: currentTab == 0}"
           @click="changeTab(0)"
         >商品详情</div>
         <div
           class="nav-item"
-          :class="{active: currentTab == 1 || !article}"
+          :class="{active: currentTab == 1 || (!article&&duobaoData&&duobaoData.goodsInfo&&!duobaoData.goodsInfo.dgoods_description)}"
           @click="changeTab(1)"
         >往期揭晓</div>
       </div>
@@ -225,7 +225,7 @@
           </div>
 
           <!-- 无数据 -->
-          <no-data :showNoData="!historyList||historyList.length<=0" />
+          <no-data :showNoData="(!historyList||historyList.length<=0) && currentTab == 1" />
         </div>
       </div>
     </div>
@@ -429,7 +429,7 @@ export default {
         this.dgoods_state = res.data.dgoods_state;
         this.is_id = info.is_id;
         this.dgoods_id = info.dgoods_id;
-        if (!info.dgoods_body) {
+        if (!info.dgoods_body && !info.dgoods_description) {
           this.currentTab = 1;
         } else {
           this.article = info.dgoods_body.replace(

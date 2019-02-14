@@ -135,6 +135,7 @@
             >
               <swiper-item
                 @click="jump"
+                :data-id="banner.id"
                 data-banner_click="mine_banner_top"
                 class="banner-wrap _3142106"
                 v-for="(banner,index) in banners"
@@ -158,6 +159,7 @@
             <div class="recommends">
               <div
                 @click="jump"
+                :data-id="recommend.id"
                 :data-appid="recommend.appid"
                 :data-url="recommend.url"
                 class="recommend"

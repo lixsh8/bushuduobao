@@ -406,7 +406,7 @@ export default {
   width: 340px;
   height: 322px;
   margin: -24px auto 10px auto;
-  background: url(#{$img_url}result_bg.png) no-repeat center;
+  background: url(#{$img_url}result_bg.png?v=1) no-repeat center;
   background-size: 100%;
   position: relative;
 
