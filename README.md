@@ -1,4 +1,4 @@
-# demo1
+# 一个基于mpvue框架的步数夺宝项目
 
 > A Mpvue project
 
